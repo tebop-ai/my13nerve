@@ -4,9 +4,36 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { Lock, LogIn, User, UserPlus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
-const Index = () => {
+interface IndexProps {
+  onAdminLogin: (username: string, superCode: string) => boolean;
+}
+
+const Index = ({ onAdminLogin }: IndexProps) => {
   const [isLogin, setIsLogin] = useState(true);
+  const [adminUsername, setAdminUsername] = useState("");
+  const [adminSuperCode, setAdminSuperCode] = useState("");
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleAdminSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onAdminLogin(adminUsername, adminSuperCode)) {
+      toast({
+        title: "Login successful",
+        description: "Welcome back, Super Admin!",
+      });
+      navigate("/dashboard");
+    } else {
+      toast({
+        title: "Login failed",
+        description: "Invalid credentials. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -108,33 +135,39 @@ const Index = () => {
                   <p className="text-gray-500">Sign in with your admin credentials</p>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Username</label>
-                  <div className="relative">
-                    <Input
-                      type="text"
-                      placeholder="Enter your username"
-                      className="pl-10"
-                    />
-                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <form onSubmit={handleAdminSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Username</label>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        placeholder="Enter your username"
+                        className="pl-10"
+                        value={adminUsername}
+                        onChange={(e) => setAdminUsername(e.target.value)}
+                      />
+                      <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">SuperCode</label>
-                  <div className="relative">
-                    <Input
-                      type="password"
-                      placeholder="Enter your SuperCode"
-                      className="pl-10"
-                    />
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">SuperCode</label>
+                    <div className="relative">
+                      <Input
+                        type="password"
+                        placeholder="Enter your SuperCode"
+                        className="pl-10"
+                        value={adminSuperCode}
+                        onChange={(e) => setAdminSuperCode(e.target.value)}
+                      />
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    </div>
                   </div>
-                </div>
 
-                <Button className="w-full" size="lg">
-                  <LogIn className="mr-2" /> Access Admin Panel
-                </Button>
+                  <Button type="submit" className="w-full" size="lg">
+                    <LogIn className="mr-2" /> Access Admin Panel
+                  </Button>
+                </form>
               </div>
             </Card>
           </TabsContent>
