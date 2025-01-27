@@ -9,9 +9,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
-  { title: "Dashboard", icon: Home, url: "/" },
+  { title: "Dashboard", icon: Home, url: "/dashboard" },
   { title: "Admin Profiles", icon: Users, url: "/admin-profiles" },
   { title: "Analytics", icon: BarChart3, url: "/analytics" },
   { title: "Enterprises", icon: Globe, url: "/enterprises" },
@@ -19,6 +20,13 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
+  const location = useLocation();
+  
+  // Don't render the sidebar on the landing page
+  if (location.pathname === "/") {
+    return null;
+  }
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -32,10 +40,10 @@ export function AppSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url} className="flex items-center gap-2">
+                    <Link to={item.url} className="flex items-center gap-2">
                       <item.icon className="h-5 w-5" />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
