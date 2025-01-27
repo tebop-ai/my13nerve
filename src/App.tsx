@@ -10,12 +10,10 @@ import Index from "./pages/Index";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <SidebarProvider>
+  <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <SidebarProvider>
+        <TooltipProvider>
           <div className="min-h-screen flex w-full">
             <AppSidebar />
             <main className="flex-1">
@@ -24,10 +22,12 @@ const App = () => (
               </Routes>
             </main>
           </div>
-        </SidebarProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+          <Toaster />
+          <Sonner />
+        </TooltipProvider>
+      </SidebarProvider>
+    </QueryClientProvider>
+  </BrowserRouter>
 );
 
 export default App;
