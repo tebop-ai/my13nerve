@@ -24,9 +24,13 @@ const AdminSignup = () => {
 
   const onSubmit = async (values: AdminSignupFormData) => {
     try {
+      console.log("Submitting form with values:", values);
       const { error } = await supabase
         .from("admin_profile_applications")
-        .insert(values);
+        .insert({
+          ...values,
+          status: 'pending',
+        });
 
       if (error) throw error;
 

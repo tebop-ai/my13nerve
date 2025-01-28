@@ -10,12 +10,15 @@ export const adminSignupSchema = z.object({
   linkedin_profile: z.string().url("Please provide a valid LinkedIn URL"),
   purpose_statement: z.string().min(100, "Please provide a detailed purpose statement"),
   ai_systems_experience: z.string().min(50, "Please describe your AI systems experience"),
+  certifications: z.string().optional(),
   background_check_consent: z.boolean(),
   terms_accepted: z.boolean(),
   code_of_conduct_accepted: z.boolean(),
   personal_statement: z.string().min(100, "Please provide a detailed personal statement"),
   languages_spoken: z.string(),
   preferred_timezone: z.string(),
+  professional_references: z.string().optional(),
+  endorsements: z.string().optional(),
 });
 
 export type AdminSignupFormData = z.infer<typeof adminSignupSchema>;
