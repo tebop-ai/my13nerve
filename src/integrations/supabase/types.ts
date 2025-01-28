@@ -9,16 +9,118 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      admin_profile_applications: {
+        Row: {
+          ai_systems_experience: string | null
+          background_check_consent: boolean | null
+          certifications: string | null
+          code_of_conduct_accepted: boolean | null
+          created_at: string | null
+          current_job_title: string | null
+          email: string
+          endorsements: string | null
+          full_name: string
+          generated_supercode: string | null
+          government_id_url: string | null
+          id: string
+          industry_expertise: string | null
+          languages_spoken: string | null
+          linkedin_profile: string | null
+          nda_document_url: string | null
+          personal_statement: string | null
+          phone_number: string | null
+          preferred_auth_method: string | null
+          preferred_timezone: string | null
+          professional_references: string | null
+          purpose_statement: string | null
+          review_notes: string | null
+          reviewed_by: string | null
+          role_function: string | null
+          status: Database["public"]["Enums"]["admin_application_status"] | null
+          terms_accepted: boolean | null
+          updated_at: string | null
+          work_experience: string | null
+        }
+        Insert: {
+          ai_systems_experience?: string | null
+          background_check_consent?: boolean | null
+          certifications?: string | null
+          code_of_conduct_accepted?: boolean | null
+          created_at?: string | null
+          current_job_title?: string | null
+          email: string
+          endorsements?: string | null
+          full_name: string
+          generated_supercode?: string | null
+          government_id_url?: string | null
+          id?: string
+          industry_expertise?: string | null
+          languages_spoken?: string | null
+          linkedin_profile?: string | null
+          nda_document_url?: string | null
+          personal_statement?: string | null
+          phone_number?: string | null
+          preferred_auth_method?: string | null
+          preferred_timezone?: string | null
+          professional_references?: string | null
+          purpose_statement?: string | null
+          review_notes?: string | null
+          reviewed_by?: string | null
+          role_function?: string | null
+          status?:
+            | Database["public"]["Enums"]["admin_application_status"]
+            | null
+          terms_accepted?: boolean | null
+          updated_at?: string | null
+          work_experience?: string | null
+        }
+        Update: {
+          ai_systems_experience?: string | null
+          background_check_consent?: boolean | null
+          certifications?: string | null
+          code_of_conduct_accepted?: boolean | null
+          created_at?: string | null
+          current_job_title?: string | null
+          email?: string
+          endorsements?: string | null
+          full_name?: string
+          generated_supercode?: string | null
+          government_id_url?: string | null
+          id?: string
+          industry_expertise?: string | null
+          languages_spoken?: string | null
+          linkedin_profile?: string | null
+          nda_document_url?: string | null
+          personal_statement?: string | null
+          phone_number?: string | null
+          preferred_auth_method?: string | null
+          preferred_timezone?: string | null
+          professional_references?: string | null
+          purpose_statement?: string | null
+          review_notes?: string | null
+          reviewed_by?: string | null
+          role_function?: string | null
+          status?:
+            | Database["public"]["Enums"]["admin_application_status"]
+            | null
+          terms_accepted?: boolean | null
+          updated_at?: string | null
+          work_experience?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_secure_supercode: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
-      [_ in never]: never
+      admin_application_status: "pending" | "approved" | "declined"
     }
     CompositeTypes: {
       [_ in never]: never

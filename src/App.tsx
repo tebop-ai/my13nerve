@@ -7,6 +7,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import AdminSignup from "./pages/AdminSignup";
 import { useState } from "react";
 
 const queryClient = new QueryClient();
@@ -67,6 +68,10 @@ const AppContent = () => {
                     <Dashboard />
                   </ProtectedRoute>
                 }
+              />
+              <Route
+                path="/admin-signup"
+                element={<AdminSignup />}
               />
             </Routes>
           </main>

@@ -3,9 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
-import { Lock, LogIn, User, UserPlus } from "lucide-react";
+import { Lock, LogIn, User, UserPlus, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface IndexProps {
   onAdminLogin: (username: string, superCode: string) => boolean;
@@ -44,9 +44,10 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         </div>
 
         <Tabs defaultValue="users" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="users">Enterprise Users</TabsTrigger>
             <TabsTrigger value="admins">For Admins</TabsTrigger>
+            <TabsTrigger value="admin-signup">Admin Sign Up</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">
@@ -168,6 +169,32 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                     <LogIn className="mr-2" /> Access Admin Panel
                   </Button>
                 </form>
+              </div>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="admin-signup">
+            <Card className="p-6">
+              <div className="space-y-4">
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-semibold">Become an Admin</h2>
+                  <p className="text-gray-500">Apply for an admin position</p>
+                </div>
+
+                <div className="text-center space-y-4">
+                  <Shield className="w-16 h-16 mx-auto text-primary" />
+                  <p className="text-gray-600">
+                    Join our team of administrators and help manage the my13nerve platform.
+                    Complete our comprehensive application process to get started.
+                  </p>
+                  <Button 
+                    onClick={() => navigate("/admin-signup")} 
+                    size="lg" 
+                    className="w-full md:w-auto"
+                  >
+                    <UserPlus className="mr-2" /> Start Application
+                  </Button>
+                </div>
               </div>
             </Card>
           </TabsContent>
