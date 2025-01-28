@@ -44,7 +44,7 @@ const AdminSignup = () => {
     try {
       const { error } = await supabase
         .from("admin_profile_applications")
-        .insert([values]);
+        .insert(values); // Changed from [values] to values
 
       if (error) throw error;
 
