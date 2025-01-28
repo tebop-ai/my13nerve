@@ -44,10 +44,9 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         </div>
 
         <Tabs defaultValue="users" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="users">Enterprise Users</TabsTrigger>
             <TabsTrigger value="admins">For Admins</TabsTrigger>
-            <TabsTrigger value="admin-signup">Admin Sign Up</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">
@@ -168,33 +167,18 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                   <Button type="submit" className="w-full" size="lg">
                     <LogIn className="mr-2" /> Access Admin Panel
                   </Button>
+
+                  <div className="text-center mt-4">
+                    <p className="text-gray-600 mb-4">Want to become an admin?</p>
+                    <Button 
+                      onClick={() => navigate("/admin-signup")} 
+                      variant="outline"
+                      className="w-full"
+                    >
+                      <UserPlus className="mr-2" /> Apply for Admin Role
+                    </Button>
+                  </div>
                 </form>
-              </div>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="admin-signup">
-            <Card className="p-6">
-              <div className="space-y-4">
-                <div className="text-center mb-6">
-                  <h2 className="text-2xl font-semibold">Become an Admin</h2>
-                  <p className="text-gray-500">Apply for an admin position</p>
-                </div>
-
-                <div className="text-center space-y-4">
-                  <Shield className="w-16 h-16 mx-auto text-primary" />
-                  <p className="text-gray-600">
-                    Join our team of administrators and help manage the my13nerve platform.
-                    Complete our comprehensive application process to get started.
-                  </p>
-                  <Button 
-                    onClick={() => navigate("/admin-signup")} 
-                    size="lg" 
-                    className="w-full md:w-auto"
-                  >
-                    <UserPlus className="mr-2" /> Start Application
-                  </Button>
-                </div>
               </div>
             </Card>
           </TabsContent>
