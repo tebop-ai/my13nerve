@@ -29,18 +29,18 @@ const AdminSignup = () => {
       // Insert the form data into Supabase
       const { error } = await supabase
         .from("admin_profile_applications")
-        .insert([{
-          ...values,
-          // status is handled by the database default value
-        }]);
+        .insert([values]);
 
       if (error) throw error;
 
+      // Show success message
       toast({
-        title: "Application Submitted",
-        description: "Your admin profile application has been submitted for review.",
+        title: "Application Submitted Successfully",
+        description: "Please check your email within 48 hours for our response.",
+        duration: 5000, // Show for 5 seconds
       });
       
+      // Navigate back to home
       navigate("/");
     } catch (error) {
       console.error("Error submitting application:", error);
