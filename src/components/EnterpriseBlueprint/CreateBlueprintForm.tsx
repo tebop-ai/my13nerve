@@ -37,7 +37,7 @@ export const CreateBlueprintForm = () => {
     try {
       const { error } = await supabase
         .from('enterprise_blueprints')
-        .insert({
+        .insert([{
           name,
           enterprise_type: enterpriseType,
           board_type: boardType,
@@ -45,7 +45,7 @@ export const CreateBlueprintForm = () => {
           executive_types: selectedExecutiveTypes,
           management_types: selectedManagementTypes,
           department_types: selectedDepartmentTypes,
-        });
+        }]);
 
       if (error) throw error;
 
