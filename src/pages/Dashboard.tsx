@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { CreateBlueprintForm } from "@/components/EnterpriseBlueprint/CreateBlueprintForm";
+import { BlueprintsList } from "@/components/EnterpriseBlueprint/BlueprintsList";
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -189,9 +191,20 @@ const Dashboard = () => {
 
         <TabsContent value="settings">
           <Card className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">System Settings</h2>
-            <div className="space-y-4">
-              <p>System settings interface will be implemented here.</p>
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-semibold mb-4">Enterprise Blueprints</h2>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Create New Blueprint</h3>
+                    <CreateBlueprintForm />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Existing Blueprints</h3>
+                    <BlueprintsList />
+                  </div>
+                </div>
+              </div>
             </div>
           </Card>
         </TabsContent>
