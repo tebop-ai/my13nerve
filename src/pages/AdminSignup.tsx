@@ -27,19 +27,38 @@ const AdminSignup = () => {
       console.log("Submitting form with values:", values);
       
       // Insert the form data into Supabase
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("admin_profile_applications")
-        .insert([{
-          ...values,
-          email: values.email,  // Ensure required fields are explicitly set
+        .insert({
           full_name: values.full_name,
-        }]);
+          email: values.email,
+          phone_number: values.phone_number,
+          current_job_title: values.current_job_title,
+          work_experience: values.work_experience,
+          industry_expertise: values.industry_expertise,
+          linkedin_profile: values.linkedin_profile,
+          purpose_statement: values.purpose_statement,
+          ai_systems_experience: values.ai_systems_experience,
+          certifications: values.certifications,
+          background_check_consent: values.background_check_consent,
+          terms_accepted: values.terms_accepted,
+          code_of_conduct_accepted: values.code_of_conduct_accepted,
+          personal_statement: values.personal_statement,
+          languages_spoken: values.languages_spoken,
+          preferred_timezone: values.preferred_timezone,
+          status: 'pending'
+        });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error submitting application:", error);
+        throw error;
+      }
+
+      console.log("Application submitted successfully:", data);
 
       toast({
         title: "Application Submitted Successfully",
-        description: "Please check your email within 48 hours for our response.",
+        description: "Your application has been sent for review. We'll contact you soon.",
         duration: 5000,
       });
       

@@ -11,18 +11,25 @@ export const AdminApplications = () => {
   const { data: applications, refetch } = useQuery({
     queryKey: ['adminApplications'],
     queryFn: async () => {
+      console.log("Fetching admin applications...");
       const { data, error } = await supabase
         .from('admin_profile_applications')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching applications:", error);
+        throw error;
+      }
+      
+      console.log("Fetched applications:", data);
       return data;
     }
   });
 
   const handleApplicationStatus = async (id: string, status: 'approved' | 'declined') => {
     try {
+      console.log(`Updating application ${id} status to ${status}`);
       const { error } = await supabase
         .from('admin_profile_applications')
         .update({ status })
