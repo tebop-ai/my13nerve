@@ -7,21 +7,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { EnterpriseType, BoardType, CEOType } from "@/types/enterprise";
 
 interface BlueprintBasicInfoProps {
   name: string;
   setName: (value: string) => void;
-  enterpriseType: string;
-  setEnterpriseType: (value: string) => void;
-  boardType: string;
-  setBoardType: (value: string) => void;
-  ceoType: string;
-  setCeoType: (value: string) => void;
+  enterpriseType: EnterpriseType | "";
+  setEnterpriseType: (value: EnterpriseType) => void;
+  boardType: BoardType | "";
+  setBoardType: (value: BoardType) => void;
+  ceoType: CEOType | "";
+  setCeoType: (value: CEOType) => void;
 }
 
-const ENTERPRISE_TYPES = ['startup', 'small_business', 'medium_business', 'corporation', 'non_profit', 'government'];
-const BOARD_TYPES = ['traditional', 'advisory', 'hybrid', 'supervisory'];
-const CEO_TYPES = ['founder', 'professional', 'interim', 'executive'];
+const ENTERPRISE_TYPES = ['startup', 'small_business', 'medium_business', 'corporation', 'non_profit', 'government'] as const;
+const BOARD_TYPES = ['traditional', 'advisory', 'hybrid', 'supervisory'] as const;
+const CEO_TYPES = ['founder', 'professional', 'interim', 'executive'] as const;
 
 export const BlueprintBasicInfo = ({
   name,
@@ -47,7 +48,11 @@ export const BlueprintBasicInfo = ({
 
       <div className="space-y-2">
         <Label htmlFor="enterpriseType">Enterprise Type</Label>
-        <Select value={enterpriseType} onValueChange={setEnterpriseType} required>
+        <Select 
+          value={enterpriseType} 
+          onValueChange={(value) => setEnterpriseType(value as EnterpriseType)}
+          required
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select enterprise type" />
           </SelectTrigger>
@@ -63,7 +68,11 @@ export const BlueprintBasicInfo = ({
 
       <div className="space-y-2">
         <Label htmlFor="boardType">Board Type</Label>
-        <Select value={boardType} onValueChange={setBoardType} required>
+        <Select 
+          value={boardType} 
+          onValueChange={(value) => setBoardType(value as BoardType)}
+          required
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select board type" />
           </SelectTrigger>
@@ -79,7 +88,11 @@ export const BlueprintBasicInfo = ({
 
       <div className="space-y-2">
         <Label htmlFor="ceoType">CEO Type</Label>
-        <Select value={ceoType} onValueChange={setCeoType} required>
+        <Select 
+          value={ceoType} 
+          onValueChange={(value) => setCeoType(value as CEOType)}
+          required
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select CEO type" />
           </SelectTrigger>

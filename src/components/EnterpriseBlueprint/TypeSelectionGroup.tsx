@@ -1,21 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-interface TypeSelectionGroupProps {
+interface TypeSelectionGroupProps<T extends string> {
   label: string;
-  types: string[];
-  selectedTypes: string[];
-  onTypeSelect: (type: string) => void;
+  types: readonly T[];
+  selectedTypes: T[];
+  onTypeSelect: (type: T) => void;
   formatLabel?: (type: string) => string;
 }
 
-export const TypeSelectionGroup = ({
+export const TypeSelectionGroup = <T extends string>({
   label,
   types,
   selectedTypes,
   onTypeSelect,
   formatLabel = (type: string) => type.toUpperCase(),
-}: TypeSelectionGroupProps) => {
+}: TypeSelectionGroupProps<T>) => {
   return (
     <div className="space-y-2">
       <Label>{label}</Label>

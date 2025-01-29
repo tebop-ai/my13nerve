@@ -75,10 +75,10 @@ export const CreateBlueprintForm = () => {
     }
   };
 
-  const handleTypeSelection = (value: string, setter: (value: any[]) => void, currentSelected: string[]) => {
-    const updatedSelection = currentSelected.includes(value)
-      ? currentSelected.filter(type => type !== value)
-      : [...currentSelected, value];
+  const handleTypeSelection = <T extends string>(type: T, setter: (value: T[]) => void, currentSelected: T[]) => {
+    const updatedSelection = currentSelected.includes(type)
+      ? currentSelected.filter(t => t !== type)
+      : [...currentSelected, type];
     setter(updatedSelection);
   };
 
@@ -99,14 +99,14 @@ export const CreateBlueprintForm = () => {
         label="Executive Types"
         types={EXECUTIVE_TYPES}
         selectedTypes={selectedExecutiveTypes}
-        onTypeSelect={(type) => handleTypeSelection(type, setSelectedExecutiveTypes, selectedExecutiveTypes)}
+        onTypeSelect={(type) => handleTypeSelection(type as ExecutiveType, setSelectedExecutiveTypes, selectedExecutiveTypes)}
       />
 
       <TypeSelectionGroup
         label="Management Types"
         types={MANAGEMENT_TYPES}
         selectedTypes={selectedManagementTypes}
-        onTypeSelect={(type) => handleTypeSelection(type, setSelectedManagementTypes, selectedManagementTypes)}
+        onTypeSelect={(type) => handleTypeSelection(type as ManagementType, setSelectedManagementTypes, selectedManagementTypes)}
         formatLabel={(type) => type.charAt(0).toUpperCase() + type.slice(1)}
       />
 
@@ -114,7 +114,7 @@ export const CreateBlueprintForm = () => {
         label="Department Types"
         types={DEPARTMENT_TYPES}
         selectedTypes={selectedDepartmentTypes}
-        onTypeSelect={(type) => handleTypeSelection(type, setSelectedDepartmentTypes, selectedDepartmentTypes)}
+        onTypeSelect={(type) => handleTypeSelection(type as DepartmentType, setSelectedDepartmentTypes, selectedDepartmentTypes)}
         formatLabel={(type) => type.charAt(0).toUpperCase() + type.slice(1)}
       />
 
