@@ -9,9 +9,13 @@ import type { EnterpriseType, BoardType, CEOType, ExecutiveType, ManagementType,
 
 const EXECUTIVE_TYPES = ['cto', 'cfo', 'coo', 'cmo', 'chro', 'cio'] as const;
 const MANAGEMENT_TYPES = ['project', 'product', 'operations', 'hr', 'finance', 'marketing'] as const;
-const DEPARTMENT_TYPES = ['engineering', 'finance', 'hr', 'marketing', 'operations', 'sales', 'legal', 'research'] as const;
+const DEPARTMENT_TYPES = ['accounting', 'financial_planning', 'treasury', 'risk_management', 'internal_audit', 'tax', 'investor_relations', 'compliance', 'procurement', 'strategic_finance', 'it_finance'] as const;
 
-export const CreateBlueprintForm = () => {
+interface CreateBlueprintFormProps {
+  onSuccess?: () => void;
+}
+
+export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
@@ -65,6 +69,9 @@ export const CreateBlueprintForm = () => {
 
       // Refresh blueprints list
       queryClient.invalidateQueries({ queryKey: ['enterpriseBlueprints'] });
+      
+      // Call onSuccess callback if provided
+      onSuccess?.();
     } catch (error) {
       console.error('Error creating blueprint:', error);
       toast({
@@ -115,7 +122,6 @@ export const CreateBlueprintForm = () => {
         types={DEPARTMENT_TYPES}
         selectedTypes={selectedDepartmentTypes}
         onTypeSelect={(type) => handleTypeSelection(type as DepartmentType, setSelectedDepartmentTypes, selectedDepartmentTypes)}
-        formatLabel={(type) => type.charAt(0).toUpperCase() + type.slice(1)}
       />
 
       <Button type="submit" className="w-full">
