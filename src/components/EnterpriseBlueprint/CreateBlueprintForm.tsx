@@ -43,6 +43,7 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
   const [selectedExecutiveTypes, setSelectedExecutiveTypes] = useState<ExecutiveType[]>([]);
   const [selectedManagementTypes, setSelectedManagementTypes] = useState<ManagementType[]>([]);
   const [selectedDepartmentTypes, setSelectedDepartmentTypes] = useState<DepartmentType[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleExecutiveTypeSelect = (type: ExecutiveType) => {
     setSelectedExecutiveTypes(prev =>
@@ -83,6 +84,8 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
       console.log("Submitting blueprint with data:", {
         name,
@@ -104,6 +107,7 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
           executive_types: selectedExecutiveTypes,
           management_types: selectedManagementTypes,
           department_types: selectedDepartmentTypes,
+          is_active: true
         })
         .select();
 
@@ -139,6 +143,8 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
         description: "Failed to create blueprint. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -177,8 +183,8 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
           onTypeSelect={handleDepartmentTypeSelect}
         />
 
-        <Button type="submit" className="w-full">
-          Create Blueprint
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Creating Blueprint..." : "Create Blueprint"}
         </Button>
       </form>
     </Card>
