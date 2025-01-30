@@ -24,7 +24,7 @@ const AdminSignup = () => {
 
   const onSubmit = async (values: AdminSignupFormData) => {
     try {
-      console.log("Submitting form with values:", values);
+      console.log("Starting form submission with values:", values);
       
       // Insert the form data into Supabase
       const { data, error } = await supabase
@@ -47,7 +47,8 @@ const AdminSignup = () => {
           languages_spoken: values.languages_spoken,
           preferred_timezone: values.preferred_timezone,
           status: 'pending'
-        });
+        })
+        .select();
 
       if (error) {
         console.error("Error submitting application:", error);
@@ -62,6 +63,7 @@ const AdminSignup = () => {
         duration: 5000,
       });
       
+      // Navigate to home page after successful submission
       navigate("/");
     } catch (error) {
       console.error("Error submitting application:", error);
@@ -69,6 +71,7 @@ const AdminSignup = () => {
         title: "Error",
         description: "There was an error submitting your application. Please try again.",
         variant: "destructive",
+        duration: 5000,
       });
     }
   };
