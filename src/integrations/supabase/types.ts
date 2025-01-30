@@ -128,7 +128,7 @@ export type Database = {
           ceo_type: Database["public"]["Enums"]["ceo_type"]
           created_at?: string | null
           created_by?: string | null
-          department_types: Database["public"]["Enums"]["department_type"][]
+          department_types?: Database["public"]["Enums"]["department_type"][]
           enterprise_type: Database["public"]["Enums"]["enterprise_type"]
           executive_types: Database["public"]["Enums"]["executive_type"][]
           id?: string
@@ -166,14 +166,17 @@ export type Database = {
       board_type: "traditional" | "advisory" | "hybrid" | "supervisory"
       ceo_type: "founder" | "professional" | "interim" | "executive"
       department_type:
-        | "engineering"
-        | "finance"
-        | "hr"
-        | "marketing"
-        | "operations"
-        | "sales"
-        | "legal"
-        | "research"
+        | "accounting"
+        | "financial_planning"
+        | "treasury"
+        | "risk_management"
+        | "internal_audit"
+        | "tax"
+        | "investor_relations"
+        | "compliance"
+        | "procurement"
+        | "strategic_finance"
+        | "it_finance"
       enterprise_type:
         | "startup"
         | "small_business"

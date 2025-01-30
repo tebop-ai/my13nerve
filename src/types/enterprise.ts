@@ -3,7 +3,18 @@ export type BoardType = 'traditional' | 'advisory' | 'hybrid' | 'supervisory';
 export type CEOType = 'founder' | 'professional' | 'interim' | 'executive';
 export type ExecutiveType = 'cto' | 'cfo' | 'coo' | 'cmo' | 'chro' | 'cio';
 export type ManagementType = 'project' | 'product' | 'operations' | 'hr' | 'finance' | 'marketing';
-export type DepartmentType = 'engineering' | 'finance' | 'hr' | 'marketing' | 'operations' | 'sales' | 'legal' | 'research';
+export type DepartmentType = 
+  | 'accounting'
+  | 'financial_planning'
+  | 'treasury'
+  | 'risk_management'
+  | 'internal_audit'
+  | 'tax'
+  | 'investor_relations'
+  | 'compliance'
+  | 'procurement'
+  | 'strategic_finance'
+  | 'it_finance';
 
 export interface EnterpriseBlueprint {
   id: string;

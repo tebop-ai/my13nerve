@@ -14,7 +14,9 @@ export const TypeSelectionGroup = <T extends string>({
   types,
   selectedTypes,
   onTypeSelect,
-  formatLabel = (type: string) => type.toUpperCase(),
+  formatLabel = (type: string) => type.split('_').map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1)
+  ).join(' '),
 }: TypeSelectionGroupProps<T>) => {
   return (
     <div className="space-y-2">
