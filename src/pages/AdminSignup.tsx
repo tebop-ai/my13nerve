@@ -24,12 +24,11 @@ const AdminSignup = () => {
 
   const onSubmit = async (values: AdminSignupFormData) => {
     try {
-      console.log("Starting form submission with values:", values);
+      console.log("Starting admin application submission with values:", values);
       
-      // Insert the form data into Supabase
       const { data, error } = await supabase
         .from("admin_profile_applications")
-        .insert({
+        .insert([{
           full_name: values.full_name,
           email: values.email,
           phone_number: values.phone_number,
@@ -47,15 +46,15 @@ const AdminSignup = () => {
           languages_spoken: values.languages_spoken,
           preferred_timezone: values.preferred_timezone,
           status: 'pending'
-        })
+        }])
         .select();
 
       if (error) {
-        console.error("Error submitting application:", error);
+        console.error("Error submitting admin application:", error);
         throw error;
       }
 
-      console.log("Application submitted successfully:", data);
+      console.log("Admin application submitted successfully:", data);
 
       toast({
         title: "Application Submitted Successfully",
@@ -63,10 +62,9 @@ const AdminSignup = () => {
         duration: 5000,
       });
       
-      // Navigate to home page after successful submission
       navigate("/");
     } catch (error) {
-      console.error("Error submitting application:", error);
+      console.error("Error submitting admin application:", error);
       toast({
         title: "Error",
         description: "There was an error submitting your application. Please try again.",
@@ -91,8 +89,8 @@ const AdminSignup = () => {
           <ProfessionalInfoSection form={form} />
           <AgreementsSection form={form} />
           
-          <Button type="submit" className="w-full">
-            Submit Application
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? "Submitting..." : "Submit Application"}
           </Button>
         </form>
       </Form>

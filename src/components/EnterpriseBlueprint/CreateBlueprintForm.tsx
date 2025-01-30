@@ -99,7 +99,7 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
 
       const { data, error } = await supabase
         .from("enterprise_blueprints")
-        .insert({
+        .insert([{
           name,
           enterprise_type: enterpriseType,
           board_type: boardType,
@@ -108,7 +108,7 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
           management_types: selectedManagementTypes,
           department_types: selectedDepartmentTypes,
           is_active: true
-        })
+        }])
         .select();
 
       if (error) {
@@ -132,7 +132,6 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
       setSelectedManagementTypes([]);
       setSelectedDepartmentTypes([]);
 
-      // Call onSuccess callback if provided
       if (onSuccess) {
         onSuccess();
       }
