@@ -264,6 +264,7 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Creating Blueprint..." : "Create Blueprint"}
         </Button>
+      </form>
     </Card>
   );
 };
