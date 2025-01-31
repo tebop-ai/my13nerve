@@ -133,6 +133,30 @@ export type Database = {
         }
         Relationships: []
       }
+      "Customer Insights": {
+        Row: {
+          Code: string
+          "Full Description": string | null
+          Occurrence: string | null
+          "Sub-Task": string | null
+          Tools: string | null
+        }
+        Insert: {
+          Code: string
+          "Full Description"?: string | null
+          Occurrence?: string | null
+          "Sub-Task"?: string | null
+          Tools?: string | null
+        }
+        Update: {
+          Code?: string
+          "Full Description"?: string | null
+          Occurrence?: string | null
+          "Sub-Task"?: string | null
+          Tools?: string | null
+        }
+        Relationships: []
+      }
       enterprise_blueprints: {
         Row: {
           accounting_tasks: string[] | null
@@ -175,6 +199,78 @@ export type Database = {
           is_active?: boolean | null
           management_types?: Database["public"]["Enums"]["management_type"][]
           name?: string
+        }
+        Relationships: []
+      }
+      "Marketing Comm": {
+        Row: {
+          Code: string
+          "Full Description": string | null
+          Occurrence: string | null
+          "Sub-Task": string | null
+          Tools: string | null
+        }
+        Insert: {
+          Code: string
+          "Full Description"?: string | null
+          Occurrence?: string | null
+          "Sub-Task"?: string | null
+          Tools?: string | null
+        }
+        Update: {
+          Code?: string
+          "Full Description"?: string | null
+          Occurrence?: string | null
+          "Sub-Task"?: string | null
+          Tools?: string | null
+        }
+        Relationships: []
+      }
+      Product_Service: {
+        Row: {
+          Code: string
+          "Full Description": string | null
+          Occurrence: string | null
+          "Sub-Task": string | null
+          Tools: string | null
+        }
+        Insert: {
+          Code: string
+          "Full Description"?: string | null
+          Occurrence?: string | null
+          "Sub-Task"?: string | null
+          Tools?: string | null
+        }
+        Update: {
+          Code?: string
+          "Full Description"?: string | null
+          Occurrence?: string | null
+          "Sub-Task"?: string | null
+          Tools?: string | null
+        }
+        Relationships: []
+      }
+      "R&D_Ops": {
+        Row: {
+          Code: string
+          "Full Description": string | null
+          Occurrence: string | null
+          "Sub-Task": string | null
+          Tools: string | null
+        }
+        Insert: {
+          Code: string
+          "Full Description"?: string | null
+          Occurrence?: string | null
+          "Sub-Task"?: string | null
+          Tools?: string | null
+        }
+        Update: {
+          Code?: string
+          "Full Description"?: string | null
+          Occurrence?: string | null
+          "Sub-Task"?: string | null
+          Tools?: string | null
         }
         Relationships: []
       }
