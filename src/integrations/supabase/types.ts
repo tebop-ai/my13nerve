@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      Accounting: {
+        Row: {
+          Code: string | null
+          "Full Description": string | null
+          Occurrence: string | null
+          "Sub-Task": string | null
+          Tools: string | null
+        }
+        Insert: {
+          Code?: string | null
+          "Full Description"?: string | null
+          Occurrence?: string | null
+          "Sub-Task"?: string | null
+          Tools?: string | null
+        }
+        Update: {
+          Code?: string | null
+          "Full Description"?: string | null
+          Occurrence?: string | null
+          "Sub-Task"?: string | null
+          Tools?: string | null
+        }
+        Relationships: []
+      }
       admin_profile_applications: {
         Row: {
           ai_systems_experience: string | null

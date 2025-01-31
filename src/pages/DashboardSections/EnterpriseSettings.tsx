@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreateBlueprintForm } from "@/components/EnterpriseBlueprint/CreateBlueprintForm";
 import { BlueprintsList } from "@/components/EnterpriseBlueprint/BlueprintsList";
+import { AccountingTasksTable } from "@/components/EnterpriseBlueprint/AccountingTasksTable";
 import { useToast } from "@/hooks/use-toast";
 
 export const EnterpriseSettings = () => {
@@ -9,24 +11,29 @@ export const EnterpriseSettings = () => {
   return (
     <Card className="p-6">
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Enterprise Blueprints</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-medium mb-4">Create New Blueprint</h3>
-              <CreateBlueprintForm onSuccess={() => {
+        <h2 className="text-2xl font-semibold mb-4">Enterprise Blueprints</h2>
+        
+        <Tabs defaultValue="existing" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="existing">Existing Blueprints</TabsTrigger>
+            <TabsTrigger value="create">Create New Blueprint</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="existing" className="space-y-4">
+            <BlueprintsList />
+          </TabsContent>
+          
+          <TabsContent value="create" className="space-y-4">
+            <CreateBlueprintForm 
+              onSuccess={() => {
                 toast({
                   title: "Success",
                   description: "Blueprint created successfully",
                 });
-              }} />
-            </div>
-            <div>
-              <h3 className="text-lg font-medium mb-4">Existing Blueprints</h3>
-              <BlueprintsList />
-            </div>
-          </div>
-        </div>
+              }} 
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </Card>
   );

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { BlueprintBasicInfo } from "./BlueprintBasicInfo";
 import { TypeSelectionGroup } from "./TypeSelectionGroup";
+import { AccountingTasksTable } from "./AccountingTasksTable";
 import type { 
   EnterpriseType, 
   BoardType, 
@@ -30,10 +32,6 @@ const DEPARTMENT_TYPES = [
   'it_finance'
 ] as const;
 
-interface CreateBlueprintFormProps {
-  onSuccess?: () => void;
-}
-
 export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => {
   const { toast } = useToast();
   const [name, setName] = useState("");
@@ -43,7 +41,9 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
   const [selectedExecutiveTypes, setSelectedExecutiveTypes] = useState<ExecutiveType[]>([]);
   const [selectedManagementTypes, setSelectedManagementTypes] = useState<ManagementType[]>([]);
   const [selectedDepartmentTypes, setSelectedDepartmentTypes] = useState<DepartmentType[]>([]);
+  const [selectedAccountingTasks, setSelectedAccountingTasks] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("basic");
 
   const handleExecutiveTypeSelect = (type: ExecutiveType) => {
     setSelectedExecutiveTypes(prev =>
@@ -66,6 +66,14 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
       prev.includes(type)
         ? prev.filter(t => t !== type)
         : [...prev, type]
+    );
+  };
+
+  const handleAccountingTaskSelect = (taskId: string) => {
+    setSelectedAccountingTasks(prev =>
+      prev.includes(taskId)
+        ? prev.filter(id => id !== taskId)
+        : [...prev, taskId]
     );
   };
 
@@ -94,7 +102,8 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
         ceoType,
         selectedExecutiveTypes,
         selectedManagementTypes,
-        selectedDepartmentTypes
+        selectedDepartmentTypes,
+        selectedAccountingTasks
       });
 
       const { data, error } = await supabase
@@ -107,6 +116,7 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
           executive_types: selectedExecutiveTypes,
           management_types: selectedManagementTypes,
           department_types: selectedDepartmentTypes,
+          accounting_tasks: selectedAccountingTasks,
           is_active: true
         }])
         .select();
@@ -131,6 +141,8 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
       setSelectedExecutiveTypes([]);
       setSelectedManagementTypes([]);
       setSelectedDepartmentTypes([]);
+      setSelectedAccountingTasks([]);
+      setActiveTab("basic");
 
       if (onSuccess) {
         onSuccess();
@@ -150,37 +162,63 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
   return (
     <Card className="p-6">
       <form onSubmit={handleSubmit} className="space-y-6">
-        <BlueprintBasicInfo
-          name={name}
-          setName={setName}
-          enterpriseType={enterpriseType}
-          setEnterpriseType={setEnterpriseType}
-          boardType={boardType}
-          setBoardType={setBoardType}
-          ceoType={ceoType}
-          setCeoType={setCeoType}
-        />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="basic">Basic Info</TabsTrigger>
+            <TabsTrigger 
+              value="departments"
+              disabled={!name || !enterpriseType || !boardType || !ceoType}
+            >
+              Departments
+            </TabsTrigger>
+          </TabsList>
 
-        <TypeSelectionGroup
-          label="Executive Types"
-          types={EXECUTIVE_TYPES}
-          selectedTypes={selectedExecutiveTypes}
-          onTypeSelect={handleExecutiveTypeSelect}
-        />
+          <TabsContent value="basic">
+            <BlueprintBasicInfo
+              name={name}
+              setName={setName}
+              enterpriseType={enterpriseType}
+              setEnterpriseType={setEnterpriseType}
+              boardType={boardType}
+              setBoardType={setBoardType}
+              ceoType={ceoType}
+              setCeoType={setCeoType}
+            />
+          </TabsContent>
 
-        <TypeSelectionGroup
-          label="Management Types"
-          types={MANAGEMENT_TYPES}
-          selectedTypes={selectedManagementTypes}
-          onTypeSelect={handleManagementTypeSelect}
-        />
+          <TabsContent value="departments" className="space-y-6">
+            <TypeSelectionGroup
+              label="Executive Types"
+              types={EXECUTIVE_TYPES}
+              selectedTypes={selectedExecutiveTypes}
+              onTypeSelect={handleExecutiveTypeSelect}
+            />
 
-        <TypeSelectionGroup
-          label="Department Types"
-          types={DEPARTMENT_TYPES}
-          selectedTypes={selectedDepartmentTypes}
-          onTypeSelect={handleDepartmentTypeSelect}
-        />
+            <TypeSelectionGroup
+              label="Management Types"
+              types={MANAGEMENT_TYPES}
+              selectedTypes={selectedManagementTypes}
+              onTypeSelect={handleManagementTypeSelect}
+            />
+
+            <TypeSelectionGroup
+              label="Department Types"
+              types={DEPARTMENT_TYPES}
+              selectedTypes={selectedDepartmentTypes}
+              onTypeSelect={handleDepartmentTypeSelect}
+            />
+
+            {selectedDepartmentTypes.includes('accounting') && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Accounting Tasks</h3>
+                <AccountingTasksTable
+                  selectedTasks={selectedAccountingTasks}
+                  onTaskSelect={handleAccountingTaskSelect}
+                />
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Creating Blueprint..." : "Create Blueprint"}
