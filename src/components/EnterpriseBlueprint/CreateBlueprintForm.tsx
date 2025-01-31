@@ -7,13 +7,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { BlueprintBasicInfo } from "./BlueprintBasicInfo";
 import { TypeSelectionGroup } from "./TypeSelectionGroup";
 import { AccountingTasksTable } from "./AccountingTasksTable";
+import { BusinessFunctionsGroup } from "./BusinessFunctionsGroup";
 import type { 
   EnterpriseType, 
   BoardType, 
   CEOType,
   ExecutiveType,
   ManagementType,
-  DepartmentType 
+  DepartmentType,
+  BusinessFunctionType,
+  DepartmentCategoryType
 } from "@/types/enterprise";
 
 export interface CreateBlueprintFormProps {
@@ -46,6 +49,8 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
   const [selectedManagementTypes, setSelectedManagementTypes] = useState<ManagementType[]>([]);
   const [selectedDepartmentTypes, setSelectedDepartmentTypes] = useState<DepartmentType[]>([]);
   const [selectedAccountingTasks, setSelectedAccountingTasks] = useState<string[]>([]);
+  const [selectedBusinessFunctions, setSelectedBusinessFunctions] = useState<BusinessFunctionType[]>([]);
+  const [selectedDepartmentCategories, setSelectedDepartmentCategories] = useState<DepartmentCategoryType[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("basic");
 
@@ -73,6 +78,22 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
     );
   };
 
+  const handleBusinessFunctionSelect = (type: BusinessFunctionType) => {
+    setSelectedBusinessFunctions(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
+  };
+
+  const handleDepartmentCategorySelect = (type: DepartmentCategoryType) => {
+    setSelectedDepartmentCategories(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
+  };
+
   const handleAccountingTaskSelect = (taskId: string) => {
     setSelectedAccountingTasks(prev =>
       prev.includes(taskId)
@@ -87,7 +108,7 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
     if (!name || !enterpriseType || !boardType || !ceoType || 
         selectedExecutiveTypes.length === 0 || 
         selectedManagementTypes.length === 0 || 
-        selectedDepartmentTypes.length === 0) {
+        selectedBusinessFunctions.length === 0) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields",
@@ -107,7 +128,9 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
         selectedExecutiveTypes,
         selectedManagementTypes,
         selectedDepartmentTypes,
-        selectedAccountingTasks
+        selectedAccountingTasks,
+        selectedBusinessFunctions,
+        selectedDepartmentCategories
       });
 
       const { data, error } = await supabase
@@ -121,6 +144,8 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
           management_types: selectedManagementTypes,
           department_types: selectedDepartmentTypes,
           accounting_tasks: selectedAccountingTasks,
+          business_functions: selectedBusinessFunctions,
+          department_categories: selectedDepartmentCategories,
           is_active: true
         }])
         .select();
@@ -146,6 +171,8 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
       setSelectedManagementTypes([]);
       setSelectedDepartmentTypes([]);
       setSelectedAccountingTasks([]);
+      setSelectedBusinessFunctions([]);
+      setSelectedDepartmentCategories([]);
       setActiveTab("basic");
 
       if (onSuccess) {
@@ -167,8 +194,9 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
     <Card className="p-6">
       <form onSubmit={handleSubmit} className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
+            <TabsTrigger value="functions">Business Functions</TabsTrigger>
             <TabsTrigger 
               value="departments"
               disabled={!name || !enterpriseType || !boardType || !ceoType}
@@ -187,6 +215,15 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
               setBoardType={setBoardType}
               ceoType={ceoType}
               setCeoType={setCeoType}
+            />
+          </TabsContent>
+
+          <TabsContent value="functions">
+            <BusinessFunctionsGroup
+              selectedFunctions={selectedBusinessFunctions}
+              onFunctionSelect={handleBusinessFunctionSelect}
+              selectedCategories={selectedDepartmentCategories}
+              onCategorySelect={handleDepartmentCategorySelect}
             />
           </TabsContent>
 
@@ -227,7 +264,6 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Creating Blueprint..." : "Create Blueprint"}
         </Button>
-      </form>
     </Card>
   );
 };

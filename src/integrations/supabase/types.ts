@@ -161,9 +161,15 @@ export type Database = {
         Row: {
           accounting_tasks: string[] | null
           board_type: Database["public"]["Enums"]["board_type"]
+          business_functions:
+            | Database["public"]["Enums"]["business_function_type"][]
+            | null
           ceo_type: Database["public"]["Enums"]["ceo_type"]
           created_at: string | null
           created_by: string | null
+          department_categories:
+            | Database["public"]["Enums"]["department_category_type"][]
+            | null
           department_types: Database["public"]["Enums"]["department_type"][]
           enterprise_type: Database["public"]["Enums"]["enterprise_type"]
           executive_types: Database["public"]["Enums"]["executive_type"][]
@@ -175,9 +181,15 @@ export type Database = {
         Insert: {
           accounting_tasks?: string[] | null
           board_type: Database["public"]["Enums"]["board_type"]
+          business_functions?:
+            | Database["public"]["Enums"]["business_function_type"][]
+            | null
           ceo_type: Database["public"]["Enums"]["ceo_type"]
           created_at?: string | null
           created_by?: string | null
+          department_categories?:
+            | Database["public"]["Enums"]["department_category_type"][]
+            | null
           department_types?: Database["public"]["Enums"]["department_type"][]
           enterprise_type: Database["public"]["Enums"]["enterprise_type"]
           executive_types: Database["public"]["Enums"]["executive_type"][]
@@ -189,9 +201,15 @@ export type Database = {
         Update: {
           accounting_tasks?: string[] | null
           board_type?: Database["public"]["Enums"]["board_type"]
+          business_functions?:
+            | Database["public"]["Enums"]["business_function_type"][]
+            | null
           ceo_type?: Database["public"]["Enums"]["ceo_type"]
           created_at?: string | null
           created_by?: string | null
+          department_categories?:
+            | Database["public"]["Enums"]["department_category_type"][]
+            | null
           department_types?: Database["public"]["Enums"]["department_type"][]
           enterprise_type?: Database["public"]["Enums"]["enterprise_type"]
           executive_types?: Database["public"]["Enums"]["executive_type"][]
@@ -287,7 +305,67 @@ export type Database = {
     Enums: {
       admin_application_status: "pending" | "approved" | "declined"
       board_type: "traditional" | "advisory" | "hybrid" | "supervisory"
+      business_function_type:
+        | "finance"
+        | "marketing"
+        | "procurement"
+        | "human_resources"
+        | "operations"
+        | "support"
       ceo_type: "founder" | "professional" | "interim" | "executive"
+      department_category_type:
+        | "accounting"
+        | "financial_planning"
+        | "treasury"
+        | "risk_management"
+        | "internal_audit"
+        | "tax"
+        | "investor_relations"
+        | "compliance"
+        | "procurement"
+        | "strategic_finance"
+        | "it_finance"
+        | "brand_management"
+        | "digital_marketing"
+        | "market_research"
+        | "advertising"
+        | "public_relations"
+        | "content_marketing"
+        | "social_media"
+        | "event_marketing"
+        | "product_marketing"
+        | "performance_marketing"
+        | "crm"
+        | "trade_marketing"
+        | "vendor_management"
+        | "contract_negotiation"
+        | "cost_optimization"
+        | "category_management"
+        | "purchase_order_processing"
+        | "logistics_coordination"
+        | "procurement_compliance"
+        | "inventory_management"
+        | "strategic_procurement"
+        | "talent_acquisition"
+        | "employee_relations"
+        | "learning_development"
+        | "compensation_benefits"
+        | "hr_compliance"
+        | "dei"
+        | "workforce_planning"
+        | "organizational_development"
+        | "hr_technology"
+        | "employee_wellbeing"
+        | "manufacturing"
+        | "supply_chain"
+        | "quality_control"
+        | "process_improvement"
+        | "facilities_management"
+        | "customer_support_ops"
+        | "business_continuity"
+        | "operational_excellence"
+        | "sustainability"
+        | "performance_monitoring"
       department_type:
         | "accounting"
         | "financial_planning"
