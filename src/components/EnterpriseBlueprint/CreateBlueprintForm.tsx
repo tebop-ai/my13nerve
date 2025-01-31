@@ -16,6 +16,10 @@ import type {
   DepartmentType 
 } from "@/types/enterprise";
 
+interface CreateBlueprintFormProps {
+  onSuccess?: () => void;
+}
+
 const EXECUTIVE_TYPES = ['cto', 'cfo', 'coo', 'cmo', 'chro', 'cio'] as const;
 const MANAGEMENT_TYPES = ['project', 'product', 'operations', 'hr', 'finance', 'marketing'] as const;
 const DEPARTMENT_TYPES = [

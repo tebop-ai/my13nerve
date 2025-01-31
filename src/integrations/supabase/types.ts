@@ -135,6 +135,7 @@ export type Database = {
       }
       enterprise_blueprints: {
         Row: {
+          accounting_tasks: string[] | null
           board_type: Database["public"]["Enums"]["board_type"]
           ceo_type: Database["public"]["Enums"]["ceo_type"]
           created_at: string | null
@@ -148,6 +149,7 @@ export type Database = {
           name: string
         }
         Insert: {
+          accounting_tasks?: string[] | null
           board_type: Database["public"]["Enums"]["board_type"]
           ceo_type: Database["public"]["Enums"]["ceo_type"]
           created_at?: string | null
@@ -161,6 +163,7 @@ export type Database = {
           name: string
         }
         Update: {
+          accounting_tasks?: string[] | null
           board_type?: Database["public"]["Enums"]["board_type"]
           ceo_type?: Database["public"]["Enums"]["ceo_type"]
           created_at?: string | null

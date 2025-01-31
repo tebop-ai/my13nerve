@@ -2,7 +2,6 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreateBlueprintForm } from "@/components/EnterpriseBlueprint/CreateBlueprintForm";
 import { BlueprintsList } from "@/components/EnterpriseBlueprint/BlueprintsList";
-import { AccountingTasksTable } from "@/components/EnterpriseBlueprint/AccountingTasksTable";
 import { useToast } from "@/hooks/use-toast";
 
 export const EnterpriseSettings = () => {
