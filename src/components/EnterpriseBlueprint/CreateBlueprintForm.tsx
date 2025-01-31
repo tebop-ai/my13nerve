@@ -16,7 +16,7 @@ import type {
   DepartmentType 
 } from "@/types/enterprise";
 
-interface CreateBlueprintFormProps {
+export interface CreateBlueprintFormProps {
   onSuccess?: () => void;
 }
 
