@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -53,6 +53,13 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
   const [selectedDepartmentCategories, setSelectedDepartmentCategories] = useState<DepartmentCategoryType[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("basic");
+
+  // Auto-switch to departments tab when a business function is selected
+  useEffect(() => {
+    if (selectedBusinessFunctions.length > 0) {
+      setActiveTab("departments");
+    }
+  }, [selectedBusinessFunctions]);
 
   const handleExecutiveTypeSelect = (type: ExecutiveType) => {
     setSelectedExecutiveTypes(prev =>
@@ -191,15 +198,26 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
   };
 
   return (
-    <Card className="p-6">
+    <Card className="p-6 bg-primary-light border-primary">
       <form onSubmit={handleSubmit} className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="basic">Basic Info</TabsTrigger>
-            <TabsTrigger value="functions">Business Functions</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 bg-secondary">
+            <TabsTrigger 
+              value="basic"
+              className="data-[state=active]:bg-primary data-[state=active]:text-white"
+            >
+              Basic Info
+            </TabsTrigger>
+            <TabsTrigger 
+              value="functions"
+              className="data-[state=active]:bg-primary data-[state=active]:text-white"
+            >
+              Business Functions
+            </TabsTrigger>
             <TabsTrigger 
               value="departments"
               disabled={!name || !enterpriseType || !boardType || !ceoType}
+              className="data-[state=active]:bg-primary data-[state=active]:text-white"
             >
               Departments
             </TabsTrigger>
@@ -228,40 +246,37 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
           </TabsContent>
 
           <TabsContent value="departments" className="space-y-6">
-            <TypeSelectionGroup
-              label="Executive Types"
-              types={EXECUTIVE_TYPES}
-              selectedTypes={selectedExecutiveTypes}
-              onTypeSelect={handleExecutiveTypeSelect}
-            />
-
-            <TypeSelectionGroup
-              label="Management Types"
-              types={MANAGEMENT_TYPES}
-              selectedTypes={selectedManagementTypes}
-              onTypeSelect={handleManagementTypeSelect}
-            />
-
-            <TypeSelectionGroup
-              label="Department Types"
-              types={DEPARTMENT_TYPES}
-              selectedTypes={selectedDepartmentTypes}
-              onTypeSelect={handleDepartmentTypeSelect}
-            />
-
-            {selectedDepartmentTypes.includes('accounting') && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Accounting Tasks</h3>
-                <AccountingTasksTable
-                  selectedTasks={selectedAccountingTasks}
-                  onTaskSelect={handleAccountingTaskSelect}
+            {selectedBusinessFunctions.map((function_type) => (
+              <div key={function_type} className="space-y-4 p-4 bg-white rounded-lg shadow">
+                <h3 className="text-lg font-medium text-primary-dark">{function_type.charAt(0).toUpperCase() + function_type.slice(1)} Department</h3>
+                <TypeSelectionGroup
+                  label="Executive Types"
+                  types={EXECUTIVE_TYPES}
+                  selectedTypes={selectedExecutiveTypes}
+                  onTypeSelect={handleExecutiveTypeSelect}
                 />
+                <TypeSelectionGroup
+                  label="Management Types"
+                  types={MANAGEMENT_TYPES}
+                  selectedTypes={selectedManagementTypes}
+                  onTypeSelect={handleManagementTypeSelect}
+                />
+                {function_type === 'finance' && (
+                  <AccountingTasksTable
+                    selectedTasks={selectedAccountingTasks}
+                    onTaskSelect={handleAccountingTaskSelect}
+                  />
+                )}
               </div>
-            )}
+            ))}
           </TabsContent>
         </Tabs>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button 
+          type="submit" 
+          className="w-full bg-primary hover:bg-primary-dark text-white"
+          disabled={isSubmitting}
+        >
           {isSubmitting ? "Creating Blueprint..." : "Create Blueprint"}
         </Button>
       </form>
