@@ -25,26 +25,30 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#86C93E", // Soft green
-          light: "#F2FCE2",   // Very light green
-          dark: "#68A030",    // Darker green
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#0263E0", // Twilio blue
+          foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#FEF7CD", // Soft yellow
-          foreground: "#F97316", // Bright orange for contrast
+          DEFAULT: "#1C2533", // Dark sidebar color
+          foreground: "#FFFFFF",
+        },
+        sidebar: {
+          DEFAULT: "#1C2533", // Dark sidebar background
+          hover: "#252F3F",
+          active: "#2C3B52",
+          text: "#FFFFFF",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "#6B7280",
+          foreground: "#9CA3AF",
         },
         accent: {
-          DEFAULT: "#F2FCE2", // Light green as accent
-          foreground: "#68A030",
+          DEFAULT: "#252F3F",
+          foreground: "#FFFFFF",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",

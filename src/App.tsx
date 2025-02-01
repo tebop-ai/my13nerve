@@ -53,9 +53,9 @@ const AppContent = () => {
   return (
     <SidebarProvider>
       <TooltipProvider>
-        <div className="min-h-screen flex w-full">
+        <div className="min-h-screen flex w-full bg-[#F7F9FC]">
           {!isLandingPage && isAuthenticated && <AppSidebar />}
-          <main className={`${!isLandingPage ? 'flex-1' : 'w-full'}`}>
+          <main className={`${!isLandingPage ? 'flex-1 p-8' : 'w-full'}`}>
             <Routes>
               <Route 
                 path="/" 
