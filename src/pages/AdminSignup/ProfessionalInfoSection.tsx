@@ -1,9 +1,10 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { ProfessionalInfoSectionProps } from "./types";
 
-export const ProfessionalInfoSection = ({ form }: ProfessionalInfoSectionProps) => {
+export const ProfessionalInfoSection = ({ form, onNext, onBack }: ProfessionalInfoSectionProps) => {
   return (
     <div className="space-y-4">
       <FormField
@@ -68,6 +69,22 @@ export const ProfessionalInfoSection = ({ form }: ProfessionalInfoSectionProps) 
           </FormItem>
         )}
       />
+
+      <div className="flex justify-between pt-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+        >
+          Back
+        </Button>
+        <Button
+          type="button"
+          onClick={onNext}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 };

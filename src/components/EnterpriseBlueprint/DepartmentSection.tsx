@@ -1,20 +1,13 @@
 import { TypeSelectionGroup } from "./TypeSelectionGroup";
 import { AccountingTasksTable } from "./AccountingTasksTable";
-import type { 
-  ExecutiveType,
-  ManagementType,
-  BusinessFunctionType
-} from "@/types/enterprise";
-
-const EXECUTIVE_TYPES = ['cto', 'cfo', 'coo', 'cmo', 'chro', 'cio'] as const;
-const MANAGEMENT_TYPES = ['project', 'product', 'operations', 'hr', 'finance', 'marketing'] as const;
+import type { DepartmentType } from "@/types/enterprise";
 
 interface DepartmentSectionProps {
-  selectedBusinessFunctions: BusinessFunctionType[];
-  selectedExecutiveTypes: ExecutiveType[];
-  onExecutiveTypeSelect: (type: ExecutiveType) => void;
-  selectedManagementTypes: ManagementType[];
-  onManagementTypeSelect: (type: ManagementType) => void;
+  selectedBusinessFunctions: string[];
+  selectedExecutiveTypes: string[];
+  onExecutiveTypeSelect: (type: string) => void;
+  selectedManagementTypes: string[];
+  onManagementTypeSelect: (type: string) => void;
   selectedAccountingTasks: string[];
   onAccountingTaskSelect: (taskId: string) => void;
 }
@@ -37,13 +30,13 @@ export const DepartmentSection = ({
           </h3>
           <TypeSelectionGroup
             label="Executive Types"
-            types={EXECUTIVE_TYPES}
+            types={['cto', 'cfo', 'coo', 'cmo', 'chro', 'cio'] as const}
             selectedTypes={selectedExecutiveTypes}
             onTypeSelect={onExecutiveTypeSelect}
           />
           <TypeSelectionGroup
             label="Management Types"
-            types={MANAGEMENT_TYPES}
+            types={['project', 'product', 'operations', 'hr', 'finance', 'marketing'] as const}
             selectedTypes={selectedManagementTypes}
             onTypeSelect={onManagementTypeSelect}
           />
