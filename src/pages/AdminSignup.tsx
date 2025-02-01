@@ -1,99 +1,146 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Card } from "@/components/ui/card";
 import { PersonalInfoSection } from "./AdminSignup/PersonalInfoSection";
 import { ProfessionalInfoSection } from "./AdminSignup/ProfessionalInfoSection";
 import { AgreementsSection } from "./AdminSignup/AgreementsSection";
-import { adminSignupSchema, type AdminSignupFormData } from "./AdminSignup/types";
+import { AdminApplicationFormData } from "./AdminSignup/types";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminSignup = () => {
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const form = useForm<AdminSignupFormData>({
-    resolver: zodResolver(adminSignupSchema),
-    defaultValues: {
-      background_check_consent: false,
-      terms_accepted: false,
-      code_of_conduct_accepted: false,
-    },
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState<AdminApplicationFormData>({
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+    governmentIdUrl: "",
+    currentJobTitle: "",
+    workExperience: "",
+    industryExpertise: "",
+    linkedinProfile: "",
+    purposeStatement: "",
+    roleFunction: "",
+    certifications: "",
+    aiSystemsExperience: "",
+    backgroundCheckConsent: false,
+    ndaDocumentUrl: "",
+    preferredAuthMethod: "",
+    professionalReferences: "",
+    endorsements: "",
+    termsAccepted: false,
+    codeOfConductAccepted: false,
+    personalStatement: "",
+    languagesSpoken: "",
+    preferredTimezone: "",
   });
 
-  const onSubmit = async (values: AdminSignupFormData) => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSubmit = async () => {
     try {
-      console.log("Starting admin application submission with values:", values);
+      console.log("Submitting admin application:", formData);
       
       const { data, error } = await supabase
-        .from("admin_profile_applications")
-        .insert([{
-          full_name: values.full_name,
-          email: values.email,
-          phone_number: values.phone_number,
-          current_job_title: values.current_job_title,
-          work_experience: values.work_experience,
-          industry_expertise: values.industry_expertise,
-          linkedin_profile: values.linkedin_profile,
-          purpose_statement: values.purpose_statement,
-          ai_systems_experience: values.ai_systems_experience,
-          certifications: values.certifications,
-          background_check_consent: values.background_check_consent,
-          terms_accepted: values.terms_accepted,
-          code_of_conduct_accepted: values.code_of_conduct_accepted,
-          personal_statement: values.personal_statement,
-          languages_spoken: values.languages_spoken,
-          preferred_timezone: values.preferred_timezone,
-          status: 'pending'
-        }])
+        .from('admin_profile_applications')
+        .insert([
+          {
+            full_name: formData.fullName,
+            email: formData.email,
+            phone_number: formData.phoneNumber,
+            government_id_url: formData.governmentIdUrl,
+            current_job_title: formData.currentJobTitle,
+            work_experience: formData.workExperience,
+            industry_expertise: formData.industryExpertise,
+            linkedin_profile: formData.linkedinProfile,
+            purpose_statement: formData.purposeStatement,
+            role_function: formData.roleFunction,
+            certifications: formData.certifications,
+            ai_systems_experience: formData.aiSystemsExperience,
+            background_check_consent: formData.backgroundCheckConsent,
+            nda_document_url: formData.ndaDocumentUrl,
+            preferred_auth_method: formData.preferredAuthMethod,
+            professional_references: formData.professionalReferences,
+            endorsements: formData.endorsements,
+            terms_accepted: formData.termsAccepted,
+            code_of_conduct_accepted: formData.codeOfConductAccepted,
+            personal_statement: formData.personalStatement,
+            languages_spoken: formData.languagesSpoken,
+            preferred_timezone: formData.preferredTimezone,
+            status: 'pending'
+          }
+        ])
         .select();
 
-      if (error) {
-        console.error("Error submitting admin application:", error);
-        throw error;
-      }
+      if (error) throw error;
 
       console.log("Admin application submitted successfully:", data);
-
+      
       toast({
-        title: "Application Submitted Successfully",
-        description: "Your application has been sent for review. We'll contact you soon.",
-        duration: 5000,
+        title: "Application Submitted",
+        description: "Your admin application has been submitted successfully. We'll review it shortly.",
       });
       
       navigate("/");
     } catch (error) {
       console.error("Error submitting admin application:", error);
       toast({
-        title: "Error",
+        title: "Submission Error",
         description: "There was an error submitting your application. Please try again.",
         variant: "destructive",
-        duration: 5000,
       });
     }
   };
 
-  return (
-    <div className="container max-w-2xl mx-auto p-6 space-y-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">Admin Profile Application</h1>
-        <p className="text-muted-foreground">
-          Complete this form to apply for an admin position
-        </p>
-      </div>
+  const updateFormData = (data: Partial<AdminApplicationFormData>) => {
+    setFormData(prev => ({ ...prev, ...data }));
+  };
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <PersonalInfoSection form={form} />
-          <ProfessionalInfoSection form={form} />
-          <AgreementsSection form={form} />
+  const handleNext = () => {
+    setCurrentStep(prev => Math.min(prev + 1, 3));
+  };
+
+  const handleBack = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Admin Application</h1>
+          <p className="mt-2 text-gray-600">Join our team of administrators</p>
+        </div>
+
+        <Card className="p-6">
+          {currentStep === 1 && (
+            <PersonalInfoSection
+              formData={formData}
+              updateFormData={updateFormData}
+              onNext={handleNext}
+            />
+          )}
           
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Submitting..." : "Submit Application"}
-          </Button>
-        </form>
-      </Form>
+          {currentStep === 2 && (
+            <ProfessionalInfoSection
+              formData={formData}
+              updateFormData={updateFormData}
+              onNext={handleNext}
+              onBack={handleBack}
+            />
+          )}
+          
+          {currentStep === 3 && (
+            <AgreementsSection
+              formData={formData}
+              updateFormData={updateFormData}
+              onSubmit={handleSubmit}
+              onBack={handleBack}
+            />
+          )}
+        </Card>
+      </div>
     </div>
   );
 };
