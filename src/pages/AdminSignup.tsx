@@ -7,14 +7,14 @@ import { AgreementsSection } from "./AdminSignup/AgreementsSection";
 import { AdminSignupFormData } from "./AdminSignup/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 
 const AdminSignup = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const form = useForm<AdminSignupFormData>({
+  const methods = useForm<AdminSignupFormData>({
     defaultValues: {
       full_name: "",
       email: "",
@@ -105,54 +105,28 @@ const AdminSignup = () => {
         </div>
 
         <Card className="p-6">
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
-            {currentStep === 1 && (
-              <PersonalInfoSection
-                form={form}
-              />
-            )}
-            
-            {currentStep === 2 && (
-              <ProfessionalInfoSection
-                form={form}
-              />
-            )}
-            
-            {currentStep === 3 && (
-              <AgreementsSection
-                form={form}
-              />
-            )}
-
-            <div className="mt-6 flex justify-between">
-              {currentStep > 1 && (
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  Back
-                </button>
+          <FormProvider {...methods}>
+            <form onSubmit={methods.handleSubmit(handleSubmit)}>
+              {currentStep === 1 && (
+                <PersonalInfoSection
+                  onNext={handleNext}
+                />
               )}
               
-              {currentStep < 3 ? (
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  Next
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  className="ml-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  Submit Application
-                </button>
+              {currentStep === 2 && (
+                <ProfessionalInfoSection
+                  onNext={handleNext}
+                  onBack={handleBack}
+                />
               )}
-            </div>
-          </form>
+              
+              {currentStep === 3 && (
+                <AgreementsSection
+                  onBack={handleBack}
+                />
+              )}
+            </form>
+          </FormProvider>
         </Card>
       </div>
     </div>
