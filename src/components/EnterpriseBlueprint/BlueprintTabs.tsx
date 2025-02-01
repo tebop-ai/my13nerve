@@ -10,7 +10,8 @@ import type {
   ExecutiveType,
   ManagementType,
   BusinessFunctionType,
-  DepartmentCategoryType
+  DepartmentCategoryType,
+  DepartmentType
 } from "@/types/enterprise";
 
 interface BlueprintTabsProps {
@@ -26,12 +27,8 @@ interface BlueprintTabsProps {
   onBusinessFunctionSelect: (type: BusinessFunctionType) => void;
   selectedDepartmentCategories: DepartmentCategoryType[];
   onDepartmentCategorySelect: (type: DepartmentCategoryType) => void;
-  selectedExecutiveTypes: ExecutiveType[];
-  onExecutiveTypeSelect: (type: ExecutiveType) => void;
-  selectedManagementTypes: ManagementType[];
-  onManagementTypeSelect: (type: ManagementType) => void;
-  selectedAccountingTasks: string[];
-  onAccountingTaskSelect: (taskId: string) => void;
+  selectedDepartments: DepartmentType[];
+  onDepartmentSelect: (type: DepartmentType) => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   isSubmitting: boolean;
@@ -51,12 +48,8 @@ export const BlueprintTabs = ({
   onBusinessFunctionSelect,
   selectedDepartmentCategories,
   onDepartmentCategorySelect,
-  selectedExecutiveTypes,
-  onExecutiveTypeSelect,
-  selectedManagementTypes,
-  onManagementTypeSelect,
-  selectedAccountingTasks,
-  onAccountingTaskSelect,
+  selectedDepartments,
+  onDepartmentSelect,
   activeTab,
   setActiveTab,
   isSubmitting,
@@ -111,13 +104,8 @@ export const BlueprintTabs = ({
 
         <TabsContent value="departments">
           <DepartmentSection 
-            selectedBusinessFunctions={selectedBusinessFunctions}
-            selectedExecutiveTypes={selectedExecutiveTypes}
-            onExecutiveTypeSelect={onExecutiveTypeSelect}
-            selectedManagementTypes={selectedManagementTypes}
-            onManagementTypeSelect={onManagementTypeSelect}
-            selectedAccountingTasks={selectedAccountingTasks}
-            onAccountingTaskSelect={onAccountingTaskSelect}
+            selectedDepartments={selectedDepartments}
+            onDepartmentSelect={onDepartmentSelect}
           />
         </TabsContent>
       </Tabs>
