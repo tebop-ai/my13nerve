@@ -135,7 +135,10 @@ export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => 
         }])
         .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error creating blueprint:", error);
+        throw error;
+      }
 
       console.log("Blueprint created successfully:", data);
 
