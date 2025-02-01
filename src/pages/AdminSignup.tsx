@@ -115,6 +115,7 @@ const AdminSignup = () => {
               
               {currentStep === 2 && (
                 <ProfessionalInfoSection
+                  form={methods}
                   onNext={handleNext}
                   onBack={handleBack}
                 />
@@ -122,6 +123,7 @@ const AdminSignup = () => {
               
               {currentStep === 3 && (
                 <AgreementsSection
+                  form={methods}
                   onBack={handleBack}
                 />
               )}
