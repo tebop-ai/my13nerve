@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { PersonalInfoSection } from "./AdminSignup/PersonalInfoSection";
@@ -11,6 +11,7 @@ import { useForm, FormProvider } from "react-hook-form";
 
 const AdminSignup = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -37,8 +38,36 @@ const AdminSignup = () => {
     }
   });
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      
+      if (!session) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to submit an admin application.",
+          variant: "destructive",
+        });
+        navigate("/");
+      }
+    };
+
+    checkAuth();
+  }, [navigate, toast]);
+
   const handleSubmit = async (data: AdminSignupFormData) => {
     try {
+      if (!isAuthenticated) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to submit an admin application.",
+          variant: "destructive",
+        });
+        navigate("/");
+        return;
+      }
+
       console.log("Submitting admin application:", data);
       
       const { data: response, error } = await supabase
@@ -68,7 +97,10 @@ const AdminSignup = () => {
         ])
         .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error submitting admin application:", error);
+        throw error;
+      }
 
       console.log("Admin application submitted successfully:", response);
       
@@ -95,6 +127,10 @@ const AdminSignup = () => {
   const handleBack = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
   };
+
+  if (!isAuthenticated) {
+    return null; // Don't render anything while checking authentication
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
