@@ -1,11 +1,6 @@
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-import { UseFormReturn } from "react-hook-form";
-import { AdminSignupFormData } from "./types";
-
-interface AgreementsSectionProps {
-  form: UseFormReturn<AdminSignupFormData>;
-}
+import { AgreementsSectionProps } from "./types";
 
 export const AgreementsSection = ({ form }: AgreementsSectionProps) => {
   return (

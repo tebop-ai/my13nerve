@@ -1,11 +1,6 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
-import { AdminSignupFormData } from "./types";
-
-interface PersonalInfoSectionProps {
-  form: UseFormReturn<AdminSignupFormData>;
-}
+import { PersonalInfoSectionProps } from "./types";
 
 export const PersonalInfoSection = ({ form }: PersonalInfoSectionProps) => {
   return (

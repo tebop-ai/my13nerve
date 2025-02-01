@@ -1,3 +1,5 @@
+import { UseFormReturn } from "react-hook-form";
+
 export interface AdminSignupFormData {
   full_name: string;
   email: string;
@@ -17,4 +19,16 @@ export interface AdminSignupFormData {
   preferred_timezone: string;
   professional_references?: string;
   endorsements?: string;
+}
+
+export interface PersonalInfoSectionProps {
+  form: UseFormReturn<AdminSignupFormData>;
+}
+
+export interface ProfessionalInfoSectionProps {
+  form: UseFormReturn<AdminSignupFormData>;
+}
+
+export interface AgreementsSectionProps {
+  form: UseFormReturn<AdminSignupFormData>;
 }
