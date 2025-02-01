@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,13 +7,13 @@ import { TypeSelectionGroup } from "./TypeSelectionGroup";
 import { DepartmentSection } from "./DepartmentSection";
 import { BusinessFunctionsGroup } from "./BusinessFunctionsGroup";
 import { BlueprintBasicInfo } from "./BlueprintBasicInfo";
-import type { EnterpriseType, BoardType, CeoType, ExecutiveType, ManagementType, DepartmentType } from "@/types/enterprise";
+import type { EnterpriseType, BoardType, CEOType, ExecutiveType, ManagementType, DepartmentType } from "@/types/enterprise";
 
 export const CreateBlueprintForm = () => {
   const [name, setName] = useState("");
   const [enterpriseType, setEnterpriseType] = useState<EnterpriseType>("startup");
   const [boardType, setBoardType] = useState<BoardType>("traditional");
-  const [ceoType, setCeoType] = useState<CeoType>("founder");
+  const [ceoType, setCeoType] = useState<CEOType>("founder");
   const [executiveTypes, setExecutiveTypes] = useState<ExecutiveType[]>([]);
   const [managementTypes, setManagementTypes] = useState<ManagementType[]>([]);
   const [departmentTypes, setDepartmentTypes] = useState<DepartmentType[]>(["accounting"]);
@@ -110,17 +109,41 @@ export const CreateBlueprintForm = () => {
 
       <Card className="p-6">
         <TypeSelectionGroup
-          executiveTypes={executiveTypes}
-          setExecutiveTypes={setExecutiveTypes}
-          managementTypes={managementTypes}
-          setManagementTypes={setManagementTypes}
+          label="Executive Types"
+          types={["cto", "cfo", "coo", "cmo", "chro", "cio"] as const}
+          selectedTypes={executiveTypes}
+          onTypeSelect={(type) => {
+            if (executiveTypes.includes(type)) {
+              setExecutiveTypes(executiveTypes.filter(t => t !== type));
+            } else {
+              setExecutiveTypes([...executiveTypes, type]);
+            }
+          }}
+        />
+        <TypeSelectionGroup
+          label="Management Types"
+          types={["project", "product", "operations", "hr", "finance", "marketing"] as const}
+          selectedTypes={managementTypes}
+          onTypeSelect={(type) => {
+            if (managementTypes.includes(type)) {
+              setManagementTypes(managementTypes.filter(t => t !== type));
+            } else {
+              setManagementTypes([...managementTypes, type]);
+            }
+          }}
         />
       </Card>
 
       <Card className="p-6">
         <DepartmentSection
-          departmentTypes={departmentTypes}
-          setDepartmentTypes={setDepartmentTypes}
+          selectedDepartments={departmentTypes}
+          onDepartmentSelect={(type) => {
+            if (departmentTypes.includes(type)) {
+              setDepartmentTypes(departmentTypes.filter(t => t !== type));
+            } else {
+              setDepartmentTypes([...departmentTypes, type]);
+            }
+          }}
         />
       </Card>
 
