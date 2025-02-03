@@ -24,18 +24,23 @@ export const ApplicationCard = ({
     try {
       console.log("Approving application:", application.id);
       
-      const { error } = await supabase
+      // First update the application status
+      const { error: updateError } = await supabase
         .from('admin_profile_applications')
-        .update({ status: 'approved' })
+        .update({ 
+          status: 'approved',
+          updated_at: new Date().toISOString()
+        })
         .eq('id', application.id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
+      // Notify the parent component
       onUpdateStatus(application.id, 'approved');
       
       toast({
         title: "Application Approved",
-        description: "Admin profile will be created automatically.",
+        description: "Admin profile has been created successfully.",
       });
     } catch (error) {
       console.error('Error approving application:', error);
