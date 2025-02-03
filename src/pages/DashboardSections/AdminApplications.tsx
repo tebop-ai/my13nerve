@@ -1,14 +1,17 @@
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { ApplicationCard } from "./components/ApplicationCard";
 import { ApplicationPreviewDialog } from "./components/ApplicationPreviewDialog";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export const AdminApplications = () => {
   const { toast } = useToast();
   const [previewApplication, setPreviewApplication] = useState<any>(null);
+  const queryClient = useQueryClient();
 
   const { data: applications, refetch } = useQuery({
     queryKey: ['adminApplications'],
@@ -45,6 +48,9 @@ export const AdminApplications = () => {
           title: "Application Approved",
           description: "Admin profile will be created automatically.",
         });
+        // Refresh both applications and profiles lists
+        queryClient.invalidateQueries({ queryKey: ['adminApplications'] });
+        queryClient.invalidateQueries({ queryKey: ['adminProfiles'] });
       } else {
         toast({
           title: "Application Declined",
@@ -63,49 +69,80 @@ export const AdminApplications = () => {
     }
   };
 
-  const downloadApplication = (application: any) => {
-    const applicationData = {
-      "Personal Information": {
-        "Full Name": application.full_name,
-        "Email": application.email,
-        "Phone": application.phone_number,
-        "Languages": application.languages_spoken,
-        "Timezone": application.preferred_timezone
-      },
-      "Professional Information": {
-        "Current Job Title": application.current_job_title,
-        "Work Experience": application.work_experience,
-        "Industry Expertise": application.industry_expertise,
-        "LinkedIn Profile": application.linkedin_profile,
-        "Certifications": application.certifications,
-        "AI Systems Experience": application.ai_systems_experience
-      },
-      "Application Details": {
-        "Purpose Statement": application.purpose_statement,
-        "Personal Statement": application.personal_statement,
-        "Role Function": application.role_function,
-        "Professional References": application.professional_references,
-        "Endorsements": application.endorsements
-      },
-      "Documents & Verification": {
-        "Government ID": application.government_id_url,
-        "NDA Document": application.nda_document_url,
-        "Background Check Consent": application.background_check_consent ? "Yes" : "No",
-        "Terms Accepted": application.terms_accepted ? "Yes" : "No",
-        "Code of Conduct Accepted": application.code_of_conduct_accepted ? "Yes" : "No"
-      }
-    };
+  const downloadApplicationPDF = async (application: any) => {
+    try {
+      const doc = new jsPDF();
+      
+      // Add title
+      doc.setFontSize(20);
+      doc.text('Admin Application', 14, 20);
+      
+      // Personal Information
+      doc.setFontSize(16);
+      doc.text('Personal Information', 14, 40);
+      autoTable(doc, {
+        startY: 45,
+        head: [['Field', 'Value']],
+        body: [
+          ['Full Name', application.full_name],
+          ['Email', application.email],
+          ['Phone', application.phone_number || 'N/A'],
+          ['Languages', application.languages_spoken || 'N/A'],
+          ['Timezone', application.preferred_timezone || 'N/A']
+        ],
+      });
 
-    const jsonString = JSON.stringify(applicationData, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${application.full_name.replace(/\s+/g, '_')}_application.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      // Professional Information
+      doc.text('Professional Information', 14, doc.lastAutoTable.finalY + 20);
+      autoTable(doc, {
+        startY: doc.lastAutoTable.finalY + 25,
+        head: [['Field', 'Value']],
+        body: [
+          ['Current Position', application.current_job_title || 'N/A'],
+          ['Industry Expertise', application.industry_expertise || 'N/A'],
+          ['Work Experience', application.work_experience || 'N/A'],
+          ['Certifications', application.certifications || 'N/A'],
+          ['AI Systems Experience', application.ai_systems_experience || 'N/A']
+        ],
+      });
+
+      // Application Details
+      doc.text('Application Details', 14, doc.lastAutoTable.finalY + 20);
+      autoTable(doc, {
+        startY: doc.lastAutoTable.finalY + 25,
+        head: [['Field', 'Value']],
+        body: [
+          ['Purpose Statement', application.purpose_statement || 'N/A'],
+          ['Personal Statement', application.personal_statement || 'N/A'],
+          ['Role Function', application.role_function || 'N/A'],
+          ['Professional References', application.professional_references || 'N/A']
+        ],
+      });
+
+      // Save PDF
+      const pdfName = `${application.full_name.replace(/\s+/g, '_')}_application.pdf`;
+      doc.save(pdfName);
+
+      // Update the pdf_downloaded_at timestamp
+      const { error } = await supabase
+        .from('admin_profile_applications')
+        .update({ pdf_downloaded_at: new Date().toISOString() })
+        .eq('id', application.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "PDF Downloaded",
+        description: "Application has been saved as PDF.",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -117,7 +154,7 @@ export const AdminApplications = () => {
             key={application.id}
             application={application}
             onPreview={setPreviewApplication}
-            onDownload={downloadApplication}
+            onDownload={downloadApplicationPDF}
             onUpdateStatus={handleApplicationStatus}
           />
         ))}

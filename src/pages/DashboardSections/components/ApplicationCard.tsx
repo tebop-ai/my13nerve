@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { UserCheck, UserX, Eye, Download, Clock } from "lucide-react";
+import { UserCheck, UserX, Eye, Download, Clock, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,6 +55,7 @@ export const ApplicationCard = ({
             <h3 className="text-lg font-semibold">{application.full_name}</h3>
             {application.status === 'approved' && (
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <CheckCircle className="w-4 h-4 mr-1" />
                 Approved
               </span>
             )}
@@ -90,7 +91,7 @@ export const ApplicationCard = ({
             size="sm"
           >
             <Download className="mr-2 h-4 w-4" />
-            Download
+            Download PDF
           </Button>
           {application.status === 'pending' && (
             <>
