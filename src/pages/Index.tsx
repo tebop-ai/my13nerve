@@ -40,15 +40,14 @@ const Index = ({ onAdminLogin }: IndexProps) => {
     
     try {
       console.log("Starting admin login process...");
-      console.log("Attempting login with:", { adminUsername, adminSuperCode });
+      console.log("Attempting login with:", { adminUsername });
       
       const { data: adminProfile, error } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('email', adminUsername)
+        .eq('full_name', adminUsername)
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
-        .eq('is_super_admin', true)
         .maybeSingle();
 
       if (error) {
@@ -63,6 +62,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         throw new Error('Invalid credentials');
       }
 
+      // Update last login timestamp
       const { error: updateError } = await supabase
         .from('admin_profiles')
         .update({ last_login: new Date().toISOString() })
@@ -71,6 +71,10 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       if (updateError) {
         console.error("Error updating last login:", updateError);
       }
+
+      // Store authentication state
+      sessionStorage.setItem("isAdminAuthenticated", "true");
+      sessionStorage.setItem("adminProfile", JSON.stringify(adminProfile));
 
       toast({
         title: "Login successful",
