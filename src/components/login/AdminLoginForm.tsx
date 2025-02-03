@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export const AdminLoginForm = () => {
-  const [adminUsername, setAdminUsername] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
   const [adminSuperCode, setAdminSuperCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export const AdminLoginForm = () => {
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!adminUsername || !adminSuperCode) {
+    if (!adminEmail || !adminSuperCode) {
       toast({
         title: "Validation Error",
         description: "Please fill in all fields",
@@ -34,13 +34,13 @@ export const AdminLoginForm = () => {
     
     try {
       console.log("Starting admin login process...");
-      console.log("Attempting login with:", { adminUsername });
+      console.log("Attempting login with:", { adminEmail });
       
       // Query for admin profile with exact matches
       const { data: adminProfile, error } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('full_name', adminUsername)
+        .eq('email', adminEmail)
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
         .maybeSingle();
@@ -99,14 +99,14 @@ export const AdminLoginForm = () => {
 
         <form onSubmit={handleAdminSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Username</label>
+            <label className="text-sm font-medium">Email</label>
             <div className="relative">
               <Input
-                type="text"
-                placeholder="Enter your username"
+                type="email"
+                placeholder="Enter your email"
                 className="pl-10"
-                value={adminUsername}
-                onChange={(e) => setAdminUsername(e.target.value)}
+                value={adminEmail}
+                onChange={(e) => setAdminEmail(e.target.value)}
                 disabled={isLoading}
                 required
               />
