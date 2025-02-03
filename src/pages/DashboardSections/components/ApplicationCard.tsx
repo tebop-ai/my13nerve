@@ -30,8 +30,7 @@ export const ApplicationCard = ({
         .select('*')
         .eq('email', 'Goapele Main')
         .eq('is_super_admin', true)
-        .eq('status', 'active')
-        .maybeSingle();
+        .single();
 
       console.log("Admin profile check result:", { adminProfile, adminError });
 
@@ -40,16 +39,6 @@ export const ApplicationCard = ({
         toast({
           title: "System Error",
           description: "Failed to verify admin permissions. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!adminProfile) {
-        console.error("No super admin profile found");
-        toast({
-          title: "Authorization Error",
-          description: "Only the super admin can approve applications. Please ensure you're logged in with the correct account.",
           variant: "destructive",
         });
         return;
