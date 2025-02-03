@@ -22,6 +22,8 @@ const departmentTableMap = {
   research_development: "R&D_Ops"
 } as const;
 
+type TableName = typeof departmentTableMap[keyof typeof departmentTableMap];
+
 const fetchDepartmentTasks = async (department: DepartmentType) => {
   console.log('Fetching tasks for department:', department);
   const tableName = departmentTableMap[department];
