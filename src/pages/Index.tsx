@@ -40,6 +40,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
     
     try {
       console.log("Starting admin login process...");
+      console.log("Attempting login with:", { adminUsername, adminSuperCode });
       
       const { data: adminProfile, error } = await supabase
         .from('admin_profiles')
@@ -60,13 +61,6 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       if (!adminProfile) {
         console.log("No matching admin profile found");
         throw new Error('Invalid credentials');
-      }
-
-      const loginSuccess = onAdminLogin(adminUsername, adminSuperCode);
-      console.log("Hardcoded credentials check result:", loginSuccess);
-
-      if (!loginSuccess) {
-        throw new Error('Login verification failed');
       }
 
       const { error: updateError } = await supabase
@@ -104,7 +98,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
           <p className="text-gray-600">Business Co-pilot Platform</p>
         </div>
 
-        <Tabs defaultValue="users" className="w-full">
+        <Tabs defaultValue="admins" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="users">Enterprise Users</TabsTrigger>
             <TabsTrigger value="admins">For Admins</TabsTrigger>
