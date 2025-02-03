@@ -35,7 +35,11 @@ export const AdminApplications = () => {
       
       const { error } = await supabase
         .from('admin_profile_applications')
-        .update({ status })
+        .update({ 
+          status,
+          updated_at: new Date().toISOString(),
+          reviewed_by: (await supabase.auth.getUser()).data.user?.id
+        })
         .eq('id', id);
 
       if (error) throw error;
@@ -63,51 +67,6 @@ export const AdminApplications = () => {
     }
   };
 
-  const downloadApplication = (application: any) => {
-    const applicationData = {
-      "Personal Information": {
-        "Full Name": application.full_name,
-        "Email": application.email,
-        "Phone": application.phone_number,
-        "Languages": application.languages_spoken,
-        "Timezone": application.preferred_timezone
-      },
-      "Professional Information": {
-        "Current Job Title": application.current_job_title,
-        "Work Experience": application.work_experience,
-        "Industry Expertise": application.industry_expertise,
-        "LinkedIn Profile": application.linkedin_profile,
-        "Certifications": application.certifications,
-        "AI Systems Experience": application.ai_systems_experience
-      },
-      "Application Details": {
-        "Purpose Statement": application.purpose_statement,
-        "Personal Statement": application.personal_statement,
-        "Role Function": application.role_function,
-        "Professional References": application.professional_references,
-        "Endorsements": application.endorsements
-      },
-      "Documents & Verification": {
-        "Government ID": application.government_id_url,
-        "NDA Document": application.nda_document_url,
-        "Background Check Consent": application.background_check_consent ? "Yes" : "No",
-        "Terms Accepted": application.terms_accepted ? "Yes" : "No",
-        "Code of Conduct Accepted": application.code_of_conduct_accepted ? "Yes" : "No"
-      }
-    };
-
-    const jsonString = JSON.stringify(applicationData, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${application.full_name.replace(/\s+/g, '_')}_application.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <Card className="p-6">
       <h2 className="text-2xl font-semibold mb-4">Admin Applications</h2>
@@ -117,7 +76,7 @@ export const AdminApplications = () => {
             key={application.id}
             application={application}
             onPreview={setPreviewApplication}
-            onDownload={downloadApplication}
+            onDownload={() => {}}
             onUpdateStatus={handleApplicationStatus}
           />
         ))}

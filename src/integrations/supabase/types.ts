@@ -208,6 +208,7 @@ export type Database = {
           ceo_type: Database["public"]["Enums"]["ceo_type"]
           created_at: string | null
           created_by: string | null
+          csv_tasks: Json | null
           department_categories:
             | Database["public"]["Enums"]["department_category_type"][]
             | null
@@ -228,6 +229,7 @@ export type Database = {
           ceo_type: Database["public"]["Enums"]["ceo_type"]
           created_at?: string | null
           created_by?: string | null
+          csv_tasks?: Json | null
           department_categories?:
             | Database["public"]["Enums"]["department_category_type"][]
             | null
@@ -248,6 +250,7 @@ export type Database = {
           ceo_type?: Database["public"]["Enums"]["ceo_type"]
           created_at?: string | null
           created_by?: string | null
+          csv_tasks?: Json | null
           department_categories?:
             | Database["public"]["Enums"]["department_category_type"][]
             | null

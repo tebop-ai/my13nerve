@@ -4,6 +4,7 @@ import { UserCheck, UserX, Eye, Download, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { jsPDF } from "jspdf";
 
 interface ApplicationCardProps {
   application: any;
@@ -15,7 +16,7 @@ interface ApplicationCardProps {
 export const ApplicationCard = ({ 
   application, 
   onPreview, 
-  onDownload, 
+  onDownload,
   onUpdateStatus 
 }: ApplicationCardProps) => {
   const { toast } = useToast();
@@ -24,7 +25,6 @@ export const ApplicationCard = ({
     try {
       console.log("Approving application:", application.id);
       
-      // First update the application status
       const { error: updateError } = await supabase
         .from('admin_profile_applications')
         .update({ 
@@ -35,7 +35,6 @@ export const ApplicationCard = ({
 
       if (updateError) throw updateError;
 
-      // Notify the parent component
       onUpdateStatus(application.id, 'approved');
       
       toast({
@@ -47,6 +46,55 @@ export const ApplicationCard = ({
       toast({
         title: "Error",
         description: "Failed to approve application.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownload = async () => {
+    try {
+      const doc = new jsPDF();
+      
+      // Add header
+      doc.setFontSize(20);
+      doc.text("Admin Application Form", 20, 20);
+      
+      // Add application details
+      doc.setFontSize(12);
+      doc.text(`Full Name: ${application.full_name}`, 20, 40);
+      doc.text(`Email: ${application.email}`, 20, 50);
+      doc.text(`Phone: ${application.phone_number}`, 20, 60);
+      doc.text(`Current Position: ${application.current_job_title}`, 20, 70);
+      
+      // Add work experience
+      doc.text("Work Experience:", 20, 90);
+      const workExpLines = doc.splitTextToSize(application.work_experience, 170);
+      doc.text(workExpLines, 20, 100);
+      
+      // Add industry expertise
+      doc.text("Industry Expertise:", 20, 130);
+      const expertiseLines = doc.splitTextToSize(application.industry_expertise, 170);
+      doc.text(expertiseLines, 20, 140);
+      
+      // Add LinkedIn profile
+      doc.text(`LinkedIn: ${application.linkedin_profile}`, 20, 170);
+      
+      // Add status and timestamps
+      doc.text(`Status: ${application.status}`, 20, 190);
+      doc.text(`Submitted: ${format(new Date(application.created_at), 'MMM d, yyyy')}`, 20, 200);
+      
+      // Download the PDF
+      doc.save(`${application.full_name.replace(/\s+/g, '_')}_application.pdf`);
+      
+      toast({
+        title: "Download Complete",
+        description: "Application PDF has been generated successfully.",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Download Error",
+        description: "Failed to generate application PDF.",
         variant: "destructive",
       });
     }
@@ -90,12 +138,12 @@ export const ApplicationCard = ({
             Preview
           </Button>
           <Button
-            onClick={() => onDownload(application)}
+            onClick={handleDownload}
             variant="outline"
             size="sm"
           >
             <Download className="mr-2 h-4 w-4" />
-            Download
+            Download PDF
           </Button>
           {application.status === 'pending' && (
             <>
@@ -118,12 +166,6 @@ export const ApplicationCard = ({
               </Button>
             </>
           )}
-          {application.status === 'approved' && application.generated_supercode && (
-            <div className="mt-2 p-2 bg-gray-50 rounded">
-              <p className="text-sm font-medium text-gray-600">SuperCode:</p>
-              <p className="font-mono text-sm">{application.generated_supercode}</p>
-            </div>
-          )}
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 text-sm">
@@ -140,6 +182,12 @@ export const ApplicationCard = ({
         <p className="font-medium">Purpose Statement</p>
         <p className="mt-1">{application.purpose_statement}</p>
       </div>
+      {application.status === 'approved' && application.generated_supercode && (
+        <div className="mt-2 p-2 bg-gray-50 rounded">
+          <p className="text-sm font-medium text-gray-600">SuperCode:</p>
+          <p className="font-mono text-sm">{application.generated_supercode}</p>
+        </div>
+      )}
     </Card>
   );
 };
