@@ -25,7 +25,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
     setIsLoading(true);
     
     try {
-      console.log("Attempting admin login...");
+      console.log("Attempting admin login with:", { adminUsername });
       
       // First check if this is a valid admin in our profiles
       const { data: adminProfile, error: adminError } = await supabase
@@ -37,7 +37,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         .maybeSingle();
 
       if (adminError) {
-        console.error("Admin login error:", adminError);
+        console.error("Admin login database error:", adminError);
         throw new Error('Database error occurred');
       }
 
@@ -46,23 +46,29 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         throw new Error('Invalid credentials');
       }
 
+      console.log("Admin profile found:", adminProfile);
+
       // If valid, proceed with the app's login flow
       if (onAdminLogin(adminUsername, adminSuperCode)) {
         console.log("Admin login successful");
-        toast({
-          title: "Login successful",
-          description: `Welcome back, ${adminProfile.full_name}!`,
-        });
-
+        
         // Update last login timestamp
         const { error: updateError } = await supabase
           .from('admin_profiles')
-          .update({ last_login: new Date().toISOString() })
+          .update({ 
+            last_login: new Date().toISOString() 
+          })
           .eq('id', adminProfile.id);
 
         if (updateError) {
           console.error("Error updating last login:", updateError);
+          // Don't throw here, as login was successful
         }
+
+        toast({
+          title: "Login successful",
+          description: `Welcome back, ${adminProfile.full_name}!`,
+        });
 
         navigate("/dashboard");
       } else {
@@ -79,6 +85,8 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       setIsLoading(false);
     }
   };
+
+  // ... keep existing code (JSX for the component remains unchanged)
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
