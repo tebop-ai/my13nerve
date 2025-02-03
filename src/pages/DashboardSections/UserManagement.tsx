@@ -2,13 +2,9 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Pencil, Trash2, Plus, Mail, Key } from "lucide-react";
+import { CreateUserDialog } from "@/components/user/CreateUserDialog";
+import { UserCard } from "@/components/user/UserCard";
 
 interface UserManagementProps {
   adminId: string;
@@ -17,23 +13,21 @@ interface UserManagementProps {
 export const UserManagement = ({ adminId }: UserManagementProps) => {
   const { toast } = useToast();
   const [isCreating, setIsCreating] = useState(false);
-  const [selectedEnterprise, setSelectedEnterprise] = useState<string>("");
-  const [newUser, setNewUser] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-  });
 
   // Fetch enterprises created by this admin
   const { data: enterprises } = useQuery({
     queryKey: ['enterprises', adminId],
     queryFn: async () => {
+      console.log("Fetching enterprises for admin:", adminId);
       const { data, error } = await supabase
         .from('enterprise_blueprints')
         .select('*')
         .eq('created_by', adminId);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching enterprises:", error);
+        throw error;
+      }
       return data;
     }
   });
@@ -42,6 +36,7 @@ export const UserManagement = ({ adminId }: UserManagementProps) => {
   const { data: users, refetch: refetchUsers } = useQuery({
     queryKey: ['enterpriseUsers', adminId],
     queryFn: async () => {
+      console.log("Fetching users for admin:", adminId);
       const { data, error } = await supabase
         .from('user_profiles')
         .select(`
@@ -52,13 +47,21 @@ export const UserManagement = ({ adminId }: UserManagementProps) => {
         `)
         .eq('admin_creator_id', adminId);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching users:", error);
+        throw error;
+      }
       return data;
     }
   });
 
-  const handleCreateUser = async () => {
-    if (!selectedEnterprise || !newUser.email || !newUser.password || !newUser.fullName) {
+  const handleCreateUser = async (
+    fullName: string,
+    email: string,
+    password: string,
+    enterpriseId: string
+  ) => {
+    if (!enterpriseId || !email || !password || !fullName) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -68,13 +71,15 @@ export const UserManagement = ({ adminId }: UserManagementProps) => {
     }
 
     try {
+      console.log("Creating new user:", { fullName, email, enterpriseId });
+      
       // First create the auth user
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: newUser.email,
-        password: newUser.password,
+        email,
+        password,
         options: {
           data: {
-            full_name: newUser.fullName,
+            full_name: fullName,
           }
         }
       });
@@ -87,9 +92,9 @@ export const UserManagement = ({ adminId }: UserManagementProps) => {
           .from('user_profiles')
           .insert({
             id: authData.user.id,
-            full_name: newUser.fullName,
-            email: newUser.email,
-            enterprise_id: selectedEnterprise,
+            full_name: fullName,
+            email,
+            enterprise_id: enterpriseId,
             admin_creator_id: adminId,
             profile_type: 'enterprise_user'
           });
@@ -102,8 +107,6 @@ export const UserManagement = ({ adminId }: UserManagementProps) => {
         });
 
         setIsCreating(false);
-        setNewUser({ fullName: "", email: "", password: "" });
-        setSelectedEnterprise("");
         refetchUsers();
       }
 
@@ -119,6 +122,7 @@ export const UserManagement = ({ adminId }: UserManagementProps) => {
 
   const handleDeleteUser = async (userId: string) => {
     try {
+      console.log("Deleting user:", userId);
       const { error } = await supabase
         .from('user_profiles')
         .delete()
@@ -144,99 +148,31 @@ export const UserManagement = ({ adminId }: UserManagementProps) => {
     }
   };
 
+  const handleEditUser = (id: string) => {
+    // To be implemented in future
+    console.log("Edit user:", id);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Enterprise Users</h2>
-        <Dialog open={isCreating} onOpenChange={setIsCreating}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Create User
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create Enterprise User</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label>Full Name</Label>
-                <Input
-                  value={newUser.fullName}
-                  onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
-                  placeholder="Enter full name"
-                />
-              </div>
-              <div>
-                <Label>Email</Label>
-                <Input
-                  type="email"
-                  value={newUser.email}
-                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                  placeholder="Enter email"
-                />
-              </div>
-              <div>
-                <Label>Password</Label>
-                <Input
-                  type="password"
-                  value={newUser.password}
-                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                  placeholder="Enter password"
-                />
-              </div>
-              <div>
-                <Label>Select Enterprise</Label>
-                <Select value={selectedEnterprise} onValueChange={setSelectedEnterprise}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an enterprise" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {enterprises?.map((enterprise) => (
-                      <SelectItem key={enterprise.id} value={enterprise.id}>
-                        {enterprise.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button onClick={handleCreateUser} className="w-full">
-                Create User
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <CreateUserDialog
+          enterprises={enterprises || []}
+          isOpen={isCreating}
+          onOpenChange={setIsCreating}
+          onCreate={handleCreateUser}
+        />
       </div>
 
       <div className="grid gap-4">
         {users?.map((user) => (
-          <Card key={user.id} className="p-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-lg font-semibold">{user.full_name}</h3>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Mail className="h-4 w-4" />
-                  {user.email}
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Enterprise: {user.enterprise_blueprints?.name}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="icon">
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  size="icon"
-                  onClick={() => handleDeleteUser(user.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </Card>
+          <UserCard
+            key={user.id}
+            user={user}
+            onDelete={handleDeleteUser}
+            onEdit={handleEditUser}
+          />
         ))}
         
         {!users?.length && (
