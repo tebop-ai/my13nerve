@@ -152,6 +152,9 @@ export type Database = {
           role: string | null
           status: string | null
           supercode: string
+          validated_by: string | null
+          validation_date: string | null
+          validation_status: string | null
         }
         Insert: {
           application_id?: string | null
@@ -165,6 +168,9 @@ export type Database = {
           role?: string | null
           status?: string | null
           supercode: string
+          validated_by?: string | null
+          validation_date?: string | null
+          validation_status?: string | null
         }
         Update: {
           application_id?: string | null
@@ -178,6 +184,9 @@ export type Database = {
           role?: string | null
           status?: string | null
           supercode?: string
+          validated_by?: string | null
+          validation_date?: string | null
+          validation_status?: string | null
         }
         Relationships: [
           {
@@ -416,6 +425,12 @@ export type Database = {
       generate_secure_supercode: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      validate_admin_profile: {
+        Args: {
+          profile_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {

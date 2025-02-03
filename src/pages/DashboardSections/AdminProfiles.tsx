@@ -2,11 +2,12 @@ import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar } from "@/components/ui/avatar";
-import { User, Key, Clock, Shield } from "lucide-react";
+import { User, Key, Clock, Shield, CheckCircle2, XCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const AdminProfiles = () => {
@@ -43,6 +44,29 @@ export const AdminProfiles = () => {
       return data;
     }
   });
+
+  const handleValidateProfile = async (profileId: string) => {
+    try {
+      const { data, error } = await supabase
+        .rpc('validate_admin_profile', { profile_id: profileId });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Admin profile validated successfully",
+      });
+      
+      refetch();
+    } catch (error) {
+      console.error("Error validating profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to validate admin profile",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -120,16 +144,41 @@ export const AdminProfiles = () => {
                     <Key className="h-4 w-4 text-gray-500" />
                     <span className="font-mono text-gray-600">{profile.supercode}</span>
                   </div>
-                  <div className="mt-2 flex gap-2">
+                  <div className="mt-2 flex items-center gap-2">
                     <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">
                       Active Admin
                     </Badge>
+                    {profile.validation_status === 'validated' ? (
+                      <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
+                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                        Validated
+                      </Badge>
+                    ) : profile.validation_status === 'rejected' ? (
+                      <Badge variant="outline" className="text-red-600 border-red-200 bg-red-50">
+                        <XCircle className="h-3 w-3 mr-1" />
+                        Rejected
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-yellow-600 border-yellow-200 bg-yellow-50">
+                        Pending Validation
+                      </Badge>
+                    )}
                     {profile.is_super_admin && (
                       <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
                         Super Admin
                       </Badge>
                     )}
                   </div>
+                  {profile.validation_status === 'pending' && (
+                    <div className="mt-2">
+                      <Button
+                        size="sm"
+                        onClick={() => handleValidateProfile(profile.id)}
+                      >
+                        Validate Profile
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
