@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "./Logo";
 
 export function AppSidebar() {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
   const navigate = useNavigate();
 
   const { data: adminProfile } = useQuery({
@@ -37,14 +37,14 @@ export function AppSidebar() {
     <aside
       className={cn(
         "bg-sidebar text-sidebar-text border-r border-sidebar-border h-screen relative group/sidebar",
-        collapsed ? "w-16" : "w-60"
+        state === "collapsed" ? "w-16" : "w-60"
       )}
     >
       <div className="flex flex-col h-full">
         <div className="h-16 flex items-center justify-center border-b border-sidebar-border">
           <Logo className={cn(
             "transition-all duration-300",
-            collapsed ? "h-8" : "h-10"
+            state === "collapsed" ? "h-8" : "h-10"
           )} />
         </div>
 
@@ -57,7 +57,7 @@ export function AppSidebar() {
                 onClick={() => navigate('/dashboard')}
               >
                 <Building2 className="h-5 w-5 mr-2" />
-                {!collapsed && "Dashboard"}
+                {state !== "collapsed" && "Dashboard"}
               </Button>
               <Button
                 variant="ghost"
@@ -65,7 +65,7 @@ export function AppSidebar() {
                 onClick={() => navigate('/admin-profiles')}
               >
                 <Users className="h-5 w-5 mr-2" />
-                {!collapsed && "Admin Profiles"}
+                {state !== "collapsed" && "Admin Profiles"}
               </Button>
             </>
           ) : (
@@ -76,7 +76,7 @@ export function AppSidebar() {
                 onClick={() => navigate('/admin-dashboard')}
               >
                 <Building2 className="h-5 w-5 mr-2" />
-                {!collapsed && "Enterprises"}
+                {state !== "collapsed" && "Enterprises"}
               </Button>
               <Button
                 variant="ghost"
@@ -84,7 +84,7 @@ export function AppSidebar() {
                 onClick={() => navigate('/users')}
               >
                 <Users className="h-5 w-5 mr-2" />
-                {!collapsed && "Users"}
+                {state !== "collapsed" && "Users"}
               </Button>
             </>
           )}
@@ -95,7 +95,7 @@ export function AppSidebar() {
             onClick={() => navigate('/settings')}
           >
             <Settings className="h-5 w-5 mr-2" />
-            {!collapsed && "Settings"}
+            {state !== "collapsed" && "Settings"}
           </Button>
         </div>
 
@@ -106,7 +106,7 @@ export function AppSidebar() {
             onClick={handleLogout}
           >
             <LogOut className="h-5 w-5 mr-2" />
-            {!collapsed && "Logout"}
+            {state !== "collapsed" && "Logout"}
           </Button>
         </div>
       </div>
