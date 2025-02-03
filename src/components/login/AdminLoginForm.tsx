@@ -27,29 +27,22 @@ export const AdminLoginForm = () => {
     }
 
     setIsLoading(true);
-    toast({
-      title: "Logging in...",
-      description: "Please wait while we verify your credentials",
-    });
+    console.log("Starting admin login process...");
+    console.log("Attempting login with email:", adminEmail);
     
     try {
-      console.log("Starting admin login process...");
-      console.log("Attempting login with email:", adminEmail);
-      
-      // Query for admin profile with exact matches, using simpler query
+      // First, get the admin profile without any conditions except email
       const { data: adminProfile, error: profileError } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', adminEmail.toLowerCase().trim())
-        .eq('supercode', adminSuperCode)
-        .eq('status', 'active')
-        .single();
+        .maybeSingle();
 
-      console.log("Admin profile query result:", { adminProfile, profileError });
+      console.log("Initial admin profile query result:", { adminProfile, profileError });
 
       if (profileError) {
         console.error("Database error:", profileError);
-        throw new Error('Invalid credentials');
+        throw new Error('Error verifying credentials');
       }
 
       if (!adminProfile) {
@@ -57,7 +50,19 @@ export const AdminLoginForm = () => {
         throw new Error('Invalid credentials');
       }
 
-      console.log("Admin profile found:", adminProfile);
+      // Then verify the supercode
+      if (adminProfile.supercode !== adminSuperCode) {
+        console.log("Supercode mismatch");
+        throw new Error('Invalid credentials');
+      }
+
+      // Verify account status
+      if (adminProfile.status !== 'active') {
+        console.log("Account not active");
+        throw new Error('Account is not active');
+      }
+
+      console.log("Admin profile found and verified:", adminProfile);
 
       // Update last login timestamp
       const { error: updateError } = await supabase
@@ -90,7 +95,7 @@ export const AdminLoginForm = () => {
       console.error("Login error:", error);
       toast({
         title: "Login failed",
-        description: "Invalid credentials. Please try again.",
+        description: error instanceof Error ? error.message : "Invalid credentials. Please try again.",
         variant: "destructive",
       });
     } finally {
