@@ -51,6 +51,7 @@ export type Database = {
           languages_spoken: string | null
           linkedin_profile: string | null
           nda_document_url: string | null
+          pdf_downloaded_at: string | null
           personal_statement: string | null
           phone_number: string | null
           preferred_auth_method: string | null
@@ -59,6 +60,7 @@ export type Database = {
           purpose_statement: string | null
           review_notes: string | null
           reviewed_by: string | null
+          role: string | null
           role_function: string | null
           status: Database["public"]["Enums"]["admin_application_status"] | null
           terms_accepted: boolean | null
@@ -82,6 +84,7 @@ export type Database = {
           languages_spoken?: string | null
           linkedin_profile?: string | null
           nda_document_url?: string | null
+          pdf_downloaded_at?: string | null
           personal_statement?: string | null
           phone_number?: string | null
           preferred_auth_method?: string | null
@@ -90,6 +93,7 @@ export type Database = {
           purpose_statement?: string | null
           review_notes?: string | null
           reviewed_by?: string | null
+          role?: string | null
           role_function?: string | null
           status?:
             | Database["public"]["Enums"]["admin_application_status"]
@@ -115,6 +119,7 @@ export type Database = {
           languages_spoken?: string | null
           linkedin_profile?: string | null
           nda_document_url?: string | null
+          pdf_downloaded_at?: string | null
           personal_statement?: string | null
           phone_number?: string | null
           preferred_auth_method?: string | null
@@ -123,6 +128,7 @@ export type Database = {
           purpose_statement?: string | null
           review_notes?: string | null
           reviewed_by?: string | null
+          role?: string | null
           role_function?: string | null
           status?:
             | Database["public"]["Enums"]["admin_application_status"]
@@ -142,6 +148,8 @@ export type Database = {
           id: string
           is_super_admin: boolean | null
           last_login: string | null
+          role: string | null
+          status: string | null
           supercode: string
         }
         Insert: {
@@ -152,6 +160,8 @@ export type Database = {
           id: string
           is_super_admin?: boolean | null
           last_login?: string | null
+          role?: string | null
+          status?: string | null
           supercode: string
         }
         Update: {
@@ -162,6 +172,8 @@ export type Database = {
           id?: string
           is_super_admin?: boolean | null
           last_login?: string | null
+          role?: string | null
+          status?: string | null
           supercode?: string
         }
         Relationships: [
