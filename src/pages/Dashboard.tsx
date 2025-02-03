@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Users, Building2, Settings } from "lucide-react";
+import { BarChart3, Users, Building2, Settings, Crown, Shield } from "lucide-react";
 import { DashboardOverview } from "./DashboardSections/DashboardOverview";
 import { AdminApplications } from "./DashboardSections/AdminApplications";
 import { EnterpriseSettings } from "./DashboardSections/EnterpriseSettings";
@@ -13,7 +13,6 @@ import { useEffect } from "react";
 const Dashboard = () => {
   const navigate = useNavigate();
   
-  // Check if user is super admin
   const { data: adminProfile, isLoading } = useQuery({
     queryKey: ['superAdminCheck'],
     queryFn: async () => {
@@ -52,10 +51,47 @@ const Dashboard = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Super Admin Dashboard</h1>
-        <div className="text-sm text-muted-foreground">
-          Welcome back, Super Admin
+        <div className="flex items-center gap-3">
+          <Crown className="h-8 w-8 text-purple-500" />
+          <div>
+            <h1 className="text-3xl font-bold">Super Admin Dashboard</h1>
+            <p className="text-muted-foreground">Full system control and management</p>
+          </div>
         </div>
+        <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-lg">
+          <Shield className="h-5 w-5 text-purple-500" />
+          <span className="text-purple-700 font-medium">Super Admin Access</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Card className="p-4 bg-purple-50 border-purple-100">
+          <div className="flex items-center gap-3">
+            <Users className="h-8 w-8 text-purple-500" />
+            <div>
+              <h3 className="font-semibold text-purple-900">Admin Management</h3>
+              <p className="text-sm text-purple-700">Manage admin accounts</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-4 bg-blue-50 border-blue-100">
+          <div className="flex items-center gap-3">
+            <Building2 className="h-8 w-8 text-blue-500" />
+            <div>
+              <h3 className="font-semibold text-blue-900">System Overview</h3>
+              <p className="text-sm text-blue-700">Monitor system performance</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-4 bg-green-50 border-green-100">
+          <div className="flex items-center gap-3">
+            <Settings className="h-8 w-8 text-green-500" />
+            <div>
+              <h3 className="font-semibold text-green-900">Global Settings</h3>
+              <p className="text-sm text-green-700">Configure system settings</p>
+            </div>
+          </div>
+        </Card>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
