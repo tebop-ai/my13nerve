@@ -25,29 +25,33 @@ const Index = ({ onAdminLogin }: IndexProps) => {
     setIsLoading(true);
     
     try {
-      console.log("Attempting admin login with:", { adminUsername, adminSuperCode });
+      console.log("Starting admin login process...");
       
       // First check if this is a valid admin in our profiles
-      const { data: adminProfile, error: adminError } = await supabase
+      const { data: adminProfile, error } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', adminUsername)
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
         .eq('is_super_admin', true)
-        .single();
+        .maybeSingle();
 
-      if (adminError) {
-        console.error("Admin login database error:", adminError);
+      if (error) {
+        console.error("Database error:", error);
         throw new Error('Database error occurred');
       }
 
-      console.log("Admin profile found:", adminProfile);
+      console.log("Admin profile query result:", adminProfile);
 
-      // If we got here, we found a valid admin profile
-      // Now check against the hardcoded credentials in App.tsx
+      if (!adminProfile) {
+        console.log("No matching admin profile found");
+        throw new Error('Invalid credentials');
+      }
+
+      // If we found a valid admin profile, verify against hardcoded credentials
       const loginSuccess = onAdminLogin(adminUsername, adminSuperCode);
-      console.log("Login success:", loginSuccess);
+      console.log("Hardcoded credentials check result:", loginSuccess);
 
       if (!loginSuccess) {
         throw new Error('Login verification failed');
@@ -56,9 +60,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       // Update last login timestamp
       const { error: updateError } = await supabase
         .from('admin_profiles')
-        .update({ 
-          last_login: new Date().toISOString() 
-        })
+        .update({ last_login: new Date().toISOString() })
         .eq('id', adminProfile.id);
 
       if (updateError) {
@@ -83,6 +85,8 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       setIsLoading(false);
     }
   };
+
+  // ... keep existing code (rest of the component JSX)
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
