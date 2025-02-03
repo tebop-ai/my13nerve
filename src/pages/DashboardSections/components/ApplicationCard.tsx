@@ -24,12 +24,13 @@ export const ApplicationCard = ({
     try {
       console.log("Approving application:", application.id);
       
-      // First verify if the user is the super admin
+      // First verify if the user is the super admin by checking all required conditions
       const { data: adminProfile, error: adminError } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', 'Goapele Main')
         .eq('is_super_admin', true)
+        .eq('status', 'active')
         .single();
 
       console.log("Admin profile check result:", { adminProfile, adminError });
@@ -37,8 +38,8 @@ export const ApplicationCard = ({
       if (adminError) {
         console.error("Error checking super admin status:", adminError);
         toast({
-          title: "System Error",
-          description: "Failed to verify admin permissions. Please try again.",
+          title: "Authorization Error",
+          description: "Only the super admin can approve applications.",
           variant: "destructive",
         });
         return;
