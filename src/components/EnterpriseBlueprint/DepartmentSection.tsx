@@ -13,10 +13,26 @@ interface DepartmentSectionProps {
   onDepartmentSelect: (type: DepartmentType) => void;
 }
 
-const fetchDepartmentTasks = async (department: string) => {
+// Map department types to their corresponding table names
+const departmentTableMap = {
+  accounting: "Accounting",
+  customer_insights: "Customer Insights",
+  marketing: "Marketing Comm",
+  product_service: "Product_Service",
+  research_development: "R&D_Ops"
+} as const;
+
+const fetchDepartmentTasks = async (department: DepartmentType) => {
   console.log('Fetching tasks for department:', department);
+  const tableName = departmentTableMap[department];
+  
+  if (!tableName) {
+    console.error('No table mapping found for department:', department);
+    return [];
+  }
+
   const { data, error } = await supabase
-    .from(department)
+    .from(tableName)
     .select('*');
   
   if (error) {
