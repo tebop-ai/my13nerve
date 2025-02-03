@@ -7,6 +7,14 @@ import { ApplicationCard } from "./components/ApplicationCard";
 import { ApplicationPreviewDialog } from "./components/ApplicationPreviewDialog";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import type { jsPDF as jsPDFType } from 'jspdf';
+
+// Extend jsPDF type to include lastAutoTable property
+interface ExtendedJsPDF extends jsPDFType {
+  lastAutoTable: {
+    finalY: number;
+  };
+}
 
 export const AdminApplications = () => {
   const { toast } = useToast();
@@ -71,7 +79,7 @@ export const AdminApplications = () => {
 
   const downloadApplicationPDF = async (application: any) => {
     try {
-      const doc = new jsPDF();
+      const doc = new jsPDF() as ExtendedJsPDF;
       
       // Add title
       doc.setFontSize(20);
