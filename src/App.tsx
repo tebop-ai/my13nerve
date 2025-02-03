@@ -32,14 +32,16 @@ const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: Rea
     const checkAuth = async () => {
       console.log("Checking authentication status...");
       const storedAuth = localStorage.getItem("isAdminAuthenticated") === "true";
+      const storedUsername = localStorage.getItem("adminUsername");
       console.log("Stored auth:", storedAuth);
+      console.log("Stored username:", storedUsername);
       
-      if (storedAuth) {
+      if (storedAuth && storedUsername) {
         try {
           const { data: adminProfile, error } = await supabase
             .from('admin_profiles')
             .select('*')
-            .eq('email', 'Goapele Main')
+            .eq('email', storedUsername)
             .eq('is_super_admin', true)
             .single();
 
@@ -53,6 +55,7 @@ const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: Rea
             setIsAuthenticated(false);
             setIsSuperAdmin(false);
             localStorage.removeItem("isAdminAuthenticated");
+            localStorage.removeItem("adminUsername");
             return;
           }
 
@@ -63,14 +66,14 @@ const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: Rea
           } else {
             console.log("No super admin profile found");
             setIsSuperAdmin(false);
-            setIsAuthenticated(false);
-            localStorage.removeItem("isAdminAuthenticated");
+            setIsAuthenticated(storedAuth);
           }
         } catch (error) {
           console.error("Error in checkAuth:", error);
           setIsSuperAdmin(false);
           setIsAuthenticated(false);
           localStorage.removeItem("isAdminAuthenticated");
+          localStorage.removeItem("adminUsername");
         }
       } else {
         setIsAuthenticated(false);
@@ -115,6 +118,7 @@ const AppContent = () => {
       superCode === SUPER_ADMIN_CREDENTIALS.superCode
     ) {
       localStorage.setItem("isAdminAuthenticated", "true");
+      localStorage.setItem("adminUsername", username);
       setIsAuthenticated(true);
       return true;
     }

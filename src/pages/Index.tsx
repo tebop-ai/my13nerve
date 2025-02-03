@@ -63,7 +63,12 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         description: isSuperAdmin ? "Welcome back, Super Admin!" : "Welcome back, Admin!",
       });
 
-      navigate(isSuperAdmin ? "/dashboard" : "/admin-dashboard");
+      // Navigate after successful login
+      if (isSuperAdmin) {
+        navigate("/dashboard");
+      } else {
+        navigate("/admin-dashboard");
+      }
       return true;
 
     } catch (error) {
@@ -74,6 +79,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         variant: "destructive",
       });
       localStorage.removeItem("isAdminAuthenticated");
+      localStorage.removeItem("adminUsername");
       return false;
     } finally {
       setIsLoading(false);
