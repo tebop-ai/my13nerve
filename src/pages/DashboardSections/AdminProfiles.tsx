@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const AdminProfiles = () => {
   const { toast } = useToast();
@@ -84,7 +85,16 @@ export const AdminProfiles = () => {
                       <div className="flex items-center gap-2">
                         <h3 className="text-lg font-semibold">{profile.full_name}</h3>
                         {profile.is_super_admin && (
-                          <Shield className="h-4 w-4 text-blue-500" title="Super Admin" />
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Shield className="h-4 w-4 text-blue-500" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Super Admin</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground">{profile.email}</p>
