@@ -15,24 +15,37 @@ const Index = ({ onAdminLogin }: IndexProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [adminUsername, setAdminUsername] = useState("");
   const [adminSuperCode, setAdminSuperCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await onAdminLogin(adminUsername, adminSuperCode);
-    if (success) {
+    setIsLoading(true);
+    try {
+      const success = await onAdminLogin(adminUsername, adminSuperCode);
+      if (success) {
+        toast({
+          title: "Login successful",
+          description: "Welcome back, Super Admin!",
+        });
+        navigate("/dashboard");
+      } else {
+        toast({
+          title: "Login failed",
+          description: "Invalid credentials. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
       toast({
-        title: "Login successful",
-        description: "Welcome back, Super Admin!",
-      });
-      navigate("/dashboard");
-    } else {
-      toast({
-        title: "Login failed",
-        description: "Invalid credentials. Please try again.",
+        title: "Login error",
+        description: "An error occurred during login. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -146,6 +159,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                         className="pl-10"
                         value={adminUsername}
                         onChange={(e) => setAdminUsername(e.target.value)}
+                        disabled={isLoading}
                       />
                       <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     </div>
@@ -160,13 +174,25 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                         className="pl-10"
                         value={adminSuperCode}
                         onChange={(e) => setAdminSuperCode(e.target.value)}
+                        disabled={isLoading}
                       />
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full" size="lg">
-                    <LogIn className="mr-2" /> Access Admin Panel
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    size="lg"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      "Logging in..."
+                    ) : (
+                      <>
+                        <LogIn className="mr-2" /> Access Admin Panel
+                      </>
+                    )}
                   </Button>
 
                   <div className="text-center mt-4">
@@ -175,6 +201,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                       onClick={() => navigate("/admin-signup")} 
                       variant="outline"
                       className="w-full"
+                      disabled={isLoading}
                     >
                       <UserPlus className="mr-2" /> Apply for Admin Role
                     </Button>
