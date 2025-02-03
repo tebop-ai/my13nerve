@@ -15,12 +15,10 @@ export const ApplicationActions = ({ application, onUpdateStatus }: ApplicationA
     try {
       console.log("Approving application:", application.id);
       
+      // Only update the status - let the database trigger handle user creation
       const { error } = await supabase
         .from('admin_profile_applications')
-        .update({ 
-          status: 'approved',
-          updated_at: new Date().toISOString()
-        })
+        .update({ status: 'approved' })
         .eq('id', application.id);
 
       if (error) {
@@ -32,7 +30,7 @@ export const ApplicationActions = ({ application, onUpdateStatus }: ApplicationA
       
       toast({
         title: "Application Approved",
-        description: "Admin profile has been created successfully.",
+        description: "Admin profile will be created automatically.",
       });
     } catch (error) {
       console.error('Error approving application:', error);
