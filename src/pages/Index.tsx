@@ -3,9 +3,10 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
-import { Lock, LogIn, User, UserPlus, Shield } from "lucide-react";
+import { Lock, LogIn, User, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface IndexProps {
   onAdminLogin: (username: string, superCode: string) => boolean;
@@ -15,23 +16,58 @@ const Index = ({ onAdminLogin }: IndexProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [adminUsername, setAdminUsername] = useState("");
   const [adminSuperCode, setAdminSuperCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleAdminSubmit = (e: React.FormEvent) => {
+  const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (onAdminLogin(adminUsername, adminSuperCode)) {
-      toast({
-        title: "Login successful",
-        description: "Welcome back, Super Admin!",
-      });
-      navigate("/dashboard");
-    } else {
+    setIsLoading(true);
+    
+    try {
+      console.log("Attempting admin login...");
+      
+      // First check if this is a valid admin in our profiles
+      const { data: adminProfile, error: adminError } = await supabase
+        .from('admin_profiles')
+        .select('*')
+        .eq('email', adminUsername)
+        .eq('supercode', adminSuperCode)
+        .eq('status', 'active')
+        .single();
+
+      if (adminError || !adminProfile) {
+        console.error("Admin login error:", adminError);
+        throw new Error('Invalid credentials');
+      }
+
+      // If valid, proceed with the app's login flow
+      if (onAdminLogin(adminUsername, adminSuperCode)) {
+        console.log("Admin login successful");
+        toast({
+          title: "Login successful",
+          description: `Welcome back, ${adminProfile.full_name}!`,
+        });
+
+        // Update last login timestamp
+        await supabase
+          .from('admin_profiles')
+          .update({ last_login: new Date().toISOString() })
+          .eq('id', adminProfile.id);
+
+        navigate("/dashboard");
+      } else {
+        throw new Error('Login failed');
+      }
+    } catch (error) {
+      console.error("Login error:", error);
       toast({
         title: "Login failed",
         description: "Invalid credentials. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -145,6 +181,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                         className="pl-10"
                         value={adminUsername}
                         onChange={(e) => setAdminUsername(e.target.value)}
+                        disabled={isLoading}
                       />
                       <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     </div>
@@ -159,13 +196,20 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                         className="pl-10"
                         value={adminSuperCode}
                         onChange={(e) => setAdminSuperCode(e.target.value)}
+                        disabled={isLoading}
                       />
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full" size="lg">
-                    <LogIn className="mr-2" /> Access Admin Panel
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    size="lg"
+                    disabled={isLoading}
+                  >
+                    <LogIn className="mr-2" /> 
+                    {isLoading ? "Signing in..." : "Access Admin Panel"}
                   </Button>
 
                   <div className="text-center mt-4">
@@ -174,6 +218,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                       onClick={() => navigate("/admin-signup")} 
                       variant="outline"
                       className="w-full"
+                      disabled={isLoading}
                     >
                       <UserPlus className="mr-2" /> Apply for Admin Role
                     </Button>
