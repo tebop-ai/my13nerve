@@ -69,7 +69,7 @@ export const AdminLoginForm = () => {
         console.error("Error updating last login:", updateError);
       }
 
-      // Store authentication state
+      // Store authentication state and profile
       sessionStorage.setItem("isAdminAuthenticated", "true");
       sessionStorage.setItem("adminProfile", JSON.stringify(adminProfile));
 
@@ -78,7 +78,14 @@ export const AdminLoginForm = () => {
         description: `Welcome back, ${adminProfile.full_name}!`,
       });
 
-      navigate("/dashboard");
+      // Redirect based on admin type
+      if (adminProfile.is_super_admin) {
+        console.log("Redirecting super admin to /dashboard");
+        navigate("/dashboard");
+      } else {
+        console.log("Redirecting regular admin to /admin-dashboard");
+        navigate("/admin-dashboard");
+      }
     } catch (error) {
       console.error("Login error:", error);
       toast({

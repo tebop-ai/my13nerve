@@ -13,12 +13,27 @@ import AdminSignup from "./pages/AdminSignup";
 
 const queryClient = new QueryClient();
 
-// Protected Route component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+// Protected Route component with role check
+const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode, requiredRole: 'super_admin' | 'admin' }) => {
   const isAuthenticated = sessionStorage.getItem("isAdminAuthenticated") === "true";
+  const profileData = sessionStorage.getItem("adminProfile");
+  const adminProfile = profileData ? JSON.parse(profileData) : null;
+  const isSuperAdmin = adminProfile?.is_super_admin === true;
   
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
+  }
+
+  // Redirect regular admins trying to access super admin routes
+  if (requiredRole === 'super_admin' && !isSuperAdmin) {
+    console.log("Regular admin attempting to access super admin route, redirecting...");
+    return <Navigate to="/admin-dashboard" replace />;
+  }
+
+  // Redirect super admin trying to access regular admin routes
+  if (requiredRole === 'admin' && isSuperAdmin) {
+    console.log("Super admin attempting to access regular admin route, redirecting...");
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
@@ -44,7 +59,7 @@ const AppContent = () => {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="super_admin">
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -52,7 +67,7 @@ const AppContent = () => {
           <Route
             path="/admin-dashboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <AdminDashboard />
               </ProtectedRoute>
             }
