@@ -20,13 +20,14 @@ export const AdminLoginForm = () => {
     console.log("Attempting login with email:", adminEmail);
 
     try {
-      // Query admin profile
+      // Query admin profile with exact match on email and supercode
       const { data: adminProfile, error: profileError } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('email', adminEmail.toLowerCase())
-        .eq('supercode', adminSuperCode)
+        .eq('email', adminEmail.trim().toLowerCase())
+        .eq('supercode', adminSuperCode.trim())
         .eq('status', 'active')
+        .eq('validation_status', 'validated')
         .maybeSingle();
 
       console.log("Admin profile query result:", adminProfile);
