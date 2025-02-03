@@ -5,9 +5,11 @@ import { Avatar } from "@/components/ui/avatar";
 import { User, Key, Clock } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 export const AdminProfiles = () => {
-  const { data: profiles, isLoading } = useQuery({
+  const { toast } = useToast();
+  const { data: profiles, isLoading, refetch } = useQuery({
     queryKey: ['adminProfiles'],
     queryFn: async () => {
       console.log("Fetching admin profiles...");
@@ -19,7 +21,8 @@ export const AdminProfiles = () => {
             status,
             government_id_url,
             industry_expertise,
-            current_job_title
+            current_job_title,
+            generated_supercode
           )
         `);
 
@@ -32,6 +35,32 @@ export const AdminProfiles = () => {
       return data;
     }
   });
+
+  const handleApproveApplication = async (applicationId: string) => {
+    try {
+      console.log("Approving application:", applicationId);
+      const { error } = await supabase
+        .from('admin_profile_applications')
+        .update({ status: 'approved' })
+        .eq('id', applicationId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Application Approved",
+        description: "Admin profile has been created successfully.",
+      });
+
+      refetch();
+    } catch (error) {
+      console.error('Error approving application:', error);
+      toast({
+        title: "Error",
+        description: "Failed to approve application.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (isLoading) {
     return (
