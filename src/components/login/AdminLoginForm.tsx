@@ -36,40 +36,21 @@ export const AdminLoginForm = () => {
       console.log("Starting admin login process...");
       console.log("Attempting login with:", { adminUsername });
       
-      // First try to find a super admin profile
-      let { data: adminProfile, error: superAdminError } = await supabase
+      // Query for admin profile with exact matches
+      const { data: adminProfile, error } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('full_name', adminUsername)
         .eq('supercode', adminSuperCode)
-        .eq('is_super_admin', true)
         .eq('status', 'active')
-        .maybeSingle();
+        .single();
 
-      // If no super admin found, try regular admin
-      if (!adminProfile) {
-        const { data: regularAdmin, error: regularAdminError } = await supabase
-          .from('admin_profiles')
-          .select('*')
-          .eq('full_name', adminUsername)
-          .eq('supercode', adminSuperCode)
-          .eq('status', 'active')
-          .maybeSingle();
-
-        if (regularAdminError) {
-          console.error("Database error:", regularAdminError);
-          throw new Error('Database error occurred');
-        }
-
-        adminProfile = regularAdmin;
-      }
-
-      console.log("Admin profile query result:", adminProfile);
-
-      if (!adminProfile) {
-        console.log("No matching admin profile found");
+      if (error) {
+        console.error("Database error:", error);
         throw new Error('Invalid credentials');
       }
+
+      console.log("Admin profile found:", adminProfile);
 
       // Update last login timestamp
       const { error: updateError } = await supabase
