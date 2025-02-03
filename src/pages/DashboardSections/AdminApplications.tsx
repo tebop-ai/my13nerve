@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { UserCheck, UserX, Eye, Download } from "lucide-react";
+import { UserCheck, UserX, Eye, Download, Clock } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { format } from "date-fns";
 
 export const AdminApplications = () => {
   const { toast } = useToast();
@@ -135,8 +136,29 @@ export const AdminApplications = () => {
           <Card key={application.id} className="p-4 space-y-4">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-lg font-semibold">{application.full_name}</h3>
+                <div className="flex items-center space-x-2">
+                  <h3 className="text-lg font-semibold">{application.full_name}</h3>
+                  {application.status === 'approved' && (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Approved
+                    </span>
+                  )}
+                  {application.status === 'declined' && (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      Declined
+                    </span>
+                  )}
+                  {application.status === 'pending' && (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      Pending Review
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-muted-foreground">{application.email}</p>
+                <div className="flex items-center text-sm text-muted-foreground mt-1">
+                  <Clock className="h-4 w-4 mr-1" />
+                  {format(new Date(application.created_at), 'MMM d, yyyy')}
+                </div>
               </div>
               <div className="space-x-2">
                 <Button
@@ -161,6 +183,7 @@ export const AdminApplications = () => {
                       onClick={() => handleApplicationStatus(application.id, 'approved')}
                       variant="default"
                       size="sm"
+                      className="bg-green-600 hover:bg-green-700"
                     >
                       <UserCheck className="mr-2 h-4 w-4" />
                       Approve
@@ -176,13 +199,9 @@ export const AdminApplications = () => {
                   </>
                 )}
                 {application.status === 'approved' && (
-                  <div className="text-green-600 font-medium">
-                    Approved | SuperCode: {application.generated_supercode}
-                  </div>
-                )}
-                {application.status === 'declined' && (
-                  <div className="text-red-600 font-medium">
-                    Declined
+                  <div className="mt-2 p-2 bg-gray-50 rounded">
+                    <p className="text-sm font-medium text-gray-600">SuperCode:</p>
+                    <p className="font-mono text-sm">{application.generated_supercode}</p>
                   </div>
                 )}
               </div>
