@@ -1,8 +1,8 @@
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
 import { Lock, LogIn, User, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -34,11 +34,11 @@ const Index = ({ onAdminLogin }: IndexProps) => {
           title: "Login successful",
           description: "Welcome back, Super Admin!",
         });
-        navigate("/dashboard");
+        navigate("/dashboard"); // This routes to the Super Admin dashboard
         return;
       }
 
-      // For other admins, check the admin_profiles table
+      // For regular admins, check the admin_profiles table
       const { data: adminProfile, error: adminError } = await supabase
         .from('admin_profiles')
         .select('*')
@@ -69,6 +69,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         description: "Welcome back, Admin!",
       });
 
+      // Regular admins go to admin-dashboard
       navigate("/admin-dashboard");
     } catch (error) {
       console.error("Login error:", error);
