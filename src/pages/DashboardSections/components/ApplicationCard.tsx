@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { UserCheck, UserX, Eye, Download, Clock } from "lucide-react";
+import { Eye, Download, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { jsPDF } from "jspdf";
+import { ApplicationActions } from "./ApplicationActions";
 
 interface ApplicationCardProps {
   application: any;
@@ -21,71 +21,29 @@ export const ApplicationCard = ({
 }: ApplicationCardProps) => {
   const { toast } = useToast();
 
-  const handleApproval = async () => {
-    try {
-      console.log("Approving application:", application.id);
-      
-      // Update application status
-      const { error: updateError } = await supabase
-        .from('admin_profile_applications')
-        .update({ 
-          status: 'approved',
-          updated_at: new Date().toISOString(),
-          reviewed_by: (await supabase.auth.getUser()).data.user?.id
-        })
-        .eq('id', application.id);
-
-      if (updateError) {
-        console.error('Error updating application:', updateError);
-        throw updateError;
-      }
-
-      // The database trigger will handle creating the admin profile and generating the supercode
-      onUpdateStatus(application.id, 'approved');
-      
-      toast({
-        title: "Application Approved",
-        description: "Admin profile has been created successfully.",
-      });
-    } catch (error) {
-      console.error('Error approving application:', error);
-      toast({
-        title: "Error",
-        description: "Failed to approve application.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleDownload = async () => {
     try {
       const doc = new jsPDF();
       
-      // Add header
       doc.setFontSize(20);
       doc.text("Admin Application Form", 20, 20);
       
-      // Add application details
       doc.setFontSize(12);
       doc.text(`Full Name: ${application.full_name}`, 20, 40);
       doc.text(`Email: ${application.email}`, 20, 50);
       doc.text(`Phone: ${application.phone_number || 'Not provided'}`, 20, 60);
       doc.text(`Current Position: ${application.current_job_title}`, 20, 70);
       
-      // Add work experience
       doc.text("Work Experience:", 20, 90);
       const workExpLines = doc.splitTextToSize(application.work_experience || 'Not provided', 170);
       doc.text(workExpLines, 20, 100);
       
-      // Add industry expertise
       doc.text("Industry Expertise:", 20, 130);
       const expertiseLines = doc.splitTextToSize(application.industry_expertise || 'Not provided', 170);
       doc.text(expertiseLines, 20, 140);
       
-      // Add LinkedIn profile
       doc.text(`LinkedIn: ${application.linkedin_profile || 'Not provided'}`, 20, 170);
       
-      // Add status and timestamps
       doc.text(`Status: ${application.status}`, 20, 190);
       doc.text(`Submitted: ${format(new Date(application.created_at), 'MMM d, yyyy')}`, 20, 200);
       
@@ -93,7 +51,6 @@ export const ApplicationCard = ({
         doc.text(`SuperCode: ${application.generated_supercode}`, 20, 210);
       }
       
-      // Download the PDF
       doc.save(`${application.full_name.replace(/\s+/g, '_')}_application.pdf`);
       
       toast({
@@ -111,7 +68,7 @@ export const ApplicationCard = ({
   };
 
   return (
-    <Card key={application.id} className="p-4 space-y-4">
+    <Card className="p-4 space-y-4">
       <div className="flex justify-between items-start">
         <div>
           <div className="flex items-center space-x-2">
@@ -155,27 +112,10 @@ export const ApplicationCard = ({
             <Download className="mr-2 h-4 w-4" />
             Download PDF
           </Button>
-          {application.status === 'pending' && (
-            <>
-              <Button
-                onClick={handleApproval}
-                variant="default"
-                size="sm"
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <UserCheck className="mr-2 h-4 w-4" />
-                Approve
-              </Button>
-              <Button
-                onClick={() => onUpdateStatus(application.id, 'declined')}
-                variant="destructive"
-                size="sm"
-              >
-                <UserX className="mr-2 h-4 w-4" />
-                Decline
-              </Button>
-            </>
-          )}
+          <ApplicationActions 
+            application={application}
+            onUpdateStatus={onUpdateStatus}
+          />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 text-sm">
