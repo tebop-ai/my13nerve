@@ -33,7 +33,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         .eq('email', adminUsername)
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
-        .single();
+        .maybeSingle(); // Using maybeSingle instead of single to handle no results case
 
       if (adminError) {
         console.error("Error verifying admin profile:", adminError);
