@@ -11,7 +11,6 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSignup from "./pages/AdminSignup";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
 const queryClient = new QueryClient();
 
@@ -25,41 +24,21 @@ const SUPER_ADMIN_CREDENTIALS = {
 const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: React.ReactNode, requireSuperAdmin?: boolean }) => {
   const [isAuthenticated, setIsAuthenticated] = React.useState<boolean | null>(null);
   const [isSuperAdmin, setIsSuperAdmin] = React.useState<boolean | null>(null);
-  const { toast } = useToast();
 
   React.useEffect(() => {
     const checkAuth = async () => {
       const storedAuth = sessionStorage.getItem("isAdminAuthenticated") === "true";
       
       if (storedAuth) {
-        try {
-          // Verify if the user is Super Admin
-          const { data: adminProfile, error } = await supabase
-            .from('admin_profiles')
-            .select('*')
-            .eq('email', 'Goapele Main')
-            .maybeSingle();
+        // Verify if the user is Super Admin
+        const { data: adminProfile, error } = await supabase
+          .from('admin_profiles')
+          .select('*')
+          .eq('email', 'Goapele Main')
+          .single();
 
-          if (error) {
-            console.error("Error checking admin profile:", error);
-            toast({
-              title: "Error",
-              description: "Failed to verify admin status",
-              variant: "destructive",
-            });
-            setIsAuthenticated(false);
-            return;
-          }
-
-          if (adminProfile) {
-            setIsSuperAdmin(true);
-          } else {
-            console.log("No admin profile found for email: Goapele Main");
-            setIsSuperAdmin(false);
-          }
-        } catch (error) {
-          console.error("Error in checkAuth:", error);
-          setIsSuperAdmin(false);
+        if (!error && adminProfile) {
+          setIsSuperAdmin(true);
         }
       }
       
@@ -88,7 +67,6 @@ const AppContent = () => {
   const [isAuthenticated, setIsAuthenticated] = React.useState(
     sessionStorage.getItem("isAdminAuthenticated") === "true"
   );
-  const { toast } = useToast();
 
   // Function to handle admin login - now returns a Promise<boolean>
   const handleAdminLogin = async (username: string, superCode: string): Promise<boolean> => {
@@ -98,40 +76,17 @@ const AppContent = () => {
       username === SUPER_ADMIN_CREDENTIALS.username &&
       superCode === SUPER_ADMIN_CREDENTIALS.superCode
     ) {
-      try {
-        // Verify against admin_profiles table
-        const { data: adminProfile, error } = await supabase
-          .from('admin_profiles')
-          .select('*')
-          .eq('email', username)
-          .maybeSingle();
+      // Verify against admin_profiles table
+      const { data: adminProfile, error } = await supabase
+        .from('admin_profiles')
+        .select('*')
+        .eq('email', username)
+        .single();
 
-        if (error) {
-          console.error("Error checking admin profile:", error);
-          toast({
-            title: "Error",
-            description: "Failed to verify admin status",
-            variant: "destructive",
-          });
-          return false;
-        }
-
-        if (adminProfile) {
-          sessionStorage.setItem("isAdminAuthenticated", "true");
-          setIsAuthenticated(true);
-          return true;
-        } else {
-          console.log("No admin profile found for email:", username);
-          toast({
-            title: "Login failed",
-            description: "Admin profile not found",
-            variant: "destructive",
-          });
-          return false;
-        }
-      } catch (error) {
-        console.error("Error in handleAdminLogin:", error);
-        return false;
+      if (!error && adminProfile) {
+        sessionStorage.setItem("isAdminAuthenticated", "true");
+        setIsAuthenticated(true);
+        return true;
       }
     }
     return false;

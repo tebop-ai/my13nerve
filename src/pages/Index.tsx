@@ -6,7 +6,6 @@ import { useState } from "react";
 import { Lock, LogIn, User, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 interface IndexProps {
   onAdminLogin: (username: string, superCode: string) => Promise<boolean>;
@@ -23,61 +22,33 @@ const Index = ({ onAdminLogin }: IndexProps) => {
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("Attempting admin login with:", { adminUsername });
     
     try {
-      // First, check if the admin exists and is active
-      const { data: adminProfile, error: adminError } = await supabase
-        .from('admin_profiles')
-        .select('*')
-        .eq('email', adminUsername)
-        .eq('status', 'active')
-        .maybeSingle();
-
-      if (adminError) {
-        console.error("Error checking admin profile:", adminError);
-        throw new Error("Failed to verify admin status");
-      }
-
-      if (!adminProfile) {
-        console.log("No active admin profile found for:", adminUsername);
-        throw new Error("Invalid credentials or inactive account");
-      }
-
-      // Verify supercode
-      if (adminProfile.supercode !== adminSuperCode) {
-        console.log("Invalid supercode for admin:", adminUsername);
-        throw new Error("Invalid credentials");
-      }
-
-      // If we get here, credentials are valid
-      console.log("Admin credentials verified successfully");
-      sessionStorage.setItem("isAdminAuthenticated", "true");
-      
-      toast({
-        title: "Login successful",
-        description: "Welcome back, Admin!",
-      });
-
-      // Redirect based on admin type
-      if (adminProfile.is_super_admin) {
+      const success = await onAdminLogin(adminUsername, adminSuperCode);
+      if (success) {
+        toast({
+          title: "Login successful",
+          description: "Welcome back, Admin!",
+        });
         navigate("/dashboard");
       } else {
-        navigate("/admin-dashboard");
+        toast({
+          title: "Login failed",
+          description: "Invalid credentials. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Login error:", error);
       toast({
-        title: "Login failed",
-        description: error instanceof Error ? error.message : "Invalid credentials. Please try again.",
+        title: "Login error",
+        description: "An error occurred during login. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
-
-  // ... keep existing code (enterprise users tab content)
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">

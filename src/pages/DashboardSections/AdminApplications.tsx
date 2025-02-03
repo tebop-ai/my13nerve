@@ -11,29 +11,31 @@ export const AdminApplications = () => {
   const [previewApplication, setPreviewApplication] = useState<any>(null);
 
   // First, check if user is super admin
-  const { data: adminProfile, isLoading: isCheckingAdmin } = useQuery({
+  const { data: adminProfile } = useQuery({
     queryKey: ['adminProfile'],
     queryFn: async () => {
       console.log("Checking admin profile...");
-      const { data: profile, error } = await supabase
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', 'Goapele Main')
-        .eq('is_super_admin', true)
-        .maybeSingle();
+        .single();
 
       if (error) {
         console.error("Error fetching admin profile:", error);
         throw error;
       }
       
-      console.log("Admin profile:", profile);
-      return profile;
+      console.log("Admin profile:", data);
+      return data;
     }
   });
 
   // Then fetch applications if user is super admin
-  const { data: applications, isLoading: isLoadingApplications, refetch } = useQuery({
+  const { data: applications, refetch } = useQuery({
     queryKey: ['adminApplications'],
     queryFn: async () => {
       console.log("Fetching admin applications...");
@@ -50,90 +52,33 @@ export const AdminApplications = () => {
       console.log("Fetched applications:", data);
       return data;
     },
-    enabled: !!adminProfile
+    enabled: !!adminProfile // Only fetch if admin profile exists
   });
-
-  const verifyAdminProfileCreation = async (applicationId: string): Promise<boolean> => {
-    console.log("Verifying admin profile creation for application:", applicationId);
-    
-    // Wait for a short delay to allow database triggers to complete
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const { data: profile, error } = await supabase
-      .from('admin_profiles')
-      .select('*')
-      .eq('application_id', applicationId)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Error verifying admin profile:", error);
-      return false;
-    }
-
-    console.log("Verification result:", profile);
-    return !!profile;
-  };
 
   const handleApplicationStatus = async (id: string, status: 'approved' | 'declined') => {
     try {
       console.log(`Updating application ${id} status to ${status}`);
       
-      // Update the application status
-      const { error: updateError } = await supabase
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
         .from('admin_profile_applications')
         .update({ 
           status,
           updated_at: new Date().toISOString(),
-          reviewed_by: adminProfile?.id
+          reviewed_by: user.id
         })
         .eq('id', id);
 
-      if (updateError) {
-        console.error('Error updating application:', updateError);
-        throw updateError;
-      }
+      if (error) throw error;
 
-      // If approved, verify the admin profile was created
-      if (status === 'approved') {
-        const isProfileCreated = await verifyAdminProfileCreation(id);
-        
-        if (!isProfileCreated) {
-          console.error('No admin profile created for application:', id);
-          toast({
-            title: "Error",
-            description: "Failed to create admin profile. Please try again or contact support.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        // Fetch the created profile to get the supercode
-        const { data: newProfile, error: profileError } = await supabase
-          .from('admin_profiles')
-          .select('supercode')
-          .eq('application_id', id)
-          .maybeSingle();
-
-        if (profileError || !newProfile) {
-          console.error('Error fetching new admin profile:', profileError);
-          toast({
-            title: "Warning",
-            description: "Application approved but there might be an issue with the profile. Please verify.",
-            variant: "destructive",
-          });
-        } else {
-          console.log('New admin profile created with supercode:', newProfile.supercode);
-          toast({
-            title: "Application Approved",
-            description: `Admin profile created with supercode: ${newProfile.supercode}`,
-          });
-        }
-      } else {
-        toast({
-          title: "Application Declined",
-          description: "The admin application has been declined.",
-        });
-      }
+      toast({
+        title: status === 'approved' ? "Application Approved" : "Application Declined",
+        description: status === 'approved' 
+          ? "Admin profile will be created automatically."
+          : "The admin application has been declined.",
+      });
 
       refetch();
     } catch (error) {
@@ -146,31 +91,11 @@ export const AdminApplications = () => {
     }
   };
 
-  if (isCheckingAdmin) {
-    return (
-      <Card className="p-6">
-        <div className="text-center text-muted-foreground py-8">
-          Checking permissions...
-        </div>
-      </Card>
-    );
-  }
-
   if (!adminProfile) {
     return (
       <Card className="p-6">
         <div className="text-center text-muted-foreground py-8">
           You don't have permission to view admin applications
-        </div>
-      </Card>
-    );
-  }
-
-  if (isLoadingApplications) {
-    return (
-      <Card className="p-6">
-        <div className="text-center text-muted-foreground py-8">
-          Loading applications...
         </div>
       </Card>
     );
