@@ -71,7 +71,7 @@ export const CreateBlueprintForm = () => {
 
       const { error } = await supabase
         .from('enterprise_blueprints')
-        .insert({
+        .insert([{  // Wrap the object in an array to match the expected type
           name,
           enterprise_type: enterpriseType,
           board_type: boardType,
@@ -81,8 +81,8 @@ export const CreateBlueprintForm = () => {
           department_types: selectedDepartments,
           business_functions: selectedBusinessFunctions,
           department_categories: selectedDepartmentCategories,
-          created_by: user.id // Set the created_by field to the current user's ID
-        });
+          created_by: user.id
+        }]);
 
       if (error) {
         console.error("Error creating blueprint:", error);
