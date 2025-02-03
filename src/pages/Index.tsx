@@ -27,7 +27,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
     
     try {
       // First verify if this is the Super Admin
-      const isSuperAdmin = adminUsername === 'goapele.main@my13nerve.com';
+      const isSuperAdmin = adminUsername === 'Goapele Main';
       console.log("Is Super Admin check:", isSuperAdmin);
 
       // Query admin profile - modified to correctly check for super admin
@@ -87,6 +87,8 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       setIsLoading(false);
     }
   };
+
+  // ... keep existing code (rest of the component JSX)
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -190,11 +192,11 @@ const Index = ({ onAdminLogin }: IndexProps) => {
 
                 <form onSubmit={handleAdminSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Email</label>
+                    <label className="text-sm font-medium">Username</label>
                     <div className="relative">
                       <Input
                         type="text"
-                        placeholder="Enter your email"
+                        placeholder="Enter your username"
                         className="pl-10"
                         value={adminUsername}
                         onChange={(e) => setAdminUsername(e.target.value)}
