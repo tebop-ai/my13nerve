@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from "react";
 import { Lock, LogIn, User, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -23,65 +23,48 @@ const Index = ({ onAdminLogin }: IndexProps) => {
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("Attempting admin login with:", { adminUsername, adminSuperCode });
+    console.log("Attempting admin login with:", { adminUsername });
     
     try {
-      // First verify the admin profile exists and matches credentials
+      // First, check if the admin exists and is active
       const { data: adminProfile, error: adminError } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', adminUsername)
-        .eq('supercode', adminSuperCode)
         .eq('status', 'active')
         .maybeSingle();
 
       if (adminError) {
-        console.error("Error verifying admin profile:", adminError);
-        throw new Error("Failed to verify admin credentials");
+        console.error("Error checking admin profile:", adminError);
+        throw new Error("Failed to verify admin status");
       }
 
       if (!adminProfile) {
-        console.log("No matching admin profile found");
+        console.log("No active admin profile found for:", adminUsername);
+        throw new Error("Invalid credentials or inactive account");
+      }
+
+      // Verify supercode
+      if (adminProfile.supercode !== adminSuperCode) {
+        console.log("Invalid supercode for admin:", adminUsername);
         throw new Error("Invalid credentials");
       }
 
-      console.log("Admin profile found:", adminProfile);
-
-      // Special handling for Super Admin
-      if (adminProfile.is_super_admin) {
-        console.log("Super Admin profile verified");
-        
-        // Set authentication state
-        const loginSuccess = await onAdminLogin(adminUsername, adminSuperCode);
-        if (!loginSuccess) {
-          throw new Error("Login failed");
-        }
-
-        toast({
-          title: "Login successful",
-          description: "Welcome back, Super Admin!",
-        });
-
-        // Navigate to dashboard
-        navigate("/dashboard");
-        return;
-      }
-
-      // Regular admin flow
-      console.log("Regular admin login successful");
-      const loginSuccess = await onAdminLogin(adminUsername, adminSuperCode);
-      if (!loginSuccess) {
-        throw new Error("Login failed");
-      }
+      // If we get here, credentials are valid
+      console.log("Admin credentials verified successfully");
+      sessionStorage.setItem("isAdminAuthenticated", "true");
       
       toast({
         title: "Login successful",
         description: "Welcome back, Admin!",
       });
 
-      // Regular admins go to admin-dashboard
-      navigate("/admin-dashboard");
-
+      // Redirect based on admin type
+      if (adminProfile.is_super_admin) {
+        navigate("/dashboard");
+      } else {
+        navigate("/admin-dashboard");
+      }
     } catch (error) {
       console.error("Login error:", error);
       toast({
@@ -89,8 +72,6 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         description: error instanceof Error ? error.message : "Invalid credentials. Please try again.",
         variant: "destructive",
       });
-      // Clear authentication state on error
-      localStorage.removeItem("isAdminAuthenticated");
     } finally {
       setIsLoading(false);
     }
@@ -200,11 +181,11 @@ const Index = ({ onAdminLogin }: IndexProps) => {
 
                 <form onSubmit={handleAdminSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Email</label>
+                    <label className="text-sm font-medium">Username</label>
                     <div className="relative">
                       <Input
                         type="text"
-                        placeholder="Enter your email"
+                        placeholder="Enter your username"
                         className="pl-10"
                         value={adminUsername}
                         onChange={(e) => setAdminUsername(e.target.value)}
