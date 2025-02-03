@@ -36,20 +36,20 @@ export const AdminLoginForm = () => {
       console.log("Starting admin login process...");
       console.log("Attempting login with email:", adminEmail);
       
-      // Query for admin profile with exact matches
+      // Query for admin profile with exact matches, using simpler query
       const { data: adminProfile, error: profileError } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('email', adminEmail)
+        .eq('email', adminEmail.toLowerCase().trim())
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
-        .maybeSingle();
+        .single();
 
       console.log("Admin profile query result:", { adminProfile, profileError });
 
       if (profileError) {
         console.error("Database error:", profileError);
-        throw new Error('Database error occurred');
+        throw new Error('Invalid credentials');
       }
 
       if (!adminProfile) {
