@@ -24,6 +24,19 @@ export const ApplicationCard = ({
     try {
       console.log("Approving application:", application.id);
       
+      // Check if we have an active session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.error("Authentication error:", sessionError);
+        toast({
+          title: "Authentication Error",
+          description: "Please ensure you are logged in as an admin.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('admin_profile_applications')
         .update({ status: 'approved' })
