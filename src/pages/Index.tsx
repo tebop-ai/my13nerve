@@ -26,7 +26,19 @@ const Index = ({ onAdminLogin }: IndexProps) => {
     console.log("Attempting admin login with:", { adminUsername });
     
     try {
-      // First, check if the admin exists and is active
+      // Special handling for Super Admin
+      if (adminUsername === "Goapele Main" && adminSuperCode === "DFGSTE^%$2738459K9I8uyhh00") {
+        console.log("Super Admin credentials match");
+        sessionStorage.setItem("isAdminAuthenticated", "true");
+        toast({
+          title: "Login successful",
+          description: "Welcome back, Super Admin!",
+        });
+        navigate("/dashboard");
+        return;
+      }
+
+      // For other admins, check the admin_profiles table
       const { data: adminProfile, error: adminError } = await supabase
         .from('admin_profiles')
         .select('*')
@@ -44,13 +56,11 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         throw new Error("Invalid credentials or inactive account");
       }
 
-      // Verify supercode
       if (adminProfile.supercode !== adminSuperCode) {
         console.log("Invalid supercode for admin:", adminUsername);
         throw new Error("Invalid credentials");
       }
 
-      // If we get here, credentials are valid
       console.log("Admin credentials verified successfully");
       sessionStorage.setItem("isAdminAuthenticated", "true");
       
@@ -59,12 +69,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         description: "Welcome back, Admin!",
       });
 
-      // Redirect based on admin type
-      if (adminProfile.is_super_admin) {
-        navigate("/dashboard");
-      } else {
-        navigate("/admin-dashboard");
-      }
+      navigate("/admin-dashboard");
     } catch (error) {
       console.error("Login error:", error);
       toast({
