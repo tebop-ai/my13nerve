@@ -5,21 +5,25 @@ import { supabase } from '@/integrations/supabase/client';
 export const Logo = ({ className = "" }: { className?: string }) => {
   const navigate = useNavigate();
   
-  const { data: adminProfile } = useQuery({
+  const { data: adminProfile, isLoading } = useQuery({
     queryKey: ['adminProfile'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.email) return null;
+
       const { data: profile, error } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('email', (await supabase.auth.getUser()).data.user?.email)
-        .single();
+        .eq('email', user.email)
+        .maybeSingle();
       
       if (error) {
         console.error("Error fetching admin profile:", error);
         return null;
       }
       return profile;
-    }
+    },
+    enabled: true // The query will run even if we don't have a user
   });
 
   const handleLogoClick = () => {
