@@ -57,7 +57,8 @@ export const AdminApplications = () => {
     try {
       console.log(`Updating application ${id} status to ${status}`);
       
-      const { error } = await supabase
+      // Update the application status
+      const { error: updateError } = await supabase
         .from('admin_profile_applications')
         .update({ 
           status,
@@ -66,14 +67,40 @@ export const AdminApplications = () => {
         })
         .eq('id', id);
 
-      if (error) throw error;
+      if (updateError) {
+        console.error('Error updating application:', updateError);
+        throw updateError;
+      }
 
-      toast({
-        title: status === 'approved' ? "Application Approved" : "Application Declined",
-        description: status === 'approved' 
-          ? "Admin profile will be created automatically."
-          : "The admin application has been declined.",
-      });
+      // If approved, verify the admin profile was created
+      if (status === 'approved') {
+        // Wait a moment for the trigger to execute
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Check if admin profile was created
+        const { data: newAdminProfile, error: checkError } = await supabase
+          .from('admin_profiles')
+          .select('*')
+          .eq('application_id', id)
+          .single();
+
+        if (checkError) {
+          console.error('Error checking new admin profile:', checkError);
+          toast({
+            title: "Warning",
+            description: "Application approved but there might be an issue with profile creation. Please verify.",
+            variant: "destructive",
+          });
+        } else {
+          console.log('New admin profile created:', newAdminProfile);
+          toast({
+            title: status === 'approved' ? "Application Approved" : "Application Declined",
+            description: status === 'approved' 
+              ? `Admin profile created with supercode: ${newAdminProfile.supercode}`
+              : "The admin application has been declined.",
+          });
+        }
+      }
 
       refetch();
     } catch (error) {
