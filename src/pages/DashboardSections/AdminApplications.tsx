@@ -3,10 +3,14 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { UserCheck, UserX } from "lucide-react";
+import { UserCheck, UserX, Eye, Download } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const AdminApplications = () => {
   const { toast } = useToast();
+  const [previewApplication, setPreviewApplication] = useState<any>(null);
 
   const { data: applications, refetch } = useQuery({
     queryKey: ['adminApplications'],
@@ -30,17 +34,42 @@ export const AdminApplications = () => {
   const handleApplicationStatus = async (id: string, status: 'approved' | 'declined') => {
     try {
       console.log(`Updating application ${id} status to ${status}`);
-      const { error } = await supabase
-        .from('admin_profile_applications')
-        .update({ status })
-        .eq('id', id);
+      
+      if (status === 'approved') {
+        // First update the application status which will trigger the supercode generation
+        const { error: updateError } = await supabase
+          .from('admin_profile_applications')
+          .update({ status })
+          .eq('id', id);
 
-      if (error) throw error;
+        if (updateError) throw updateError;
 
-      toast({
-        title: `Application ${status}`,
-        description: `The admin application has been ${status}.`,
-      });
+        // Fetch the updated application to get the generated supercode
+        const { data: updatedApp, error: fetchError } = await supabase
+          .from('admin_profile_applications')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (fetchError) throw fetchError;
+
+        toast({
+          title: "Application Approved",
+          description: `Admin profile created successfully. Supercode: ${updatedApp.generated_supercode}`,
+        });
+      } else {
+        const { error } = await supabase
+          .from('admin_profile_applications')
+          .update({ status })
+          .eq('id', id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Application Declined",
+          description: "The admin application has been declined.",
+        });
+      }
 
       refetch();
     } catch (error) {
@@ -51,6 +80,51 @@ export const AdminApplications = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const downloadApplication = (application: any) => {
+    const applicationData = {
+      "Personal Information": {
+        "Full Name": application.full_name,
+        "Email": application.email,
+        "Phone": application.phone_number,
+        "Languages": application.languages_spoken,
+        "Timezone": application.preferred_timezone
+      },
+      "Professional Information": {
+        "Current Job Title": application.current_job_title,
+        "Work Experience": application.work_experience,
+        "Industry Expertise": application.industry_expertise,
+        "LinkedIn Profile": application.linkedin_profile,
+        "Certifications": application.certifications,
+        "AI Systems Experience": application.ai_systems_experience
+      },
+      "Application Details": {
+        "Purpose Statement": application.purpose_statement,
+        "Personal Statement": application.personal_statement,
+        "Role Function": application.role_function,
+        "Professional References": application.professional_references,
+        "Endorsements": application.endorsements
+      },
+      "Documents & Verification": {
+        "Government ID": application.government_id_url,
+        "NDA Document": application.nda_document_url,
+        "Background Check Consent": application.background_check_consent ? "Yes" : "No",
+        "Terms Accepted": application.terms_accepted ? "Yes" : "No",
+        "Code of Conduct Accepted": application.code_of_conduct_accepted ? "Yes" : "No"
+      }
+    };
+
+    const jsonString = JSON.stringify(applicationData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${application.full_name.replace(/\s+/g, '_')}_application.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -65,6 +139,22 @@ export const AdminApplications = () => {
                 <p className="text-sm text-muted-foreground">{application.email}</p>
               </div>
               <div className="space-x-2">
+                <Button
+                  onClick={() => setPreviewApplication(application)}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  Preview
+                </Button>
+                <Button
+                  onClick={() => downloadApplication(application)}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download
+                </Button>
                 {application.status === 'pending' && (
                   <>
                     <Button
@@ -119,6 +209,149 @@ export const AdminApplications = () => {
           </div>
         )}
       </div>
+
+      <Dialog open={!!previewApplication} onOpenChange={() => setPreviewApplication(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Application Preview</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-[600px] pr-4">
+            {previewApplication && (
+              <div className="space-y-6">
+                <section>
+                  <h3 className="text-lg font-semibold mb-3">Personal Information</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="font-medium">Full Name</p>
+                      <p className="text-muted-foreground">{previewApplication.full_name}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Email</p>
+                      <p className="text-muted-foreground">{previewApplication.email}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Phone</p>
+                      <p className="text-muted-foreground">{previewApplication.phone_number}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Languages</p>
+                      <p className="text-muted-foreground">{previewApplication.languages_spoken}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Timezone</p>
+                      <p className="text-muted-foreground">{previewApplication.preferred_timezone}</p>
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <h3 className="text-lg font-semibold mb-3">Professional Information</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="font-medium">Current Job Title</p>
+                      <p className="text-muted-foreground">{previewApplication.current_job_title}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Work Experience</p>
+                      <p className="text-muted-foreground">{previewApplication.work_experience}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Industry Expertise</p>
+                      <p className="text-muted-foreground">{previewApplication.industry_expertise}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">LinkedIn Profile</p>
+                      <p className="text-muted-foreground">{previewApplication.linkedin_profile}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Certifications</p>
+                      <p className="text-muted-foreground">{previewApplication.certifications}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">AI Systems Experience</p>
+                      <p className="text-muted-foreground">{previewApplication.ai_systems_experience}</p>
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <h3 className="text-lg font-semibold mb-3">Application Details</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="font-medium">Purpose Statement</p>
+                      <p className="text-muted-foreground">{previewApplication.purpose_statement}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Personal Statement</p>
+                      <p className="text-muted-foreground">{previewApplication.personal_statement}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Role Function</p>
+                      <p className="text-muted-foreground">{previewApplication.role_function}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Professional References</p>
+                      <p className="text-muted-foreground">{previewApplication.professional_references}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Endorsements</p>
+                      <p className="text-muted-foreground">{previewApplication.endorsements}</p>
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <h3 className="text-lg font-semibold mb-3">Documents & Verification</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="font-medium">Government ID</p>
+                      <p className="text-muted-foreground">
+                        {previewApplication.government_id_url ? (
+                          <a href={previewApplication.government_id_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                            View Document
+                          </a>
+                        ) : (
+                          "Not provided"
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-medium">NDA Document</p>
+                      <p className="text-muted-foreground">
+                        {previewApplication.nda_document_url ? (
+                          <a href={previewApplication.nda_document_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                            View Document
+                          </a>
+                        ) : (
+                          "Not provided"
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Background Check Consent</p>
+                      <p className="text-muted-foreground">
+                        {previewApplication.background_check_consent ? "Yes" : "No"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Terms Accepted</p>
+                      <p className="text-muted-foreground">
+                        {previewApplication.terms_accepted ? "Yes" : "No"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Code of Conduct Accepted</p>
+                      <p className="text-muted-foreground">
+                        {previewApplication.code_of_conduct_accepted ? "Yes" : "No"}
+                      </p>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
