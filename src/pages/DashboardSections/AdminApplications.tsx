@@ -20,7 +20,7 @@ export const AdminApplications = () => {
         .select('*')
         .eq('email', 'Goapele Main')
         .eq('is_super_admin', true)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching admin profile:", error);
@@ -82,7 +82,7 @@ export const AdminApplications = () => {
           .from('admin_profiles')
           .select('*')
           .eq('application_id', id)
-          .single();
+          .maybeSingle();
 
         if (checkError) {
           console.error('Error checking new admin profile:', checkError);
@@ -91,15 +91,25 @@ export const AdminApplications = () => {
             description: "Application approved but there might be an issue with profile creation. Please verify.",
             variant: "destructive",
           });
+        } else if (!newAdminProfile) {
+          console.error('No admin profile created for application:', id);
+          toast({
+            title: "Error",
+            description: "Failed to create admin profile. Please try again or contact support.",
+            variant: "destructive",
+          });
         } else {
           console.log('New admin profile created:', newAdminProfile);
           toast({
-            title: status === 'approved' ? "Application Approved" : "Application Declined",
-            description: status === 'approved' 
-              ? `Admin profile created with supercode: ${newAdminProfile.supercode}`
-              : "The admin application has been declined.",
+            title: "Application Approved",
+            description: `Admin profile created with supercode: ${newAdminProfile.supercode}`,
           });
         }
+      } else {
+        toast({
+          title: "Application Declined",
+          description: "The admin application has been declined.",
+        });
       }
 
       refetch();
