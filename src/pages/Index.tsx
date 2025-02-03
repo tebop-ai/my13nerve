@@ -34,10 +34,15 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         .eq('email', adminUsername)
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
-        .single();
+        .maybeSingle();
 
-      if (adminError || !adminProfile) {
+      if (adminError) {
         console.error("Admin login error:", adminError);
+        throw new Error('Database error occurred');
+      }
+
+      if (!adminProfile) {
+        console.log("No admin profile found");
         throw new Error('Invalid credentials');
       }
 
@@ -50,10 +55,14 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         });
 
         // Update last login timestamp
-        await supabase
+        const { error: updateError } = await supabase
           .from('admin_profiles')
           .update({ last_login: new Date().toISOString() })
           .eq('id', adminProfile.id);
+
+        if (updateError) {
+          console.error("Error updating last login:", updateError);
+        }
 
         navigate("/dashboard");
       } else {
@@ -63,7 +72,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       console.error("Login error:", error);
       toast({
         title: "Login failed",
-        description: "Invalid credentials. Please try again.",
+        description: error instanceof Error ? error.message : "Invalid credentials. Please try again.",
         variant: "destructive",
       });
     } finally {
