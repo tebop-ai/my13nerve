@@ -27,17 +27,17 @@ const Index = ({ onAdminLogin }: IndexProps) => {
     
     try {
       // First verify if this is the Super Admin
-      const isSuperAdmin = adminUsername === 'Goapele Main';
+      const isSuperAdmin = adminUsername === 'goapele.main@my13nerve.com';
       console.log("Is Super Admin check:", isSuperAdmin);
 
-      // Query admin profile
+      // Query admin profile - modified to correctly check for super admin
       const { data: adminProfile, error: adminError } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', adminUsername)
         .eq('status', 'active')
         .eq('is_super_admin', isSuperAdmin)
-        .single();
+        .maybeSingle();
 
       console.log("Admin profile query result:", { adminProfile, adminError });
 
@@ -88,8 +88,6 @@ const Index = ({ onAdminLogin }: IndexProps) => {
     }
   };
 
-  // ... keep existing code (enterprise users tab content)
-
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-4xl w-full">
@@ -98,7 +96,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
           <p className="text-gray-600">Business Co-pilot Platform</p>
         </div>
 
-        <Tabs defaultValue="users" className="w-full">
+        <Tabs defaultValue="admins" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="users">Enterprise Users</TabsTrigger>
             <TabsTrigger value="admins">For Admins</TabsTrigger>
