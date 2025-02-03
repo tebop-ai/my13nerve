@@ -10,50 +10,20 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSignup from "./pages/AdminSignup";
-import { supabase } from "@/integrations/supabase/client";
 
 const queryClient = new QueryClient();
 
-// Admin credentials for Super Admin
-const SUPER_ADMIN_CREDENTIALS = {
+// Admin credentials
+const ADMIN_CREDENTIALS = {
   username: "Goapele Main",
   superCode: "DFGSTE^%$2738459K9I8uyhh00"
 };
 
-// Protected Route component with Super Admin check
-const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: React.ReactNode, requireSuperAdmin?: boolean }) => {
-  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean | null>(null);
-  const [isSuperAdmin, setIsSuperAdmin] = React.useState<boolean | null>(null);
-
-  React.useEffect(() => {
-    const checkAuth = async () => {
-      const storedAuth = sessionStorage.getItem("isAdminAuthenticated") === "true";
-      
-      if (storedAuth) {
-        // Verify if the user is Super Admin
-        const { data: adminProfile, error } = await supabase
-          .from('admin_profiles')
-          .select('*')
-          .eq('email', 'Goapele Main')
-          .single();
-
-        if (!error && adminProfile) {
-          setIsSuperAdmin(true);
-        }
-      }
-      
-      setIsAuthenticated(storedAuth);
-    };
-
-    checkAuth();
-  }, []);
-
-  if (isAuthenticated === null || (requireSuperAdmin && isSuperAdmin === null)) {
-    // Show loading state while checking authentication
-    return <div>Loading...</div>;
-  }
-
-  if (!isAuthenticated || (requireSuperAdmin && !isSuperAdmin)) {
+// Protected Route component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = sessionStorage.getItem("isAdminAuthenticated") === "true";
+  
+  if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
 
@@ -68,26 +38,15 @@ const AppContent = () => {
     sessionStorage.getItem("isAdminAuthenticated") === "true"
   );
 
-  // Function to handle admin login - now returns a Promise<boolean>
-  const handleAdminLogin = async (username: string, superCode: string): Promise<boolean> => {
-    console.log("Attempting admin login:", { username });
-    
+  // Function to handle admin login
+  const handleAdminLogin = (username: string, superCode: string) => {
     if (
-      username === SUPER_ADMIN_CREDENTIALS.username &&
-      superCode === SUPER_ADMIN_CREDENTIALS.superCode
+      username === ADMIN_CREDENTIALS.username &&
+      superCode === ADMIN_CREDENTIALS.superCode
     ) {
-      // Verify against admin_profiles table
-      const { data: adminProfile, error } = await supabase
-        .from('admin_profiles')
-        .select('*')
-        .eq('email', username)
-        .single();
-
-      if (!error && adminProfile) {
-        sessionStorage.setItem("isAdminAuthenticated", "true");
-        setIsAuthenticated(true);
-        return true;
-      }
+      sessionStorage.setItem("isAdminAuthenticated", "true");
+      setIsAuthenticated(true);
+      return true;
     }
     return false;
   };
@@ -104,7 +63,7 @@ const AppContent = () => {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute requireSuperAdmin={true}>
+              <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -128,7 +87,7 @@ const AppContent = () => {
 };
 
 const App = () => {
-  console.log("Rendering App component");
+  console.log("Rendering App component"); // Added for debugging
 
   return (
     <React.StrictMode>

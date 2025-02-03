@@ -3,50 +3,35 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
-import { Lock, LogIn, User, UserPlus } from "lucide-react";
+import { Lock, LogIn, User, UserPlus, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 interface IndexProps {
-  onAdminLogin: (username: string, superCode: string) => Promise<boolean>;
+  onAdminLogin: (username: string, superCode: string) => boolean;
 }
 
 const Index = ({ onAdminLogin }: IndexProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [adminUsername, setAdminUsername] = useState("");
   const [adminSuperCode, setAdminSuperCode] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleAdminSubmit = async (e: React.FormEvent) => {
+  const handleAdminSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    try {
-      const success = await onAdminLogin(adminUsername, adminSuperCode);
-      if (success) {
-        toast({
-          title: "Login successful",
-          description: "Welcome back, Admin!",
-        });
-        navigate("/dashboard");
-      } else {
-        toast({
-          title: "Login failed",
-          description: "Invalid credentials. Please try again.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Login error:", error);
+    if (onAdminLogin(adminUsername, adminSuperCode)) {
       toast({
-        title: "Login error",
-        description: "An error occurred during login. Please try again.",
+        title: "Login successful",
+        description: "Welcome back, Super Admin!",
+      });
+      navigate("/dashboard");
+    } else {
+      toast({
+        title: "Login failed",
+        description: "Invalid credentials. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -160,8 +145,6 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                         className="pl-10"
                         value={adminUsername}
                         onChange={(e) => setAdminUsername(e.target.value)}
-                        disabled={isLoading}
-                        required
                       />
                       <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     </div>
@@ -176,26 +159,13 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                         className="pl-10"
                         value={adminSuperCode}
                         onChange={(e) => setAdminSuperCode(e.target.value)}
-                        disabled={isLoading}
-                        required
                       />
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     </div>
                   </div>
 
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    size="lg"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      "Logging in..."
-                    ) : (
-                      <>
-                        <LogIn className="mr-2" /> Access Admin Panel
-                      </>
-                    )}
+                  <Button type="submit" className="w-full" size="lg">
+                    <LogIn className="mr-2" /> Access Admin Panel
                   </Button>
 
                   <div className="text-center mt-4">
@@ -204,7 +174,6 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                       onClick={() => navigate("/admin-signup")} 
                       variant="outline"
                       className="w-full"
-                      disabled={isLoading}
                     >
                       <UserPlus className="mr-2" /> Apply for Admin Role
                     </Button>
