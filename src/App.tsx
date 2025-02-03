@@ -26,10 +26,13 @@ const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: Rea
   const [isAuthenticated, setIsAuthenticated] = React.useState<boolean | null>(null);
   const [isSuperAdmin, setIsSuperAdmin] = React.useState<boolean | null>(null);
   const { toast } = useToast();
+  const location = useLocation();
 
   React.useEffect(() => {
     const checkAuth = async () => {
+      console.log("Checking authentication status...");
       const storedAuth = sessionStorage.getItem("isAdminAuthenticated") === "true";
+      console.log("Stored auth:", storedAuth);
       
       if (storedAuth) {
         try {
@@ -38,7 +41,8 @@ const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: Rea
             .from('admin_profiles')
             .select('*')
             .eq('email', 'Goapele Main')
-            .maybeSingle();
+            .eq('is_super_admin', true)
+            .single();
 
           if (error) {
             console.error("Error checking admin profile:", error);
@@ -48,13 +52,15 @@ const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: Rea
               variant: "destructive",
             });
             setIsAuthenticated(false);
+            setIsSuperAdmin(false);
             return;
           }
 
           if (adminProfile) {
+            console.log("Super admin verified:", adminProfile);
             setIsSuperAdmin(true);
           } else {
-            console.log("No admin profile found for email: Goapele Main");
+            console.log("No super admin profile found");
             setIsSuperAdmin(false);
           }
         } catch (error) {
@@ -67,17 +73,22 @@ const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: Rea
     };
 
     checkAuth();
-  }, []);
+  }, [location.pathname]); // Re-run when path changes
 
   if (isAuthenticated === null || (requireSuperAdmin && isSuperAdmin === null)) {
-    // Show loading state while checking authentication
+    console.log("Loading authentication state...");
     return <div>Loading...</div>;
   }
 
   if (!isAuthenticated || (requireSuperAdmin && !isSuperAdmin)) {
+    console.log("Authentication failed, redirecting to home");
+    console.log("isAuthenticated:", isAuthenticated);
+    console.log("requireSuperAdmin:", requireSuperAdmin);
+    console.log("isSuperAdmin:", isSuperAdmin);
     return <Navigate to="/" replace />;
   }
 
+  console.log("Authentication successful, rendering protected content");
   return <>{children}</>;
 };
 
@@ -88,9 +99,8 @@ const AppContent = () => {
   const [isAuthenticated, setIsAuthenticated] = React.useState(
     sessionStorage.getItem("isAdminAuthenticated") === "true"
   );
-  const { toast } = useToast();
 
-  // Function to handle admin login - now returns a Promise<boolean>
+  // Function to handle admin login
   const handleAdminLogin = async (username: string, superCode: string): Promise<boolean> => {
     console.log("Attempting admin login:", { username });
     
@@ -98,41 +108,9 @@ const AppContent = () => {
       username === SUPER_ADMIN_CREDENTIALS.username &&
       superCode === SUPER_ADMIN_CREDENTIALS.superCode
     ) {
-      try {
-        // Verify against admin_profiles table
-        const { data: adminProfile, error } = await supabase
-          .from('admin_profiles')
-          .select('*')
-          .eq('email', username)
-          .maybeSingle();
-
-        if (error) {
-          console.error("Error checking admin profile:", error);
-          toast({
-            title: "Error",
-            description: "Failed to verify admin status",
-            variant: "destructive",
-          });
-          return false;
-        }
-
-        if (adminProfile) {
-          sessionStorage.setItem("isAdminAuthenticated", "true");
-          setIsAuthenticated(true);
-          return true;
-        } else {
-          console.log("No admin profile found for email:", username);
-          toast({
-            title: "Login failed",
-            description: "Admin profile not found",
-            variant: "destructive",
-          });
-          return false;
-        }
-      } catch (error) {
-        console.error("Error in handleAdminLogin:", error);
-        return false;
-      }
+      sessionStorage.setItem("isAdminAuthenticated", "true");
+      setIsAuthenticated(true);
+      return true;
     }
     return false;
   };
