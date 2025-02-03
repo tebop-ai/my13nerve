@@ -17,9 +17,11 @@ export const AdminLoginForm = () => {
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    console.log("Attempting login with email:", adminEmail);
 
     try {
-      const { data: adminProfile, error } = await supabase
+      // Query admin profile
+      const { data: adminProfile, error: profileError } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', adminEmail.toLowerCase())
@@ -27,17 +29,27 @@ export const AdminLoginForm = () => {
         .eq('status', 'active')
         .maybeSingle();
 
-      if (error) throw error;
-      
+      console.log("Admin profile query result:", adminProfile);
+
+      if (profileError) {
+        console.error("Profile query error:", profileError);
+        throw profileError;
+      }
+
       if (!adminProfile) {
-        throw new Error('Invalid credentials');
+        console.log("No matching admin profile found");
+        throw new Error('Invalid credentials or inactive account');
       }
 
       // Update last login timestamp
-      await supabase
+      const { error: updateError } = await supabase
         .from('admin_profiles')
         .update({ last_login: new Date().toISOString() })
         .eq('id', adminProfile.id);
+
+      if (updateError) {
+        console.error("Error updating last login:", updateError);
+      }
 
       // Store authentication state and profile
       sessionStorage.setItem("isAdminAuthenticated", "true");
@@ -58,7 +70,7 @@ export const AdminLoginForm = () => {
       console.error("Login error:", error);
       toast({
         title: "Login failed",
-        description: "Invalid email or SuperCode. Please try again.",
+        description: "Please check your email and SuperCode and try again.",
         variant: "destructive",
       });
     } finally {
