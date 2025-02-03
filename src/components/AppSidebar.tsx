@@ -1,13 +1,4 @@
-import { 
-  BarChart3, 
-  Users, 
-  Settings, 
-  Globe,
-  Home,
-  ChevronDown,
-  Layout,
-  Shield
-} from "lucide-react";
+import { Home, Users, BarChart3, Settings, Globe } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -19,140 +10,43 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Link, useLocation } from "react-router-dom";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
 
-const mainMenuItems = [
-  { title: "Overview", icon: Home, url: "/dashboard" },
-  { title: "Admin Dashboard", icon: Shield, url: "/admin-dashboard" },
+const menuItems = [
+  { title: "Dashboard", icon: Home, url: "/dashboard" },
   { title: "Admin Profiles", icon: Users, url: "/admin-profiles" },
   { title: "Analytics", icon: BarChart3, url: "/analytics" },
+  { title: "Enterprises", icon: Globe, url: "/enterprises" },
+  { title: "Settings", icon: Settings, url: "/settings" },
 ];
-
-const subMenuItems = {
-  applications: [
-    { title: "OAuth Apps", url: "/oauth-apps" },
-    { title: "Authorized Apps", url: "/authorized-apps" },
-  ],
-  enterprises: [
-    { title: "All Enterprises", url: "/enterprises" },
-    { title: "Settings", url: "/enterprise-settings" },
-  ],
-};
 
 export function AppSidebar() {
   const location = useLocation();
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    applications: false,
-    enterprises: false,
-  });
   
   // Don't render the sidebar on the landing page
   if (location.pathname === "/") {
     return null;
   }
 
-  const toggleSection = (section: string) => {
-    setOpenSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
-  };
-
   return (
     <Sidebar>
-      <SidebarContent className="bg-secondary">
+      <SidebarContent>
         <div className="p-4">
-          <h1 className="text-2xl font-bold text-white">my13nerve</h1>
+          <h1 className="text-2xl font-bold text-primary">my13nerve</h1>
         </div>
-        
         <SidebarGroup>
+          <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainMenuItems.map((item) => (
+              {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    className="text-white hover:bg-sidebar-hover"
-                  >
-                    <Link 
-                      to={item.url}
-                      className="flex items-center gap-2 px-4 py-2 rounded-md"
-                    >
+                  <SidebarMenuButton asChild>
+                    <Link to={item.url} className="flex items-center gap-2">
                       <item.icon className="h-5 w-5" />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-
-              {/* Applications Section */}
-              <Collapsible
-                open={openSections.applications}
-                onOpenChange={() => toggleSection('applications')}
-              >
-                <CollapsibleTrigger className="flex items-center gap-2 w-full px-4 py-2 text-white hover:bg-sidebar-hover rounded-md">
-                  <Layout className="h-5 w-5" />
-                  <span className="flex-1 text-left">Applications</span>
-                  <ChevronDown className={cn(
-                    "h-4 w-4 transition-transform duration-200",
-                    openSections.applications ? "transform rotate-180" : ""
-                  )} />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pl-6">
-                  {subMenuItems.applications.map((item) => (
-                    <Link
-                      key={item.title}
-                      to={item.url}
-                      className="flex items-center gap-2 px-4 py-2 text-white hover:bg-sidebar-hover rounded-md"
-                    >
-                      <span>{item.title}</span>
-                    </Link>
-                  ))}
-                </CollapsibleContent>
-              </Collapsible>
-
-              {/* Enterprises Section */}
-              <Collapsible
-                open={openSections.enterprises}
-                onOpenChange={() => toggleSection('enterprises')}
-              >
-                <CollapsibleTrigger className="flex items-center gap-2 w-full px-4 py-2 text-white hover:bg-sidebar-hover rounded-md">
-                  <Globe className="h-5 w-5" />
-                  <span className="flex-1 text-left">Enterprises</span>
-                  <ChevronDown className={cn(
-                    "h-4 w-4 transition-transform duration-200",
-                    openSections.enterprises ? "transform rotate-180" : ""
-                  )} />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pl-6">
-                  {subMenuItems.enterprises.map((item) => (
-                    <Link
-                      key={item.title}
-                      to={item.url}
-                      className="flex items-center gap-2 px-4 py-2 text-white hover:bg-sidebar-hover rounded-md"
-                    >
-                      <span>{item.title}</span>
-                    </Link>
-                  ))}
-                </CollapsibleContent>
-              </Collapsible>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  className="text-white hover:bg-sidebar-hover"
-                >
-                  <Link 
-                    to="/settings"
-                    className="flex items-center gap-2 px-4 py-2 rounded-md"
-                  >
-                    <Settings className="h-5 w-5" />
-                    <span>Settings</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

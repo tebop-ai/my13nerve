@@ -1,30 +1,93 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { TypeSelectionGroup } from "./TypeSelectionGroup";
-import { DepartmentSection } from "./DepartmentSection";
-import { BusinessFunctionsGroup } from "./BusinessFunctionsGroup";
 import { BlueprintBasicInfo } from "./BlueprintBasicInfo";
-import type { EnterpriseType, BoardType, CEOType, ExecutiveType, ManagementType, DepartmentType } from "@/types/enterprise";
+import { TypeSelectionGroup } from "./TypeSelectionGroup";
+import { AccountingTasksTable } from "./AccountingTasksTable";
+import type { 
+  EnterpriseType, 
+  BoardType, 
+  CEOType,
+  ExecutiveType,
+  ManagementType,
+  DepartmentType 
+} from "@/types/enterprise";
 
-export const CreateBlueprintForm = () => {
-  const [name, setName] = useState("");
-  const [enterpriseType, setEnterpriseType] = useState<EnterpriseType>("startup");
-  const [boardType, setBoardType] = useState<BoardType>("traditional");
-  const [ceoType, setCeoType] = useState<CEOType>("founder");
-  const [executiveTypes, setExecutiveTypes] = useState<ExecutiveType[]>([]);
-  const [managementTypes, setManagementTypes] = useState<ManagementType[]>([]);
-  const [departmentTypes, setDepartmentTypes] = useState<DepartmentType[]>(["accounting"]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+export interface CreateBlueprintFormProps {
+  onSuccess?: () => void;
+}
+
+const EXECUTIVE_TYPES = ['cto', 'cfo', 'coo', 'cmo', 'chro', 'cio'] as const;
+const MANAGEMENT_TYPES = ['project', 'product', 'operations', 'hr', 'finance', 'marketing'] as const;
+const DEPARTMENT_TYPES = [
+  'accounting',
+  'financial_planning',
+  'treasury',
+  'risk_management',
+  'internal_audit',
+  'tax',
+  'investor_relations',
+  'compliance',
+  'procurement',
+  'strategic_finance',
+  'it_finance'
+] as const;
+
+export const CreateBlueprintForm = ({ onSuccess }: CreateBlueprintFormProps) => {
   const { toast } = useToast();
+  const [name, setName] = useState("");
+  const [enterpriseType, setEnterpriseType] = useState<EnterpriseType | "">("");
+  const [boardType, setBoardType] = useState<BoardType | "">("");
+  const [ceoType, setCeoType] = useState<CEOType | "">("");
+  const [selectedExecutiveTypes, setSelectedExecutiveTypes] = useState<ExecutiveType[]>([]);
+  const [selectedManagementTypes, setSelectedManagementTypes] = useState<ManagementType[]>([]);
+  const [selectedDepartmentTypes, setSelectedDepartmentTypes] = useState<DepartmentType[]>([]);
+  const [selectedAccountingTasks, setSelectedAccountingTasks] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("basic");
+
+  const handleExecutiveTypeSelect = (type: ExecutiveType) => {
+    setSelectedExecutiveTypes(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
+  };
+
+  const handleManagementTypeSelect = (type: ManagementType) => {
+    setSelectedManagementTypes(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
+  };
+
+  const handleDepartmentTypeSelect = (type: DepartmentType) => {
+    setSelectedDepartmentTypes(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
+  };
+
+  const handleAccountingTaskSelect = (taskId: string) => {
+    setSelectedAccountingTasks(prev =>
+      prev.includes(taskId)
+        ? prev.filter(id => id !== taskId)
+        : [...prev, taskId]
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !enterpriseType || !boardType || !ceoType || executiveTypes.length === 0 || managementTypes.length === 0 || departmentTypes.length === 0) {
+    if (!name || !enterpriseType || !boardType || !ceoType || 
+        selectedExecutiveTypes.length === 0 || 
+        selectedManagementTypes.length === 0 || 
+        selectedDepartmentTypes.length === 0) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields",
@@ -34,57 +97,65 @@ export const CreateBlueprintForm = () => {
     }
 
     setIsSubmitting(true);
-    
+
     try {
-      console.log("Submitting blueprint:", {
+      console.log("Submitting blueprint with data:", {
         name,
         enterpriseType,
         boardType,
         ceoType,
-        executiveTypes,
-        managementTypes,
-        departmentTypes
+        selectedExecutiveTypes,
+        selectedManagementTypes,
+        selectedDepartmentTypes,
+        selectedAccountingTasks
       });
 
       const { data, error } = await supabase
-        .from('enterprise_blueprints')
-        .insert([
-          {
-            name,
-            enterprise_type: enterpriseType,
-            board_type: boardType,
-            ceo_type: ceoType,
-            executive_types: executiveTypes,
-            management_types: managementTypes,
-            department_types: departmentTypes,
-            is_active: true
-          }
-        ])
+        .from("enterprise_blueprints")
+        .insert([{
+          name,
+          enterprise_type: enterpriseType,
+          board_type: boardType,
+          ceo_type: ceoType,
+          executive_types: selectedExecutiveTypes,
+          management_types: selectedManagementTypes,
+          department_types: selectedDepartmentTypes,
+          accounting_tasks: selectedAccountingTasks,
+          is_active: true
+        }])
         .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error creating blueprint:", error);
+        throw error;
+      }
 
       console.log("Blueprint created successfully:", data);
-      
+
       toast({
         title: "Success",
-        description: "Enterprise blueprint created successfully",
+        description: "Blueprint created successfully",
       });
 
       // Reset form
       setName("");
-      setEnterpriseType("startup");
-      setBoardType("traditional");
-      setCeoType("founder");
-      setExecutiveTypes([]);
-      setManagementTypes([]);
-      setDepartmentTypes(["accounting"]);
-      
+      setEnterpriseType("");
+      setBoardType("");
+      setCeoType("");
+      setSelectedExecutiveTypes([]);
+      setSelectedManagementTypes([]);
+      setSelectedDepartmentTypes([]);
+      setSelectedAccountingTasks([]);
+      setActiveTab("basic");
+
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       console.error("Error creating blueprint:", error);
       toast({
         title: "Error",
-        description: "Failed to create enterprise blueprint. Please try again.",
+        description: "Failed to create blueprint. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -93,69 +164,70 @@ export const CreateBlueprintForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <Card className="p-6">
-        <BlueprintBasicInfo
-          name={name}
-          setName={setName}
-          enterpriseType={enterpriseType}
-          setEnterpriseType={setEnterpriseType}
-          boardType={boardType}
-          setBoardType={setBoardType}
-          ceoType={ceoType}
-          setCeoType={setCeoType}
-        />
-      </Card>
+    <Card className="p-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="basic">Basic Info</TabsTrigger>
+            <TabsTrigger 
+              value="departments"
+              disabled={!name || !enterpriseType || !boardType || !ceoType}
+            >
+              Departments
+            </TabsTrigger>
+          </TabsList>
 
-      <Card className="p-6">
-        <TypeSelectionGroup
-          label="Executive Types"
-          types={["cto", "cfo", "coo", "cmo", "chro", "cio"] as const}
-          selectedTypes={executiveTypes}
-          onTypeSelect={(type) => {
-            if (executiveTypes.includes(type)) {
-              setExecutiveTypes(executiveTypes.filter(t => t !== type));
-            } else {
-              setExecutiveTypes([...executiveTypes, type]);
-            }
-          }}
-        />
-        <TypeSelectionGroup
-          label="Management Types"
-          types={["project", "product", "operations", "hr", "finance", "marketing"] as const}
-          selectedTypes={managementTypes}
-          onTypeSelect={(type) => {
-            if (managementTypes.includes(type)) {
-              setManagementTypes(managementTypes.filter(t => t !== type));
-            } else {
-              setManagementTypes([...managementTypes, type]);
-            }
-          }}
-        />
-      </Card>
+          <TabsContent value="basic">
+            <BlueprintBasicInfo
+              name={name}
+              setName={setName}
+              enterpriseType={enterpriseType}
+              setEnterpriseType={setEnterpriseType}
+              boardType={boardType}
+              setBoardType={setBoardType}
+              ceoType={ceoType}
+              setCeoType={setCeoType}
+            />
+          </TabsContent>
 
-      <Card className="p-6">
-        <DepartmentSection
-          selectedDepartments={departmentTypes}
-          onDepartmentSelect={(type) => {
-            if (departmentTypes.includes(type)) {
-              setDepartmentTypes(departmentTypes.filter(t => t !== type));
-            } else {
-              setDepartmentTypes([...departmentTypes, type]);
-            }
-          }}
-        />
-      </Card>
+          <TabsContent value="departments" className="space-y-6">
+            <TypeSelectionGroup
+              label="Executive Types"
+              types={EXECUTIVE_TYPES}
+              selectedTypes={selectedExecutiveTypes}
+              onTypeSelect={handleExecutiveTypeSelect}
+            />
 
-      <div className="flex justify-end">
-        <Button 
-          type="submit" 
-          disabled={isSubmitting}
-          className="w-full sm:w-auto"
-        >
-          {isSubmitting ? "Creating..." : "Create Blueprint"}
+            <TypeSelectionGroup
+              label="Management Types"
+              types={MANAGEMENT_TYPES}
+              selectedTypes={selectedManagementTypes}
+              onTypeSelect={handleManagementTypeSelect}
+            />
+
+            <TypeSelectionGroup
+              label="Department Types"
+              types={DEPARTMENT_TYPES}
+              selectedTypes={selectedDepartmentTypes}
+              onTypeSelect={handleDepartmentTypeSelect}
+            />
+
+            {selectedDepartmentTypes.includes('accounting') && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Accounting Tasks</h3>
+                <AccountingTasksTable
+                  selectedTasks={selectedAccountingTasks}
+                  onTaskSelect={handleAccountingTaskSelect}
+                />
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Creating Blueprint..." : "Create Blueprint"}
         </Button>
-      </div>
-    </form>
+      </form>
+    </Card>
   );
 };

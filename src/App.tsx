@@ -7,7 +7,6 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
-import AdminDashboard from "./pages/AdminDashboard";
 import AdminSignup from "./pages/AdminSignup";
 import { useState } from "react";
 
@@ -52,54 +51,44 @@ const AppContent = () => {
   };
 
   return (
-    <div className="min-h-screen flex w-full bg-[#F7F9FC]">
-      {!isLandingPage && isAuthenticated && <AppSidebar />}
-      <main className={`${!isLandingPage ? 'flex-1 p-8' : 'w-full'}`}>
-        <Routes>
-          <Route 
-            path="/" 
-            element={<Index onAdminLogin={handleAdminLogin} />} 
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin-dashboard"
-            element={
-              <ProtectedRoute>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin-signup"
-            element={<AdminSignup />}
-          />
-        </Routes>
-      </main>
-    </div>
+    <SidebarProvider>
+      <TooltipProvider>
+        <div className="min-h-screen flex w-full">
+          {!isLandingPage && isAuthenticated && <AppSidebar />}
+          <main className={`${!isLandingPage ? 'flex-1' : 'w-full'}`}>
+            <Routes>
+              <Route 
+                path="/" 
+                element={<Index onAdminLogin={handleAdminLogin} />} 
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin-signup"
+                element={<AdminSignup />}
+              />
+            </Routes>
+          </main>
+        </div>
+        <Toaster />
+        <Sonner />
+      </TooltipProvider>
+    </SidebarProvider>
   );
 };
 
-const App = () => {
-  return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <SidebarProvider>
-          <TooltipProvider>
-            <AppContent />
-            <Toaster />
-            <Sonner />
-          </TooltipProvider>
-        </SidebarProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
-  );
-};
+const App = () => (
+  <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <AppContent />
+    </QueryClientProvider>
+  </BrowserRouter>
+);
 
 export default App;

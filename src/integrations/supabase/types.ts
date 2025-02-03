@@ -51,7 +51,6 @@ export type Database = {
           languages_spoken: string | null
           linkedin_profile: string | null
           nda_document_url: string | null
-          pdf_downloaded_at: string | null
           personal_statement: string | null
           phone_number: string | null
           preferred_auth_method: string | null
@@ -60,7 +59,6 @@ export type Database = {
           purpose_statement: string | null
           review_notes: string | null
           reviewed_by: string | null
-          role: string | null
           role_function: string | null
           status: Database["public"]["Enums"]["admin_application_status"] | null
           terms_accepted: boolean | null
@@ -84,7 +82,6 @@ export type Database = {
           languages_spoken?: string | null
           linkedin_profile?: string | null
           nda_document_url?: string | null
-          pdf_downloaded_at?: string | null
           personal_statement?: string | null
           phone_number?: string | null
           preferred_auth_method?: string | null
@@ -93,7 +90,6 @@ export type Database = {
           purpose_statement?: string | null
           review_notes?: string | null
           reviewed_by?: string | null
-          role?: string | null
           role_function?: string | null
           status?:
             | Database["public"]["Enums"]["admin_application_status"]
@@ -119,7 +115,6 @@ export type Database = {
           languages_spoken?: string | null
           linkedin_profile?: string | null
           nda_document_url?: string | null
-          pdf_downloaded_at?: string | null
           personal_statement?: string | null
           phone_number?: string | null
           preferred_auth_method?: string | null
@@ -128,7 +123,6 @@ export type Database = {
           purpose_statement?: string | null
           review_notes?: string | null
           reviewed_by?: string | null
-          role?: string | null
           role_function?: string | null
           status?:
             | Database["public"]["Enums"]["admin_application_status"]
@@ -139,91 +133,13 @@ export type Database = {
         }
         Relationships: []
       }
-      admin_profiles: {
-        Row: {
-          application_id: string | null
-          created_at: string | null
-          email: string
-          full_name: string
-          id: string
-          is_super_admin: boolean | null
-          last_login: string | null
-          role: string | null
-          status: string | null
-          supercode: string
-        }
-        Insert: {
-          application_id?: string | null
-          created_at?: string | null
-          email: string
-          full_name: string
-          id: string
-          is_super_admin?: boolean | null
-          last_login?: string | null
-          role?: string | null
-          status?: string | null
-          supercode: string
-        }
-        Update: {
-          application_id?: string | null
-          created_at?: string | null
-          email?: string
-          full_name?: string
-          id?: string
-          is_super_admin?: boolean | null
-          last_login?: string | null
-          role?: string | null
-          status?: string | null
-          supercode?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "admin_profiles_application_id_fkey"
-            columns: ["application_id"]
-            isOneToOne: false
-            referencedRelation: "admin_profile_applications"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      "Customer Insights": {
-        Row: {
-          Code: string
-          "Full Description": string | null
-          Occurrence: string | null
-          "Sub-Task": string | null
-          Tools: string | null
-        }
-        Insert: {
-          Code: string
-          "Full Description"?: string | null
-          Occurrence?: string | null
-          "Sub-Task"?: string | null
-          Tools?: string | null
-        }
-        Update: {
-          Code?: string
-          "Full Description"?: string | null
-          Occurrence?: string | null
-          "Sub-Task"?: string | null
-          Tools?: string | null
-        }
-        Relationships: []
-      }
       enterprise_blueprints: {
         Row: {
           accounting_tasks: string[] | null
           board_type: Database["public"]["Enums"]["board_type"]
-          business_functions:
-            | Database["public"]["Enums"]["business_function_type"][]
-            | null
           ceo_type: Database["public"]["Enums"]["ceo_type"]
           created_at: string | null
           created_by: string | null
-          csv_tasks: Json | null
-          department_categories:
-            | Database["public"]["Enums"]["department_category_type"][]
-            | null
           department_types: Database["public"]["Enums"]["department_type"][]
           enterprise_type: Database["public"]["Enums"]["enterprise_type"]
           executive_types: Database["public"]["Enums"]["executive_type"][]
@@ -235,16 +151,9 @@ export type Database = {
         Insert: {
           accounting_tasks?: string[] | null
           board_type: Database["public"]["Enums"]["board_type"]
-          business_functions?:
-            | Database["public"]["Enums"]["business_function_type"][]
-            | null
           ceo_type: Database["public"]["Enums"]["ceo_type"]
           created_at?: string | null
           created_by?: string | null
-          csv_tasks?: Json | null
-          department_categories?:
-            | Database["public"]["Enums"]["department_category_type"][]
-            | null
           department_types?: Database["public"]["Enums"]["department_type"][]
           enterprise_type: Database["public"]["Enums"]["enterprise_type"]
           executive_types: Database["public"]["Enums"]["executive_type"][]
@@ -256,16 +165,9 @@ export type Database = {
         Update: {
           accounting_tasks?: string[] | null
           board_type?: Database["public"]["Enums"]["board_type"]
-          business_functions?:
-            | Database["public"]["Enums"]["business_function_type"][]
-            | null
           ceo_type?: Database["public"]["Enums"]["ceo_type"]
           created_at?: string | null
           created_by?: string | null
-          csv_tasks?: Json | null
-          department_categories?:
-            | Database["public"]["Enums"]["department_category_type"][]
-            | null
           department_types?: Database["public"]["Enums"]["department_type"][]
           enterprise_type?: Database["public"]["Enums"]["enterprise_type"]
           executive_types?: Database["public"]["Enums"]["executive_type"][]
@@ -275,119 +177,6 @@ export type Database = {
           name?: string
         }
         Relationships: []
-      }
-      "Marketing Comm": {
-        Row: {
-          Code: string
-          "Full Description": string | null
-          Occurrence: string | null
-          "Sub-Task": string | null
-          Tools: string | null
-        }
-        Insert: {
-          Code: string
-          "Full Description"?: string | null
-          Occurrence?: string | null
-          "Sub-Task"?: string | null
-          Tools?: string | null
-        }
-        Update: {
-          Code?: string
-          "Full Description"?: string | null
-          Occurrence?: string | null
-          "Sub-Task"?: string | null
-          Tools?: string | null
-        }
-        Relationships: []
-      }
-      Product_Service: {
-        Row: {
-          Code: string
-          "Full Description": string | null
-          Occurrence: string | null
-          "Sub-Task": string | null
-          Tools: string | null
-        }
-        Insert: {
-          Code: string
-          "Full Description"?: string | null
-          Occurrence?: string | null
-          "Sub-Task"?: string | null
-          Tools?: string | null
-        }
-        Update: {
-          Code?: string
-          "Full Description"?: string | null
-          Occurrence?: string | null
-          "Sub-Task"?: string | null
-          Tools?: string | null
-        }
-        Relationships: []
-      }
-      "R&D_Ops": {
-        Row: {
-          Code: string
-          "Full Description": string | null
-          Occurrence: string | null
-          "Sub-Task": string | null
-          Tools: string | null
-        }
-        Insert: {
-          Code: string
-          "Full Description"?: string | null
-          Occurrence?: string | null
-          "Sub-Task"?: string | null
-          Tools?: string | null
-        }
-        Update: {
-          Code?: string
-          "Full Description"?: string | null
-          Occurrence?: string | null
-          "Sub-Task"?: string | null
-          Tools?: string | null
-        }
-        Relationships: []
-      }
-      user_profiles: {
-        Row: {
-          created_at: string | null
-          created_by: string | null
-          email: string
-          enterprise_id: string | null
-          full_name: string
-          id: string
-          is_active: boolean | null
-          profile_type: Database["public"]["Enums"]["user_profile_type"] | null
-        }
-        Insert: {
-          created_at?: string | null
-          created_by?: string | null
-          email: string
-          enterprise_id?: string | null
-          full_name: string
-          id?: string
-          is_active?: boolean | null
-          profile_type?: Database["public"]["Enums"]["user_profile_type"] | null
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string | null
-          email?: string
-          enterprise_id?: string | null
-          full_name?: string
-          id?: string
-          is_active?: boolean | null
-          profile_type?: Database["public"]["Enums"]["user_profile_type"] | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_profiles_enterprise_id_fkey"
-            columns: ["enterprise_id"]
-            isOneToOne: false
-            referencedRelation: "enterprise_blueprints"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {
@@ -402,67 +191,7 @@ export type Database = {
     Enums: {
       admin_application_status: "pending" | "approved" | "declined"
       board_type: "traditional" | "advisory" | "hybrid" | "supervisory"
-      business_function_type:
-        | "finance"
-        | "marketing"
-        | "procurement"
-        | "human_resources"
-        | "operations"
-        | "support"
       ceo_type: "founder" | "professional" | "interim" | "executive"
-      department_category_type:
-        | "accounting"
-        | "financial_planning"
-        | "treasury"
-        | "risk_management"
-        | "internal_audit"
-        | "tax"
-        | "investor_relations"
-        | "compliance"
-        | "procurement"
-        | "strategic_finance"
-        | "it_finance"
-        | "brand_management"
-        | "digital_marketing"
-        | "market_research"
-        | "advertising"
-        | "public_relations"
-        | "content_marketing"
-        | "social_media"
-        | "event_marketing"
-        | "product_marketing"
-        | "performance_marketing"
-        | "crm"
-        | "trade_marketing"
-        | "vendor_management"
-        | "contract_negotiation"
-        | "cost_optimization"
-        | "category_management"
-        | "purchase_order_processing"
-        | "logistics_coordination"
-        | "procurement_compliance"
-        | "inventory_management"
-        | "strategic_procurement"
-        | "talent_acquisition"
-        | "employee_relations"
-        | "learning_development"
-        | "compensation_benefits"
-        | "hr_compliance"
-        | "dei"
-        | "workforce_planning"
-        | "organizational_development"
-        | "hr_technology"
-        | "employee_wellbeing"
-        | "manufacturing"
-        | "supply_chain"
-        | "quality_control"
-        | "process_improvement"
-        | "facilities_management"
-        | "customer_support_ops"
-        | "business_continuity"
-        | "operational_excellence"
-        | "sustainability"
-        | "performance_monitoring"
       department_type:
         | "accounting"
         | "financial_planning"
@@ -490,7 +219,6 @@ export type Database = {
         | "hr"
         | "finance"
         | "marketing"
-      user_profile_type: "enterprise_user"
     }
     CompositeTypes: {
       [_ in never]: never

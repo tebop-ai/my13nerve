@@ -23,7 +23,14 @@ export const EnterpriseSettings = () => {
           </TabsContent>
           
           <TabsContent value="create" className="space-y-4">
-            <CreateBlueprintForm />
+            <CreateBlueprintForm 
+              onSuccess={() => {
+                toast({
+                  title: "Success",
+                  description: "Blueprint created successfully",
+                });
+              }} 
+            />
           </TabsContent>
         </Tabs>
       </div>

@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Dispatch, SetStateAction } from "react";
 
 interface TypeSelectionGroupProps<T extends string> {
   label: string;
@@ -8,10 +7,6 @@ interface TypeSelectionGroupProps<T extends string> {
   selectedTypes: T[];
   onTypeSelect: (type: T) => void;
   formatLabel?: (type: string) => string;
-  executiveTypes?: T[];
-  setExecutiveTypes?: Dispatch<SetStateAction<T[]>>;
-  managementTypes?: T[];
-  setManagementTypes?: Dispatch<SetStateAction<T[]>>;
 }
 
 export const TypeSelectionGroup = <T extends string>({
