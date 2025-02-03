@@ -4,6 +4,7 @@ import { BarChart3, Users, Building2, Settings, UserCheck } from "lucide-react";
 import { DashboardOverview } from "./DashboardSections/DashboardOverview";
 import { AdminApplications } from "./DashboardSections/AdminApplications";
 import { EnterpriseSettings } from "./DashboardSections/EnterpriseSettings";
+import { AdminProfiles } from "./DashboardSections/AdminProfiles";
 
 const Dashboard = () => {
   return (
@@ -21,9 +22,9 @@ const Dashboard = () => {
             <BarChart3 className="h-4 w-4" />
             Overview
           </TabsTrigger>
-          <TabsTrigger value="users" className="flex items-center gap-2">
+          <TabsTrigger value="admin-profiles" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            Users
+            Admin Profiles
           </TabsTrigger>
           <TabsTrigger value="enterprises" className="flex items-center gap-2">
             <Building2 className="h-4 w-4" />
@@ -43,13 +44,8 @@ const Dashboard = () => {
           <DashboardOverview />
         </TabsContent>
 
-        <TabsContent value="users">
-          <Card className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">User Management</h2>
-            <div className="space-y-4">
-              <p>User management interface will be implemented here.</p>
-            </div>
-          </Card>
+        <TabsContent value="admin-profiles">
+          <AdminProfiles />
         </TabsContent>
 
         <TabsContent value="enterprises">
