@@ -27,7 +27,7 @@ export const AdminLoginForm = () => {
         .eq('email', adminEmail.trim().toLowerCase())
         .eq('status', 'active')
         .eq('validation_status', 'validated')
-        .maybeSingle();
+        .single();
 
       console.log("Initial admin profile query result:", adminProfile);
 
@@ -41,8 +41,8 @@ export const AdminLoginForm = () => {
         throw new Error('No active admin profile found');
       }
 
-      // Then verify the supercode
-      if (adminProfile.supercode !== adminSuperCode.trim()) {
+      // Then verify the supercode - make sure to trim whitespace and match case
+      if (adminProfile.supercode.trim() !== adminSuperCode.trim()) {
         console.log("SuperCode mismatch");
         throw new Error('Invalid SuperCode');
       }
@@ -83,7 +83,7 @@ export const AdminLoginForm = () => {
             errorMessage += "No active admin profile found for this email.";
             break;
           case 'Invalid SuperCode':
-            errorMessage += "Invalid SuperCode provided.";
+            errorMessage += "Invalid SuperCode provided. Please check and try again.";
             break;
           default:
             errorMessage += "Please check your credentials and try again.";
