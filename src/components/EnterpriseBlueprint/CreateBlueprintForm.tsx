@@ -59,19 +59,22 @@ export const CreateBlueprintForm = () => {
         throw new Error("No authenticated user found");
       }
 
+      // Ensure all required fields are non-empty strings
+      if (!name || !enterpriseType || !boardType || !ceoType) {
+        throw new Error("Required fields are missing");
+      }
+
       console.info("Submitting blueprint:", {
         name,
         enterpriseType,
         boardType,
         ceoType,
-        executiveTypes: [],
-        managementTypes: [],
-        departmentTypes: selectedDepartments
+        selectedDepartments
       });
 
       const { error } = await supabase
         .from('enterprise_blueprints')
-        .insert([{  // Wrap the object in an array to match the expected type
+        .insert({
           name,
           enterprise_type: enterpriseType,
           board_type: boardType,
@@ -82,7 +85,7 @@ export const CreateBlueprintForm = () => {
           business_functions: selectedBusinessFunctions,
           department_categories: selectedDepartmentCategories,
           created_by: user.id
-        }]);
+        });
 
       if (error) {
         console.error("Error creating blueprint:", error);
