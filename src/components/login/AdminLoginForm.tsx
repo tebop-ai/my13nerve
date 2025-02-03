@@ -16,63 +16,28 @@ export const AdminLoginForm = () => {
 
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!adminEmail || !adminSuperCode) {
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
-    console.log("Starting admin login process...");
-    console.log("Attempting login with email:", adminEmail);
-    
+
     try {
-      // First, get the admin profile without any conditions except email
-      const { data: adminProfile, error: profileError } = await supabase
+      const { data: adminProfile, error } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('email', adminEmail.toLowerCase().trim())
+        .eq('email', adminEmail.toLowerCase())
+        .eq('supercode', adminSuperCode)
+        .eq('status', 'active')
         .maybeSingle();
 
-      console.log("Initial admin profile query result:", { adminProfile, profileError });
-
-      if (profileError) {
-        console.error("Database error:", profileError);
-        throw new Error('Error verifying credentials');
-      }
-
+      if (error) throw error;
+      
       if (!adminProfile) {
-        console.log("No matching admin profile found");
         throw new Error('Invalid credentials');
       }
-
-      // Then verify the supercode
-      if (adminProfile.supercode !== adminSuperCode) {
-        console.log("Supercode mismatch");
-        throw new Error('Invalid credentials');
-      }
-
-      // Verify account status
-      if (adminProfile.status !== 'active') {
-        console.log("Account not active");
-        throw new Error('Account is not active');
-      }
-
-      console.log("Admin profile found and verified:", adminProfile);
 
       // Update last login timestamp
-      const { error: updateError } = await supabase
+      await supabase
         .from('admin_profiles')
         .update({ last_login: new Date().toISOString() })
         .eq('id', adminProfile.id);
-
-      if (updateError) {
-        console.error("Error updating last login:", updateError);
-      }
 
       // Store authentication state and profile
       sessionStorage.setItem("isAdminAuthenticated", "true");
@@ -85,17 +50,15 @@ export const AdminLoginForm = () => {
 
       // Redirect based on admin type
       if (adminProfile.is_super_admin) {
-        console.log("Redirecting super admin to /dashboard");
         navigate("/dashboard");
       } else {
-        console.log("Redirecting regular admin to /admin-dashboard");
         navigate("/admin-dashboard");
       }
     } catch (error) {
       console.error("Login error:", error);
       toast({
         title: "Login failed",
-        description: error instanceof Error ? error.message : "Invalid credentials. Please try again.",
+        description: "Invalid email or SuperCode. Please try again.",
         variant: "destructive",
       });
     } finally {
