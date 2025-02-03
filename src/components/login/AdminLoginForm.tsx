@@ -43,10 +43,15 @@ export const AdminLoginForm = () => {
         .eq('full_name', adminUsername)
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Database error:", error);
+        throw new Error('Database error occurred');
+      }
+
+      if (!adminProfile) {
+        console.log("No matching admin profile found");
         throw new Error('Invalid credentials');
       }
 
