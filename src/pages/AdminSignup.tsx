@@ -40,24 +40,7 @@ const AdminSignup = () => {
   const handleSubmit = async (data: AdminSignupFormData) => {
     try {
       console.log("Submitting admin application:", data);
-
-      // First, sign up for a public account
-      const { error: signUpError } = await supabase.auth.signUp({
-        email: data.email,
-        password: "temporary-password-" + Math.random().toString(36).slice(2),
-        options: {
-          data: {
-            full_name: data.full_name,
-          }
-        }
-      });
-
-      if (signUpError) {
-        console.error("Error signing up:", signUpError);
-        throw signUpError;
-      }
-
-      // Then submit the admin application
+      
       const { data: response, error } = await supabase
         .from('admin_profile_applications')
         .insert([
@@ -94,7 +77,7 @@ const AdminSignup = () => {
       
       toast({
         title: "Application Submitted",
-        description: "Your admin application has been submitted successfully. Please check your email for verification.",
+        description: "Your admin application has been submitted successfully. We'll review it shortly.",
       });
       
       navigate("/");

@@ -10,30 +10,7 @@ export const AdminApplications = () => {
   const { toast } = useToast();
   const [previewApplication, setPreviewApplication] = useState<any>(null);
 
-  // First, check if user is super admin
-  const { data: adminProfile, isLoading: isCheckingAdmin } = useQuery({
-    queryKey: ['adminProfile'],
-    queryFn: async () => {
-      console.log("Checking admin profile...");
-      const { data: profile, error } = await supabase
-        .from('admin_profiles')
-        .select('*')
-        .eq('email', 'Goapele Main')
-        .eq('is_super_admin', true)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error fetching admin profile:", error);
-        throw error;
-      }
-      
-      console.log("Admin profile:", profile);
-      return profile;
-    }
-  });
-
-  // Then fetch applications if user is super admin
-  const { data: applications, isLoading: isLoadingApplications, refetch } = useQuery({
+  const { data: applications, refetch } = useQuery({
     queryKey: ['adminApplications'],
     queryFn: async () => {
       console.log("Fetching admin applications...");
@@ -49,85 +26,25 @@ export const AdminApplications = () => {
       
       console.log("Fetched applications:", data);
       return data;
-    },
-    enabled: !!adminProfile
-  });
-
-  const verifyAdminProfileCreation = async (applicationId: string): Promise<boolean> => {
-    console.log("Verifying admin profile creation for application:", applicationId);
-    
-    // Wait for a short delay to allow database triggers to complete
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const { data: profile, error } = await supabase
-      .from('admin_profiles')
-      .select('*')
-      .eq('application_id', applicationId)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Error verifying admin profile:", error);
-      return false;
     }
-
-    console.log("Verification result:", profile);
-    return !!profile;
-  };
+  });
 
   const handleApplicationStatus = async (id: string, status: 'approved' | 'declined') => {
     try {
       console.log(`Updating application ${id} status to ${status}`);
       
-      // Update the application status
-      const { error: updateError } = await supabase
+      const { error } = await supabase
         .from('admin_profile_applications')
-        .update({ 
-          status,
-          updated_at: new Date().toISOString(),
-          reviewed_by: adminProfile?.id
-        })
+        .update({ status })
         .eq('id', id);
 
-      if (updateError) {
-        console.error('Error updating application:', updateError);
-        throw updateError;
-      }
+      if (error) throw error;
 
-      // If approved, verify the admin profile was created
       if (status === 'approved') {
-        const isProfileCreated = await verifyAdminProfileCreation(id);
-        
-        if (!isProfileCreated) {
-          console.error('No admin profile created for application:', id);
-          toast({
-            title: "Error",
-            description: "Failed to create admin profile. Please try again or contact support.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        // Fetch the created profile to get the supercode
-        const { data: newProfile, error: profileError } = await supabase
-          .from('admin_profiles')
-          .select('supercode')
-          .eq('application_id', id)
-          .maybeSingle();
-
-        if (profileError || !newProfile) {
-          console.error('Error fetching new admin profile:', profileError);
-          toast({
-            title: "Warning",
-            description: "Application approved but there might be an issue with the profile. Please verify.",
-            variant: "destructive",
-          });
-        } else {
-          console.log('New admin profile created with supercode:', newProfile.supercode);
-          toast({
-            title: "Application Approved",
-            description: `Admin profile created with supercode: ${newProfile.supercode}`,
-          });
-        }
+        toast({
+          title: "Application Approved",
+          description: "Admin profile will be created automatically.",
+        });
       } else {
         toast({
           title: "Application Declined",
@@ -146,35 +63,50 @@ export const AdminApplications = () => {
     }
   };
 
-  if (isCheckingAdmin) {
-    return (
-      <Card className="p-6">
-        <div className="text-center text-muted-foreground py-8">
-          Checking permissions...
-        </div>
-      </Card>
-    );
-  }
+  const downloadApplication = (application: any) => {
+    const applicationData = {
+      "Personal Information": {
+        "Full Name": application.full_name,
+        "Email": application.email,
+        "Phone": application.phone_number,
+        "Languages": application.languages_spoken,
+        "Timezone": application.preferred_timezone
+      },
+      "Professional Information": {
+        "Current Job Title": application.current_job_title,
+        "Work Experience": application.work_experience,
+        "Industry Expertise": application.industry_expertise,
+        "LinkedIn Profile": application.linkedin_profile,
+        "Certifications": application.certifications,
+        "AI Systems Experience": application.ai_systems_experience
+      },
+      "Application Details": {
+        "Purpose Statement": application.purpose_statement,
+        "Personal Statement": application.personal_statement,
+        "Role Function": application.role_function,
+        "Professional References": application.professional_references,
+        "Endorsements": application.endorsements
+      },
+      "Documents & Verification": {
+        "Government ID": application.government_id_url,
+        "NDA Document": application.nda_document_url,
+        "Background Check Consent": application.background_check_consent ? "Yes" : "No",
+        "Terms Accepted": application.terms_accepted ? "Yes" : "No",
+        "Code of Conduct Accepted": application.code_of_conduct_accepted ? "Yes" : "No"
+      }
+    };
 
-  if (!adminProfile) {
-    return (
-      <Card className="p-6">
-        <div className="text-center text-muted-foreground py-8">
-          You don't have permission to view admin applications
-        </div>
-      </Card>
-    );
-  }
-
-  if (isLoadingApplications) {
-    return (
-      <Card className="p-6">
-        <div className="text-center text-muted-foreground py-8">
-          Loading applications...
-        </div>
-      </Card>
-    );
-  }
+    const jsonString = JSON.stringify(applicationData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${application.full_name.replace(/\s+/g, '_')}_application.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <Card className="p-6">
@@ -185,7 +117,7 @@ export const AdminApplications = () => {
             key={application.id}
             application={application}
             onPreview={setPreviewApplication}
-            onDownload={() => {}}
+            onDownload={downloadApplication}
             onUpdateStatus={handleApplicationStatus}
           />
         ))}

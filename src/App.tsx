@@ -1,4 +1,3 @@
-import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,94 +9,24 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSignup from "./pages/AdminSignup";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const queryClient = new QueryClient();
 
-// Admin credentials for Super Admin
-const SUPER_ADMIN_CREDENTIALS = {
+// Admin credentials
+const ADMIN_CREDENTIALS = {
   username: "Goapele Main",
   superCode: "DFGSTE^%$2738459K9I8uyhh00"
 };
 
-// Protected Route component with Super Admin check
-const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: React.ReactNode, requireSuperAdmin?: boolean }) => {
-  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean | null>(null);
-  const [isSuperAdmin, setIsSuperAdmin] = React.useState<boolean | null>(null);
-  const { toast } = useToast();
-  const location = useLocation();
-
-  React.useEffect(() => {
-    const checkAuth = async () => {
-      console.log("Checking authentication status...");
-      const storedAuth = localStorage.getItem("isAdminAuthenticated") === "true";
-      const storedUsername = localStorage.getItem("adminUsername");
-      console.log("Stored auth:", storedAuth);
-      console.log("Stored username:", storedUsername);
-      
-      if (storedAuth && storedUsername) {
-        try {
-          const { data: adminProfile, error } = await supabase
-            .from('admin_profiles')
-            .select('*')
-            .eq('email', storedUsername)
-            .eq('is_super_admin', true)
-            .single();
-
-          if (error) {
-            console.error("Error checking admin profile:", error);
-            toast({
-              title: "Error",
-              description: "Failed to verify admin status",
-              variant: "destructive",
-            });
-            setIsAuthenticated(false);
-            setIsSuperAdmin(false);
-            localStorage.removeItem("isAdminAuthenticated");
-            localStorage.removeItem("adminUsername");
-            return;
-          }
-
-          if (adminProfile) {
-            console.log("Super admin verified:", adminProfile);
-            setIsSuperAdmin(true);
-            setIsAuthenticated(true);
-          } else {
-            console.log("No super admin profile found");
-            setIsSuperAdmin(false);
-            setIsAuthenticated(storedAuth);
-          }
-        } catch (error) {
-          console.error("Error in checkAuth:", error);
-          setIsSuperAdmin(false);
-          setIsAuthenticated(false);
-          localStorage.removeItem("isAdminAuthenticated");
-          localStorage.removeItem("adminUsername");
-        }
-      } else {
-        setIsAuthenticated(false);
-        setIsSuperAdmin(false);
-      }
-    };
-
-    checkAuth();
-  }, [location.pathname, toast]);
-
-  if (isAuthenticated === null || (requireSuperAdmin && isSuperAdmin === null)) {
-    console.log("Loading authentication state...");
-    return <div>Loading...</div>;
-  }
-
-  if (!isAuthenticated || (requireSuperAdmin && !isSuperAdmin)) {
-    console.log("Authentication failed, redirecting to home");
-    console.log("isAuthenticated:", isAuthenticated);
-    console.log("requireSuperAdmin:", requireSuperAdmin);
-    console.log("isSuperAdmin:", isSuperAdmin);
+// Protected Route component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = sessionStorage.getItem("isAdminAuthenticated") === "true";
+  
+  if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
 
-  console.log("Authentication successful, rendering protected content");
   return <>{children}</>;
 };
 
@@ -105,20 +34,17 @@ const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: Rea
 const AppContent = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
-  const [isAuthenticated, setIsAuthenticated] = React.useState(
-    localStorage.getItem("isAdminAuthenticated") === "true"
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    sessionStorage.getItem("isAdminAuthenticated") === "true"
   );
 
   // Function to handle admin login
-  const handleAdminLogin = async (username: string, superCode: string): Promise<boolean> => {
-    console.log("Attempting admin login:", { username });
-    
+  const handleAdminLogin = (username: string, superCode: string) => {
     if (
-      username === SUPER_ADMIN_CREDENTIALS.username &&
-      superCode === SUPER_ADMIN_CREDENTIALS.superCode
+      username === ADMIN_CREDENTIALS.username &&
+      superCode === ADMIN_CREDENTIALS.superCode
     ) {
-      localStorage.setItem("isAdminAuthenticated", "true");
-      localStorage.setItem("adminUsername", username);
+      sessionStorage.setItem("isAdminAuthenticated", "true");
       setIsAuthenticated(true);
       return true;
     }
@@ -137,7 +63,7 @@ const AppContent = () => {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute requireSuperAdmin={true}>
+              <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -161,22 +87,18 @@ const AppContent = () => {
 };
 
 const App = () => {
-  console.log("Rendering App component");
-
   return (
-    <React.StrictMode>
-      <BrowserRouter>
-        <QueryClientProvider client={queryClient}>
-          <SidebarProvider>
-            <TooltipProvider>
-              <AppContent />
-              <Toaster />
-              <Sonner />
-            </TooltipProvider>
-          </SidebarProvider>
-        </QueryClientProvider>
-      </BrowserRouter>
-    </React.StrictMode>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <SidebarProvider>
+          <TooltipProvider>
+            <AppContent />
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </SidebarProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
   );
 };
 

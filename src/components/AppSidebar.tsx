@@ -6,6 +6,7 @@ import {
   Home,
   ChevronDown,
   Layout,
+  Shield
 } from "lucide-react";
 import {
   Sidebar,
@@ -24,18 +25,19 @@ import { cn } from "@/lib/utils";
 
 const mainMenuItems = [
   { title: "Overview", icon: Home, url: "/dashboard" },
-  { title: "Admin Profiles", icon: Users, url: "/dashboard?tab=admin-profiles" },
-  { title: "Analytics", icon: BarChart3, url: "/dashboard?tab=overview" },
+  { title: "Admin Dashboard", icon: Shield, url: "/admin-dashboard" },
+  { title: "Admin Profiles", icon: Users, url: "/admin-profiles" },
+  { title: "Analytics", icon: BarChart3, url: "/analytics" },
 ];
 
 const subMenuItems = {
   applications: [
-    { title: "Create Blueprint", url: "/dashboard?tab=blueprints" },
-    { title: "View Blueprints", url: "/dashboard?tab=blueprints" },
+    { title: "OAuth Apps", url: "/oauth-apps" },
+    { title: "Authorized Apps", url: "/authorized-apps" },
   ],
   enterprises: [
-    { title: "All Enterprises", url: "/dashboard?tab=overview" },
-    { title: "Settings", url: "/dashboard?tab=settings" },
+    { title: "All Enterprises", url: "/enterprises" },
+    { title: "Settings", url: "/enterprise-settings" },
   ],
 };
 
@@ -46,6 +48,7 @@ export function AppSidebar() {
     enterprises: false,
   });
   
+  // Don't render the sidebar on the landing page
   if (location.pathname === "/") {
     return null;
   }
@@ -84,6 +87,7 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
 
+              {/* Applications Section */}
               <Collapsible
                 open={openSections.applications}
                 onOpenChange={() => toggleSection('applications')}
@@ -109,6 +113,7 @@ export function AppSidebar() {
                 </CollapsibleContent>
               </Collapsible>
 
+              {/* Enterprises Section */}
               <Collapsible
                 open={openSections.enterprises}
                 onOpenChange={() => toggleSection('enterprises')}
@@ -140,7 +145,7 @@ export function AppSidebar() {
                   className="text-white hover:bg-sidebar-hover"
                 >
                   <Link 
-                    to="/dashboard?tab=settings"
+                    to="/settings"
                     className="flex items-center gap-2 px-4 py-2 rounded-md"
                   >
                     <Settings className="h-5 w-5" />

@@ -59,7 +59,6 @@ export type Database = {
           purpose_statement: string | null
           review_notes: string | null
           reviewed_by: string | null
-          role: string | null
           role_function: string | null
           status: Database["public"]["Enums"]["admin_application_status"] | null
           terms_accepted: boolean | null
@@ -91,7 +90,6 @@ export type Database = {
           purpose_statement?: string | null
           review_notes?: string | null
           reviewed_by?: string | null
-          role?: string | null
           role_function?: string | null
           status?:
             | Database["public"]["Enums"]["admin_application_status"]
@@ -125,7 +123,6 @@ export type Database = {
           purpose_statement?: string | null
           review_notes?: string | null
           reviewed_by?: string | null
-          role?: string | null
           role_function?: string | null
           status?:
             | Database["public"]["Enums"]["admin_application_status"]
@@ -145,8 +142,6 @@ export type Database = {
           id: string
           is_super_admin: boolean | null
           last_login: string | null
-          role: string | null
-          status: string | null
           supercode: string
         }
         Insert: {
@@ -157,8 +152,6 @@ export type Database = {
           id: string
           is_super_admin?: boolean | null
           last_login?: string | null
-          role?: string | null
-          status?: string | null
           supercode: string
         }
         Update: {
@@ -169,8 +162,6 @@ export type Database = {
           id?: string
           is_super_admin?: boolean | null
           last_login?: string | null
-          role?: string | null
-          status?: string | null
           supercode?: string
         }
         Relationships: [
@@ -217,7 +208,6 @@ export type Database = {
           ceo_type: Database["public"]["Enums"]["ceo_type"]
           created_at: string | null
           created_by: string | null
-          csv_tasks: Json | null
           department_categories:
             | Database["public"]["Enums"]["department_category_type"][]
             | null
@@ -238,7 +228,6 @@ export type Database = {
           ceo_type: Database["public"]["Enums"]["ceo_type"]
           created_at?: string | null
           created_by?: string | null
-          csv_tasks?: Json | null
           department_categories?:
             | Database["public"]["Enums"]["department_category_type"][]
             | null
@@ -259,7 +248,6 @@ export type Database = {
           ceo_type?: Database["public"]["Enums"]["ceo_type"]
           created_at?: string | null
           created_by?: string | null
-          csv_tasks?: Json | null
           department_categories?:
             | Database["public"]["Enums"]["department_category_type"][]
             | null
@@ -344,47 +332,6 @@ export type Database = {
           Tools?: string | null
         }
         Relationships: []
-      }
-      user_profiles: {
-        Row: {
-          created_at: string | null
-          created_by: string | null
-          email: string
-          enterprise_id: string | null
-          full_name: string
-          id: string
-          is_active: boolean | null
-          profile_type: Database["public"]["Enums"]["user_profile_type"] | null
-        }
-        Insert: {
-          created_at?: string | null
-          created_by?: string | null
-          email: string
-          enterprise_id?: string | null
-          full_name: string
-          id?: string
-          is_active?: boolean | null
-          profile_type?: Database["public"]["Enums"]["user_profile_type"] | null
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string | null
-          email?: string
-          enterprise_id?: string | null
-          full_name?: string
-          id?: string
-          is_active?: boolean | null
-          profile_type?: Database["public"]["Enums"]["user_profile_type"] | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_profiles_enterprise_id_fkey"
-            columns: ["enterprise_id"]
-            isOneToOne: false
-            referencedRelation: "enterprise_blueprints"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {
@@ -487,7 +434,6 @@ export type Database = {
         | "hr"
         | "finance"
         | "marketing"
-      user_profile_type: "enterprise_user"
     }
     CompositeTypes: {
       [_ in never]: never
