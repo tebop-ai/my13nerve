@@ -5,7 +5,8 @@ import {
   Globe,
   Home,
   ChevronDown,
-  Layout
+  Layout,
+  Shield
 } from "lucide-react";
 import {
   Sidebar,
@@ -24,6 +25,7 @@ import { cn } from "@/lib/utils";
 
 const mainMenuItems = [
   { title: "Overview", icon: Home, url: "/dashboard" },
+  { title: "Admin Dashboard", icon: Shield, url: "/admin-dashboard" },
   { title: "Admin Profiles", icon: Users, url: "/admin-profiles" },
   { title: "Analytics", icon: BarChart3, url: "/analytics" },
 ];

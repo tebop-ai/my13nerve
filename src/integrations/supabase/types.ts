@@ -133,6 +133,47 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_profiles: {
+        Row: {
+          application_id: string | null
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          is_super_admin: boolean | null
+          last_login: string | null
+          supercode: string
+        }
+        Insert: {
+          application_id?: string | null
+          created_at?: string | null
+          email: string
+          full_name: string
+          id: string
+          is_super_admin?: boolean | null
+          last_login?: string | null
+          supercode: string
+        }
+        Update: {
+          application_id?: string | null
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          is_super_admin?: boolean | null
+          last_login?: string | null
+          supercode?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_profiles_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profile_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       "Customer Insights": {
         Row: {
           Code: string
