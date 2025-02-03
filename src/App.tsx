@@ -68,17 +68,26 @@ const AppContent = () => {
     sessionStorage.getItem("isAdminAuthenticated") === "true"
   );
 
-  // Function to handle admin login
-  const handleAdminLogin = async (username: string, superCode: string) => {
+  // Function to handle admin login - now returns a Promise<boolean>
+  const handleAdminLogin = async (username: string, superCode: string): Promise<boolean> => {
     console.log("Attempting admin login:", { username });
     
     if (
       username === SUPER_ADMIN_CREDENTIALS.username &&
       superCode === SUPER_ADMIN_CREDENTIALS.superCode
     ) {
-      sessionStorage.setItem("isAdminAuthenticated", "true");
-      setIsAuthenticated(true);
-      return true;
+      // Verify against admin_profiles table
+      const { data: adminProfile, error } = await supabase
+        .from('admin_profiles')
+        .select('*')
+        .eq('email', username)
+        .single();
+
+      if (!error && adminProfile) {
+        sessionStorage.setItem("isAdminAuthenticated", "true");
+        setIsAuthenticated(true);
+        return true;
+      }
     }
     return false;
   };
