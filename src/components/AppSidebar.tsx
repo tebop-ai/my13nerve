@@ -26,18 +26,18 @@ import { cn } from "@/lib/utils";
 const mainMenuItems = [
   { title: "Overview", icon: Home, url: "/dashboard" },
   { title: "Admin Dashboard", icon: Shield, url: "/admin-dashboard" },
-  { title: "Admin Profiles", icon: Users, url: "/admin-profiles" },
-  { title: "Analytics", icon: BarChart3, url: "/analytics" },
+  { title: "Admin Profiles", icon: Users, url: "/admin-dashboard?tab=admin-profiles" },
+  { title: "Analytics", icon: BarChart3, url: "/admin-dashboard?tab=overview" },
 ];
 
 const subMenuItems = {
   applications: [
-    { title: "OAuth Apps", url: "/oauth-apps" },
-    { title: "Authorized Apps", url: "/authorized-apps" },
+    { title: "Create Blueprint", url: "/admin-dashboard?tab=blueprints" },
+    { title: "View Blueprints", url: "/admin-dashboard?tab=blueprints" },
   ],
   enterprises: [
-    { title: "All Enterprises", url: "/enterprises" },
-    { title: "Settings", url: "/enterprise-settings" },
+    { title: "All Enterprises", url: "/admin-dashboard?tab=overview" },
+    { title: "Settings", url: "/admin-dashboard?tab=settings" },
   ],
 };
 
@@ -145,7 +145,7 @@ export function AppSidebar() {
                   className="text-white hover:bg-sidebar-hover"
                 >
                   <Link 
-                    to="/settings"
+                    to="/admin-dashboard?tab=settings"
                     className="flex items-center gap-2 px-4 py-2 rounded-md"
                   >
                     <Settings className="h-5 w-5" />

@@ -2,6 +2,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { BarChart3, Users, Building2, Settings } from "lucide-react";
 import { AdminDashboardOverview } from "./DashboardSections/AdminDashboardOverview";
+import { AdminProfiles } from "./DashboardSections/AdminProfiles";
+import { EnterpriseSettings } from "./DashboardSections/EnterpriseSettings";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
@@ -46,9 +48,9 @@ const AdminDashboard = () => {
             <BarChart3 className="h-4 w-4" />
             Overview
           </TabsTrigger>
-          <TabsTrigger value="users" className="flex items-center gap-2">
+          <TabsTrigger value="admin-profiles" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            Users
+            Admin Profiles
           </TabsTrigger>
           <TabsTrigger value="blueprints" className="flex items-center gap-2">
             <Building2 className="h-4 w-4" />
@@ -64,18 +66,12 @@ const AdminDashboard = () => {
           <AdminDashboardOverview />
         </TabsContent>
 
-        <TabsContent value="users">
-          <Card className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">User Management</h2>
-            <p>User management interface will be implemented in the next phase.</p>
-          </Card>
+        <TabsContent value="admin-profiles">
+          <AdminProfiles />
         </TabsContent>
 
         <TabsContent value="blueprints">
-          <Card className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Enterprise Blueprints</h2>
-            <p>View-only access to enterprise blueprints will be implemented in the next phase.</p>
-          </Card>
+          <EnterpriseSettings />
         </TabsContent>
 
         <TabsContent value="settings">
