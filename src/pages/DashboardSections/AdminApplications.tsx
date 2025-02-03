@@ -11,17 +11,15 @@ export const AdminApplications = () => {
   const [previewApplication, setPreviewApplication] = useState<any>(null);
 
   // First, check if user is super admin
-  const { data: adminProfile } = useQuery({
+  const { data: adminProfile, isLoading: isCheckingAdmin } = useQuery({
     queryKey: ['adminProfile'],
     queryFn: async () => {
       console.log("Checking admin profile...");
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase
+      const { data: profile, error } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', 'Goapele Main')
+        .eq('is_super_admin', true)
         .single();
 
       if (error) {
@@ -29,13 +27,13 @@ export const AdminApplications = () => {
         throw error;
       }
       
-      console.log("Admin profile:", data);
-      return data;
+      console.log("Admin profile:", profile);
+      return profile;
     }
   });
 
   // Then fetch applications if user is super admin
-  const { data: applications, refetch } = useQuery({
+  const { data: applications, isLoading: isLoadingApplications, refetch } = useQuery({
     queryKey: ['adminApplications'],
     queryFn: async () => {
       console.log("Fetching admin applications...");
@@ -59,15 +57,12 @@ export const AdminApplications = () => {
     try {
       console.log(`Updating application ${id} status to ${status}`);
       
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
       const { error } = await supabase
         .from('admin_profile_applications')
         .update({ 
           status,
           updated_at: new Date().toISOString(),
-          reviewed_by: user.id
+          reviewed_by: adminProfile?.id
         })
         .eq('id', id);
 
@@ -91,11 +86,31 @@ export const AdminApplications = () => {
     }
   };
 
+  if (isCheckingAdmin) {
+    return (
+      <Card className="p-6">
+        <div className="text-center text-muted-foreground py-8">
+          Checking permissions...
+        </div>
+      </Card>
+    );
+  }
+
   if (!adminProfile) {
     return (
       <Card className="p-6">
         <div className="text-center text-muted-foreground py-8">
           You don't have permission to view admin applications
+        </div>
+      </Card>
+    );
+  }
+
+  if (isLoadingApplications) {
+    return (
+      <Card className="p-6">
+        <div className="text-center text-muted-foreground py-8">
+          Loading applications...
         </div>
       </Card>
     );
