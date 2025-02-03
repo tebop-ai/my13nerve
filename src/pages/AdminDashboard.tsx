@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { Building2, Settings, Users, User, Briefcase, LayoutDashboard } from "lucide-react";
+import { Building2, Settings, Users, User, Briefcase, LayoutDashboard, Boxes } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -81,15 +81,15 @@ const AdminDashboard = () => {
           </div>
         </Card>
         
-        <Card className="p-4 bg-green-50 border-green-200 hover:bg-green-100 transition-colors">
+        <Card className="p-4 bg-sky-50 border-sky-200 hover:bg-sky-100 transition-colors">
           <div className="flex items-center gap-3">
-            <LayoutDashboard className="h-8 w-8 text-green-500" />
+            <Boxes className="h-8 w-8 text-sky-500" />
             <div>
-              <h3 className="font-semibold text-green-900">Account Status</h3>
-              <p className="text-2xl font-bold text-green-600 capitalize">
+              <h3 className="font-semibold text-sky-900">Account Status</h3>
+              <p className="text-2xl font-bold text-sky-600 capitalize">
                 {adminProfile.validation_status}
               </p>
-              <p className="text-sm text-green-700">Your account validation status</p>
+              <p className="text-sm text-sky-700">Your account validation status</p>
             </div>
           </div>
         </Card>

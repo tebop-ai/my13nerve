@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { BarChart3, Users, Building2, Settings, Crown, Shield, Siren, Database } from "lucide-react";
+import { BarChart3, Users, Building2, Settings, Crown, Shield, Siren, Database, Sparkles } from "lucide-react";
 import { DashboardOverview } from "./DashboardSections/DashboardOverview";
 import { AdminApplications } from "./DashboardSections/AdminApplications";
 import { EnterpriseSettings } from "./DashboardSections/EnterpriseSettings";
@@ -65,8 +65,8 @@ const Dashboard = () => {
             <p className="text-purple-600">Complete system control and oversight</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg border border-purple-200">
-          <Shield className="h-5 w-5 text-purple-500" />
+        <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-lg border border-purple-200">
+          <Sparkles className="h-5 w-5 text-purple-500" />
           <span className="text-purple-700 font-medium">Super Admin Access</span>
         </div>
       </div>
