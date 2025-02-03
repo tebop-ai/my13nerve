@@ -3,12 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
-import { Lock, LogIn, User, UserPlus, Shield } from "lucide-react";
+import { Lock, LogIn, User, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 interface IndexProps {
-  onAdminLogin: (username: string, superCode: string) => boolean;
+  onAdminLogin: (username: string, superCode: string) => Promise<boolean>;
 }
 
 const Index = ({ onAdminLogin }: IndexProps) => {
@@ -18,9 +18,10 @@ const Index = ({ onAdminLogin }: IndexProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleAdminSubmit = (e: React.FormEvent) => {
+  const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (onAdminLogin(adminUsername, adminSuperCode)) {
+    const success = await onAdminLogin(adminUsername, adminSuperCode);
+    if (success) {
       toast({
         title: "Login successful",
         description: "Welcome back, Super Admin!",
