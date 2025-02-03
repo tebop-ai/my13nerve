@@ -25,7 +25,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
     setIsLoading(true);
     
     try {
-      console.log("Attempting admin login with:", { adminUsername });
+      console.log("Attempting admin login with:", { adminUsername, adminSuperCode });
       
       // First check if this is a valid admin in our profiles
       const { data: adminProfile, error: adminError } = await supabase
@@ -34,6 +34,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         .eq('email', adminUsername)
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
+        .eq('is_super_admin', true)  // Add this line to check for super admin
         .maybeSingle();
 
       if (adminError) {
@@ -42,16 +43,17 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       }
 
       if (!adminProfile) {
-        console.log("No admin profile found");
+        console.log("No admin profile found or invalid credentials");
         throw new Error('Invalid credentials');
       }
 
       console.log("Admin profile found:", adminProfile);
 
       // If valid, proceed with the app's login flow
-      if (onAdminLogin(adminUsername, adminSuperCode)) {
-        console.log("Admin login successful");
-        
+      const loginSuccess = onAdminLogin(adminUsername, adminSuperCode);
+      console.log("Login success:", loginSuccess);
+
+      if (loginSuccess) {
         // Update last login timestamp
         const { error: updateError } = await supabase
           .from('admin_profiles')
@@ -72,7 +74,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
 
         navigate("/dashboard");
       } else {
-        throw new Error('Login failed');
+        throw new Error('Login verification failed');
       }
     } catch (error) {
       console.error("Login error:", error);
