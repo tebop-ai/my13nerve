@@ -22,12 +22,25 @@ const Index = ({ onAdminLogin }: IndexProps) => {
 
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!adminUsername || !adminSuperCode) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
+    toast({
+      title: "Logging in...",
+      description: "Please wait while we verify your credentials",
+    });
     
     try {
       console.log("Starting admin login process...");
       
-      // First check if this is a valid admin in our profiles
       const { data: adminProfile, error } = await supabase
         .from('admin_profiles')
         .select('*')
@@ -49,7 +62,6 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         throw new Error('Invalid credentials');
       }
 
-      // If we found a valid admin profile, verify against hardcoded credentials
       const loginSuccess = onAdminLogin(adminUsername, adminSuperCode);
       console.log("Hardcoded credentials check result:", loginSuccess);
 
@@ -57,7 +69,6 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         throw new Error('Login verification failed');
       }
 
-      // Update last login timestamp
       const { error: updateError } = await supabase
         .from('admin_profiles')
         .update({ last_login: new Date().toISOString() })
@@ -65,7 +76,6 @@ const Index = ({ onAdminLogin }: IndexProps) => {
 
       if (updateError) {
         console.error("Error updating last login:", updateError);
-        // Don't throw here, as login was successful
       }
 
       toast({
@@ -85,8 +95,6 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       setIsLoading(false);
     }
   };
-
-  // ... keep existing code (rest of the component JSX)
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -199,6 +207,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                         value={adminUsername}
                         onChange={(e) => setAdminUsername(e.target.value)}
                         disabled={isLoading}
+                        required
                       />
                       <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     </div>
@@ -214,6 +223,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                         value={adminSuperCode}
                         onChange={(e) => setAdminSuperCode(e.target.value)}
                         disabled={isLoading}
+                        required
                       />
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     </div>
@@ -225,8 +235,17 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                     size="lg"
                     disabled={isLoading}
                   >
-                    <LogIn className="mr-2" /> 
-                    {isLoading ? "Signing in..." : "Access Admin Panel"}
+                    {isLoading ? (
+                      <>
+                        <span className="animate-spin mr-2">⌛</span>
+                        Signing in...
+                      </>
+                    ) : (
+                      <>
+                        <LogIn className="mr-2" /> 
+                        Access Admin Panel
+                      </>
+                    )}
                   </Button>
 
                   <div className="text-center mt-4">
