@@ -17,7 +17,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleAdminSubmit = async (username: string, superCode: string) => {
+  const handleAdminSubmit = async (username: string, superCode: string): Promise<boolean> => {
     setIsLoading(true);
     console.log("Attempting admin login with:", { username });
     
@@ -64,6 +64,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       });
 
       navigate(isSuperAdmin ? "/dashboard" : "/admin-dashboard");
+      return true;
 
     } catch (error) {
       console.error("Login error:", error);
@@ -73,6 +74,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         variant: "destructive",
       });
       localStorage.removeItem("isAdminAuthenticated");
+      return false;
     } finally {
       setIsLoading(false);
     }
