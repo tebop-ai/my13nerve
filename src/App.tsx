@@ -10,20 +10,50 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSignup from "./pages/AdminSignup";
+import { supabase } from "@/integrations/supabase/client";
 
 const queryClient = new QueryClient();
 
-// Admin credentials
-const ADMIN_CREDENTIALS = {
+// Admin credentials for Super Admin
+const SUPER_ADMIN_CREDENTIALS = {
   username: "Goapele Main",
   superCode: "DFGSTE^%$2738459K9I8uyhh00"
 };
 
-// Protected Route component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = sessionStorage.getItem("isAdminAuthenticated") === "true";
-  
-  if (!isAuthenticated) {
+// Protected Route component with Super Admin check
+const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: React.ReactNode, requireSuperAdmin?: boolean }) => {
+  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean | null>(null);
+  const [isSuperAdmin, setIsSuperAdmin] = React.useState<boolean | null>(null);
+
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      const storedAuth = sessionStorage.getItem("isAdminAuthenticated") === "true";
+      
+      if (storedAuth) {
+        // Verify if the user is Super Admin
+        const { data: adminProfile, error } = await supabase
+          .from('admin_profiles')
+          .select('*')
+          .eq('email', 'Goapele Main')
+          .single();
+
+        if (!error && adminProfile) {
+          setIsSuperAdmin(true);
+        }
+      }
+      
+      setIsAuthenticated(storedAuth);
+    };
+
+    checkAuth();
+  }, []);
+
+  if (isAuthenticated === null || (requireSuperAdmin && isSuperAdmin === null)) {
+    // Show loading state while checking authentication
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated || (requireSuperAdmin && !isSuperAdmin)) {
     return <Navigate to="/" replace />;
   }
 
@@ -39,10 +69,12 @@ const AppContent = () => {
   );
 
   // Function to handle admin login
-  const handleAdminLogin = (username: string, superCode: string) => {
+  const handleAdminLogin = async (username: string, superCode: string) => {
+    console.log("Attempting admin login:", { username });
+    
     if (
-      username === ADMIN_CREDENTIALS.username &&
-      superCode === ADMIN_CREDENTIALS.superCode
+      username === SUPER_ADMIN_CREDENTIALS.username &&
+      superCode === SUPER_ADMIN_CREDENTIALS.superCode
     ) {
       sessionStorage.setItem("isAdminAuthenticated", "true");
       setIsAuthenticated(true);
@@ -63,7 +95,7 @@ const AppContent = () => {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requireSuperAdmin={true}>
                 <Dashboard />
               </ProtectedRoute>
             }
@@ -87,7 +119,7 @@ const AppContent = () => {
 };
 
 const App = () => {
-  console.log("Rendering App component"); // Added for debugging
+  console.log("Rendering App component");
 
   return (
     <React.StrictMode>
