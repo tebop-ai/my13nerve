@@ -1,3 +1,4 @@
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,7 +10,6 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSignup from "./pages/AdminSignup";
-import { useState } from "react";
 
 const queryClient = new QueryClient();
 
@@ -34,7 +34,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const AppContent = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
-  const [isAuthenticated, setIsAuthenticated] = useState(
+  const [isAuthenticated, setIsAuthenticated] = React.useState(
     sessionStorage.getItem("isAdminAuthenticated") === "true"
   );
 
@@ -87,18 +87,22 @@ const AppContent = () => {
 };
 
 const App = () => {
+  console.log("Rendering App component"); // Added for debugging
+
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <SidebarProvider>
-          <TooltipProvider>
-            <AppContent />
-            <Toaster />
-            <Sonner />
-          </TooltipProvider>
-        </SidebarProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
+    <React.StrictMode>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <SidebarProvider>
+            <TooltipProvider>
+              <AppContent />
+              <Toaster />
+              <Sonner />
+            </TooltipProvider>
+          </SidebarProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </React.StrictMode>
   );
 };
 
