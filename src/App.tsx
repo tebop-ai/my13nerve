@@ -20,7 +20,15 @@ const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode,
   const adminProfile = profileData ? JSON.parse(profileData) : null;
   const isSuperAdmin = adminProfile?.is_super_admin === true;
   
+  console.log("Protected Route Check:", {
+    isAuthenticated,
+    isSuperAdmin,
+    requiredRole,
+    profileEmail: adminProfile?.email
+  });
+
   if (!isAuthenticated) {
+    console.log("Not authenticated, redirecting to login");
     return <Navigate to="/" replace />;
   }
 
@@ -46,6 +54,16 @@ const AppContent = () => {
   const [isAuthenticated, setIsAuthenticated] = React.useState(
     sessionStorage.getItem("isAdminAuthenticated") === "true"
   );
+
+  React.useEffect(() => {
+    const checkAuth = () => {
+      const auth = sessionStorage.getItem("isAdminAuthenticated") === "true";
+      setIsAuthenticated(auth);
+    };
+
+    window.addEventListener('storage', checkAuth);
+    return () => window.removeEventListener('storage', checkAuth);
+  }, []);
 
   return (
     <div className="min-h-screen flex w-full bg-[#F7F9FC]">
