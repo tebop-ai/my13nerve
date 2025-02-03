@@ -66,7 +66,8 @@ export const AdminLoginForm = () => {
         description: `Welcome back, ${adminProfile.full_name}!`,
       });
 
-      // Redirect based on admin type
+      // Redirect based on admin type - regular admins go to /admin-dashboard, super admins go to /dashboard
+      console.log("Admin type:", adminProfile.is_super_admin ? "super admin" : "regular admin");
       if (adminProfile.is_super_admin) {
         navigate("/dashboard");
       } else {
