@@ -51,7 +51,6 @@ export type Database = {
           languages_spoken: string | null
           linkedin_profile: string | null
           nda_document_url: string | null
-          pdf_downloaded_at: string | null
           personal_statement: string | null
           phone_number: string | null
           preferred_auth_method: string | null
@@ -84,7 +83,6 @@ export type Database = {
           languages_spoken?: string | null
           linkedin_profile?: string | null
           nda_document_url?: string | null
-          pdf_downloaded_at?: string | null
           personal_statement?: string | null
           phone_number?: string | null
           preferred_auth_method?: string | null
@@ -119,7 +117,6 @@ export type Database = {
           languages_spoken?: string | null
           linkedin_profile?: string | null
           nda_document_url?: string | null
-          pdf_downloaded_at?: string | null
           personal_statement?: string | null
           phone_number?: string | null
           preferred_auth_method?: string | null

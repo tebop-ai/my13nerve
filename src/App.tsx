@@ -1,3 +1,4 @@
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,25 +8,93 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import AdminSignup from "./pages/AdminSignup";
-import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const queryClient = new QueryClient();
 
-// Admin credentials
-const ADMIN_CREDENTIALS = {
+// Admin credentials for Super Admin
+const SUPER_ADMIN_CREDENTIALS = {
   username: "Goapele Main",
   superCode: "DFGSTE^%$2738459K9I8uyhh00"
 };
 
-// Protected Route component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = sessionStorage.getItem("isAdminAuthenticated") === "true";
-  
-  if (!isAuthenticated) {
+// Protected Route component with Super Admin check
+const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: React.ReactNode, requireSuperAdmin?: boolean }) => {
+  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean | null>(null);
+  const [isSuperAdmin, setIsSuperAdmin] = React.useState<boolean | null>(null);
+  const { toast } = useToast();
+  const location = useLocation();
+
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      console.log("Checking authentication status...");
+      const storedAuth = localStorage.getItem("isAdminAuthenticated") === "true";
+      console.log("Stored auth:", storedAuth);
+      
+      if (storedAuth) {
+        try {
+          const { data: adminProfile, error } = await supabase
+            .from('admin_profiles')
+            .select('*')
+            .eq('email', 'Goapele Main')
+            .eq('is_super_admin', true)
+            .single();
+
+          if (error) {
+            console.error("Error checking admin profile:", error);
+            toast({
+              title: "Error",
+              description: "Failed to verify admin status",
+              variant: "destructive",
+            });
+            setIsAuthenticated(false);
+            setIsSuperAdmin(false);
+            localStorage.removeItem("isAdminAuthenticated");
+            return;
+          }
+
+          if (adminProfile) {
+            console.log("Super admin verified:", adminProfile);
+            setIsSuperAdmin(true);
+            setIsAuthenticated(true);
+          } else {
+            console.log("No super admin profile found");
+            setIsSuperAdmin(false);
+            setIsAuthenticated(false);
+            localStorage.removeItem("isAdminAuthenticated");
+          }
+        } catch (error) {
+          console.error("Error in checkAuth:", error);
+          setIsSuperAdmin(false);
+          setIsAuthenticated(false);
+          localStorage.removeItem("isAdminAuthenticated");
+        }
+      } else {
+        setIsAuthenticated(false);
+        setIsSuperAdmin(false);
+      }
+    };
+
+    checkAuth();
+  }, [location.pathname, toast]);
+
+  if (isAuthenticated === null || (requireSuperAdmin && isSuperAdmin === null)) {
+    console.log("Loading authentication state...");
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated || (requireSuperAdmin && !isSuperAdmin)) {
+    console.log("Authentication failed, redirecting to home");
+    console.log("isAuthenticated:", isAuthenticated);
+    console.log("requireSuperAdmin:", requireSuperAdmin);
+    console.log("isSuperAdmin:", isSuperAdmin);
     return <Navigate to="/" replace />;
   }
 
+  console.log("Authentication successful, rendering protected content");
   return <>{children}</>;
 };
 
@@ -33,17 +102,19 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const AppContent = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    sessionStorage.getItem("isAdminAuthenticated") === "true"
+  const [isAuthenticated, setIsAuthenticated] = React.useState(
+    localStorage.getItem("isAdminAuthenticated") === "true"
   );
 
   // Function to handle admin login
-  const handleAdminLogin = (username: string, superCode: string) => {
+  const handleAdminLogin = async (username: string, superCode: string): Promise<boolean> => {
+    console.log("Attempting admin login:", { username });
+    
     if (
-      username === ADMIN_CREDENTIALS.username &&
-      superCode === ADMIN_CREDENTIALS.superCode
+      username === SUPER_ADMIN_CREDENTIALS.username &&
+      superCode === SUPER_ADMIN_CREDENTIALS.superCode
     ) {
-      sessionStorage.setItem("isAdminAuthenticated", "true");
+      localStorage.setItem("isAdminAuthenticated", "true");
       setIsAuthenticated(true);
       return true;
     }
@@ -51,44 +122,58 @@ const AppContent = () => {
   };
 
   return (
-    <SidebarProvider>
-      <TooltipProvider>
-        <div className="min-h-screen flex w-full">
-          {!isLandingPage && isAuthenticated && <AppSidebar />}
-          <main className={`${!isLandingPage ? 'flex-1' : 'w-full'}`}>
-            <Routes>
-              <Route 
-                path="/" 
-                element={<Index onAdminLogin={handleAdminLogin} />} 
-              />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin-signup"
-                element={<AdminSignup />}
-              />
-            </Routes>
-          </main>
-        </div>
-        <Toaster />
-        <Sonner />
-      </TooltipProvider>
-    </SidebarProvider>
+    <div className="min-h-screen flex w-full bg-[#F7F9FC]">
+      {!isLandingPage && isAuthenticated && <AppSidebar />}
+      <main className={`${!isLandingPage ? 'flex-1 p-8' : 'w-full'}`}>
+        <Routes>
+          <Route 
+            path="/" 
+            element={<Index onAdminLogin={handleAdminLogin} />} 
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute requireSuperAdmin={true}>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin-signup"
+            element={<AdminSignup />}
+          />
+        </Routes>
+      </main>
+    </div>
   );
 };
 
-const App = () => (
-  <BrowserRouter>
-    <QueryClientProvider client={queryClient}>
-      <AppContent />
-    </QueryClientProvider>
-  </BrowserRouter>
-);
+const App = () => {
+  console.log("Rendering App component");
+
+  return (
+    <React.StrictMode>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <SidebarProvider>
+            <TooltipProvider>
+              <AppContent />
+              <Toaster />
+              <Sonner />
+            </TooltipProvider>
+          </SidebarProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </React.StrictMode>
+  );
+};
 
 export default App;

@@ -2,6 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface AccountingTask {
   Occurrence: string;
@@ -11,6 +15,10 @@ interface AccountingTask {
   Tools: string;
 }
 
+interface TaskGroup {
+  [key: string]: AccountingTask[];
+}
+
 export const AccountingTasksTable = ({
   selectedTasks,
   onTaskSelect,
@@ -18,6 +26,8 @@ export const AccountingTasksTable = ({
   selectedTasks: string[];
   onTaskSelect: (taskId: string) => void;
 }) => {
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  
   const { data: tasks, isLoading } = useQuery({
     queryKey: ['accountingTasks'],
     queryFn: async () => {
@@ -44,37 +54,72 @@ export const AccountingTasksTable = ({
     return <div>No accounting tasks available</div>;
   }
 
+  // Group tasks by occurrence
+  const groupedTasks = tasks.reduce((acc: TaskGroup, task) => {
+    const group = task.Occurrence || 'Other';
+    if (!acc[group]) {
+      acc[group] = [];
+    }
+    acc[group].push(task);
+    return acc;
+  }, {});
+
+  const toggleGroup = (group: string) => {
+    setOpenGroups(prev => ({
+      ...prev,
+      [group]: !prev[group]
+    }));
+  };
+
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-12"></TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead>Sub-Task</TableHead>
-            <TableHead>Occurrence</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Tools</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tasks.map((task, index) => (
-            <TableRow key={index}>
-              <TableCell>
-                <Checkbox
-                  checked={selectedTasks.includes(task.Code)}
-                  onCheckedChange={() => onTaskSelect(task.Code)}
-                />
-              </TableCell>
-              <TableCell>{task.Code}</TableCell>
-              <TableCell>{task["Sub-Task"]}</TableCell>
-              <TableCell>{task.Occurrence}</TableCell>
-              <TableCell>{task["Full Description"]}</TableCell>
-              <TableCell>{task.Tools}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="space-y-4">
+      {Object.entries(groupedTasks).map(([group, groupTasks]) => (
+        <Collapsible
+          key={group}
+          open={openGroups[group]}
+          onOpenChange={() => toggleGroup(group)}
+          className="border rounded-md"
+        >
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-gray-50">
+            <h4 className="font-medium">{group} Tasks</h4>
+            <ChevronDown className={cn(
+              "h-4 w-4 transition-transform duration-200",
+              openGroups[group] ? "transform rotate-180" : ""
+            )} />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12"></TableHead>
+                    <TableHead>Code</TableHead>
+                    <TableHead>Sub-Task</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Tools</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {groupTasks.map((task, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedTasks.includes(task.Code)}
+                          onCheckedChange={() => onTaskSelect(task.Code)}
+                        />
+                      </TableCell>
+                      <TableCell>{task.Code}</TableCell>
+                      <TableCell>{task["Sub-Task"]}</TableCell>
+                      <TableCell>{task["Full Description"]}</TableCell>
+                      <TableCell>{task.Tools}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      ))}
     </div>
   );
 };

@@ -1,13 +1,9 @@
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-import { UseFormReturn } from "react-hook-form";
-import { AdminSignupFormData } from "./types";
+import { Button } from "@/components/ui/button";
+import { AgreementsSectionProps } from "./types";
 
-interface AgreementsSectionProps {
-  form: UseFormReturn<AdminSignupFormData>;
-}
-
-export const AgreementsSection = ({ form }: AgreementsSectionProps) => {
+export const AgreementsSection = ({ form, onBack }: AgreementsSectionProps) => {
   return (
     <div className="space-y-4">
       <FormField
@@ -69,6 +65,19 @@ export const AgreementsSection = ({ form }: AgreementsSectionProps) => {
           </FormItem>
         )}
       />
+
+      <div className="flex justify-between pt-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+        >
+          Back
+        </Button>
+        <Button type="submit">
+          Submit Application
+        </Button>
+      </div>
     </div>
   );
 };

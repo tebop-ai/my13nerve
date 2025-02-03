@@ -1,17 +1,15 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
-import { AdminSignupFormData } from "./types";
+import { Button } from "@/components/ui/button";
+import { useFormContext } from "react-hook-form";
+import { PersonalInfoSectionProps } from "./types";
 
-interface PersonalInfoSectionProps {
-  form: UseFormReturn<AdminSignupFormData>;
-}
+export const PersonalInfoSection = ({ onNext }: PersonalInfoSectionProps) => {
+  const { formState: { isValid } } = useFormContext();
 
-export const PersonalInfoSection = ({ form }: PersonalInfoSectionProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-4">
       <FormField
-        control={form.control}
         name="full_name"
         render={({ field }) => (
           <FormItem>
@@ -25,7 +23,6 @@ export const PersonalInfoSection = ({ form }: PersonalInfoSectionProps) => {
       />
 
       <FormField
-        control={form.control}
         name="email"
         render={({ field }) => (
           <FormItem>
@@ -39,7 +36,6 @@ export const PersonalInfoSection = ({ form }: PersonalInfoSectionProps) => {
       />
 
       <FormField
-        control={form.control}
         name="phone_number"
         render={({ field }) => (
           <FormItem>
@@ -53,7 +49,6 @@ export const PersonalInfoSection = ({ form }: PersonalInfoSectionProps) => {
       />
 
       <FormField
-        control={form.control}
         name="languages_spoken"
         render={({ field }) => (
           <FormItem>
@@ -65,6 +60,16 @@ export const PersonalInfoSection = ({ form }: PersonalInfoSectionProps) => {
           </FormItem>
         )}
       />
+
+      <div className="flex justify-end">
+        <Button
+          type="button"
+          onClick={onNext}
+          className="ml-auto"
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 };
