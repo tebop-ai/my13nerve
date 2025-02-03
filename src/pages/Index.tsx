@@ -29,8 +29,6 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       // Special handling for Super Admin
       if (adminUsername === "Goapele Main" && adminSuperCode === "DFGSTE^%$2738459K9I8uyhh00") {
         console.log("Super Admin credentials match");
-        // Set authentication state before navigation
-        sessionStorage.setItem("isAdminAuthenticated", "true");
         
         // Verify super admin status in database
         const { data: adminProfile, error } = await supabase
@@ -50,16 +48,19 @@ const Index = ({ onAdminLogin }: IndexProps) => {
           throw new Error("Super admin profile not found");
         }
 
+        // Set authentication state
+        const loginSuccess = await onAdminLogin(adminUsername, adminSuperCode);
+        if (!loginSuccess) {
+          throw new Error("Login failed");
+        }
+
         toast({
           title: "Login successful",
           description: "Welcome back, Super Admin!",
         });
 
-        // Ensure navigation happens after authentication is set
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 100);
-        
+        // Navigate to dashboard
+        navigate("/dashboard");
         return;
       }
 
@@ -87,7 +88,10 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       }
 
       console.log("Admin credentials verified successfully");
-      sessionStorage.setItem("isAdminAuthenticated", "true");
+      const loginSuccess = await onAdminLogin(adminUsername, adminSuperCode);
+      if (!loginSuccess) {
+        throw new Error("Login failed");
+      }
       
       toast({
         title: "Login successful",
@@ -95,9 +99,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       });
 
       // Regular admins go to admin-dashboard
-      setTimeout(() => {
-        navigate("/admin-dashboard");
-      }, 100);
+      navigate("/admin-dashboard");
 
     } catch (error) {
       console.error("Login error:", error);
@@ -107,7 +109,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         variant: "destructive",
       });
       // Clear authentication state on error
-      sessionStorage.removeItem("isAdminAuthenticated");
+      localStorage.removeItem("isAdminAuthenticated");
     } finally {
       setIsLoading(false);
     }

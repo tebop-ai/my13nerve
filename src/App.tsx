@@ -31,12 +31,11 @@ const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: Rea
   React.useEffect(() => {
     const checkAuth = async () => {
       console.log("Checking authentication status...");
-      const storedAuth = sessionStorage.getItem("isAdminAuthenticated") === "true";
+      const storedAuth = localStorage.getItem("isAdminAuthenticated") === "true";
       console.log("Stored auth:", storedAuth);
       
       if (storedAuth) {
         try {
-          // Verify if the user is Super Admin
           const { data: adminProfile, error } = await supabase
             .from('admin_profiles')
             .select('*')
@@ -53,27 +52,34 @@ const ProtectedRoute = ({ children, requireSuperAdmin = false }: { children: Rea
             });
             setIsAuthenticated(false);
             setIsSuperAdmin(false);
+            localStorage.removeItem("isAdminAuthenticated");
             return;
           }
 
           if (adminProfile) {
             console.log("Super admin verified:", adminProfile);
             setIsSuperAdmin(true);
+            setIsAuthenticated(true);
           } else {
             console.log("No super admin profile found");
             setIsSuperAdmin(false);
+            setIsAuthenticated(false);
+            localStorage.removeItem("isAdminAuthenticated");
           }
         } catch (error) {
           console.error("Error in checkAuth:", error);
           setIsSuperAdmin(false);
+          setIsAuthenticated(false);
+          localStorage.removeItem("isAdminAuthenticated");
         }
+      } else {
+        setIsAuthenticated(false);
+        setIsSuperAdmin(false);
       }
-      
-      setIsAuthenticated(storedAuth);
     };
 
     checkAuth();
-  }, [location.pathname]); // Re-run when path changes
+  }, [location.pathname, toast]);
 
   if (isAuthenticated === null || (requireSuperAdmin && isSuperAdmin === null)) {
     console.log("Loading authentication state...");
@@ -97,7 +103,7 @@ const AppContent = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
   const [isAuthenticated, setIsAuthenticated] = React.useState(
-    sessionStorage.getItem("isAdminAuthenticated") === "true"
+    localStorage.getItem("isAdminAuthenticated") === "true"
   );
 
   // Function to handle admin login
@@ -108,7 +114,7 @@ const AppContent = () => {
       username === SUPER_ADMIN_CREDENTIALS.username &&
       superCode === SUPER_ADMIN_CREDENTIALS.superCode
     ) {
-      sessionStorage.setItem("isAdminAuthenticated", "true");
+      localStorage.setItem("isAdminAuthenticated", "true");
       setIsAuthenticated(true);
       return true;
     }
