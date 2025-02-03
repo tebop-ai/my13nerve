@@ -26,28 +26,31 @@ const Index = ({ onAdminLogin }: IndexProps) => {
     console.log("Attempting admin login with:", { adminUsername });
     
     try {
+      // First verify the admin profile exists and matches credentials
+      const { data: adminProfile, error: adminError } = await supabase
+        .from('admin_profiles')
+        .select('*')
+        .eq('email', adminUsername)
+        .eq('supercode', adminSuperCode)
+        .eq('status', 'active')
+        .single();
+
+      if (adminError) {
+        console.error("Error verifying admin profile:", adminError);
+        throw new Error("Failed to verify admin credentials");
+      }
+
+      if (!adminProfile) {
+        console.log("No matching admin profile found");
+        throw new Error("Invalid credentials");
+      }
+
+      console.log("Admin profile found:", adminProfile);
+
       // Special handling for Super Admin
-      if (adminUsername === "Goapele Main" && adminSuperCode === "DFGSTE^%$2738459K9I8uyhh00") {
-        console.log("Super Admin credentials match");
+      if (adminProfile.is_super_admin) {
+        console.log("Super Admin profile verified");
         
-        // Verify super admin status in database
-        const { data: adminProfile, error } = await supabase
-          .from('admin_profiles')
-          .select('*')
-          .eq('email', 'Goapele Main')
-          .eq('is_super_admin', true)
-          .single();
-
-        if (error) {
-          console.error("Error verifying super admin:", error);
-          throw new Error("Failed to verify super admin status");
-        }
-
-        if (!adminProfile) {
-          console.error("Super admin profile not found");
-          throw new Error("Super admin profile not found");
-        }
-
         // Set authentication state
         const loginSuccess = await onAdminLogin(adminUsername, adminSuperCode);
         if (!loginSuccess) {
@@ -64,30 +67,8 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         return;
       }
 
-      // For regular admins, check the admin_profiles table
-      const { data: adminProfile, error: adminError } = await supabase
-        .from('admin_profiles')
-        .select('*')
-        .eq('email', adminUsername)
-        .eq('status', 'active')
-        .maybeSingle();
-
-      if (adminError) {
-        console.error("Error checking admin profile:", adminError);
-        throw new Error("Failed to verify admin status");
-      }
-
-      if (!adminProfile) {
-        console.log("No active admin profile found for:", adminUsername);
-        throw new Error("Invalid credentials or inactive account");
-      }
-
-      if (adminProfile.supercode !== adminSuperCode) {
-        console.log("Invalid supercode for admin:", adminUsername);
-        throw new Error("Invalid credentials");
-      }
-
-      console.log("Admin credentials verified successfully");
+      // Regular admin flow
+      console.log("Regular admin login successful");
       const loginSuccess = await onAdminLogin(adminUsername, adminSuperCode);
       if (!loginSuccess) {
         throw new Error("Login failed");
