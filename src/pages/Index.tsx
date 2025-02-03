@@ -31,7 +31,6 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         .from('admin_profiles')
         .select('*')
         .eq('email', adminUsername)
-        .eq('supercode', adminSuperCode)
         .eq('status', 'active')
         .maybeSingle();
 
@@ -44,6 +43,12 @@ const Index = ({ onAdminLogin }: IndexProps) => {
 
       if (!adminProfile) {
         console.log("No matching admin profile found");
+        throw new Error("Invalid credentials");
+      }
+
+      // Verify supercode separately
+      if (adminProfile.supercode !== adminSuperCode) {
+        console.log("Supercode mismatch");
         throw new Error("Invalid credentials");
       }
 
