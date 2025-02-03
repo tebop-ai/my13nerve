@@ -22,12 +22,13 @@ const Index = ({ onAdminLogin }: IndexProps) => {
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
     try {
       const success = await onAdminLogin(adminUsername, adminSuperCode);
       if (success) {
         toast({
           title: "Login successful",
-          description: "Welcome back, Super Admin!",
+          description: "Welcome back, Admin!",
         });
         navigate("/dashboard");
       } else {
@@ -160,6 +161,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                         value={adminUsername}
                         onChange={(e) => setAdminUsername(e.target.value)}
                         disabled={isLoading}
+                        required
                       />
                       <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     </div>
@@ -175,6 +177,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
                         value={adminSuperCode}
                         onChange={(e) => setAdminSuperCode(e.target.value)}
                         disabled={isLoading}
+                        required
                       />
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     </div>
