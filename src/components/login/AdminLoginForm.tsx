@@ -34,10 +34,10 @@ export const AdminLoginForm = () => {
     
     try {
       console.log("Starting admin login process...");
-      console.log("Attempting login with:", { adminEmail });
+      console.log("Attempting login with email:", adminEmail);
       
       // Query for admin profile with exact matches
-      const { data: adminProfile, error } = await supabase
+      const { data: adminProfile, error: profileError } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', adminEmail)
@@ -45,8 +45,10 @@ export const AdminLoginForm = () => {
         .eq('status', 'active')
         .maybeSingle();
 
-      if (error) {
-        console.error("Database error:", error);
+      console.log("Admin profile query result:", { adminProfile, profileError });
+
+      if (profileError) {
+        console.error("Database error:", profileError);
         throw new Error('Database error occurred');
       }
 
