@@ -1,157 +1,115 @@
-import { 
-  BarChart3, 
-  Users, 
-  Settings, 
-  Globe,
-  Home,
-  ChevronDown,
-  Layout,
-} from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { Link, useLocation } from "react-router-dom";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
-
-const mainMenuItems = [
-  { title: "Overview", icon: Home, url: "/dashboard" },
-  { title: "Admin Profiles", icon: Users, url: "/dashboard?tab=admin-profiles" },
-  { title: "Analytics", icon: BarChart3, url: "/dashboard?tab=overview" },
-];
-
-const subMenuItems = {
-  applications: [
-    { title: "Create Blueprint", url: "/dashboard?tab=blueprints" },
-    { title: "View Blueprints", url: "/dashboard?tab=blueprints" },
-  ],
-  enterprises: [
-    { title: "All Enterprises", url: "/dashboard?tab=overview" },
-    { title: "Settings", url: "/dashboard?tab=settings" },
-  ],
-};
+import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
+import { useNavigate } from "react-router-dom";
+import { Building2, Users, Settings, LogOut } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Logo } from "./Logo";
 
 export function AppSidebar() {
-  const location = useLocation();
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    applications: false,
-    enterprises: false,
-  });
-  
-  if (location.pathname === "/") {
-    return null;
-  }
+  const { collapsed } = useSidebar();
+  const navigate = useNavigate();
 
-  const toggleSection = (section: string) => {
-    setOpenSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
+  const { data: adminProfile } = useQuery({
+    queryKey: ['adminProfile'],
+    queryFn: async () => {
+      const { data: profile, error } = await supabase
+        .from('admin_profiles')
+        .select('*')
+        .eq('email', (await supabase.auth.getUser()).data.user?.email)
+        .single();
+      
+      if (error) {
+        console.error("Error fetching admin profile:", error);
+        return null;
+      }
+      return profile;
+    }
+  });
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
   };
 
   return (
-    <Sidebar>
-      <SidebarContent className="bg-secondary">
-        <div className="p-4">
-          <h1 className="text-2xl font-bold text-white">my13nerve</h1>
+    <aside
+      className={cn(
+        "bg-sidebar text-sidebar-text border-r border-sidebar-border h-screen relative group/sidebar",
+        collapsed ? "w-16" : "w-60"
+      )}
+    >
+      <div className="flex flex-col h-full">
+        <div className="h-16 flex items-center justify-center border-b border-sidebar-border">
+          <Logo className={cn(
+            "transition-all duration-300",
+            collapsed ? "h-8" : "h-10"
+          )} />
         </div>
-        
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainMenuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    className="text-white hover:bg-sidebar-hover"
-                  >
-                    <Link 
-                      to={item.url}
-                      className="flex items-center gap-2 px-4 py-2 rounded-md"
-                    >
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
 
-              <Collapsible
-                open={openSections.applications}
-                onOpenChange={() => toggleSection('applications')}
+        <div className="flex-1 py-4 space-y-2 px-2">
+          {adminProfile?.is_super_admin ? (
+            <>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-sidebar-text hover:text-white hover:bg-sidebar-hover"
+                onClick={() => navigate('/dashboard')}
               >
-                <CollapsibleTrigger className="flex items-center gap-2 w-full px-4 py-2 text-white hover:bg-sidebar-hover rounded-md">
-                  <Layout className="h-5 w-5" />
-                  <span className="flex-1 text-left">Applications</span>
-                  <ChevronDown className={cn(
-                    "h-4 w-4 transition-transform duration-200",
-                    openSections.applications ? "transform rotate-180" : ""
-                  )} />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pl-6">
-                  {subMenuItems.applications.map((item) => (
-                    <Link
-                      key={item.title}
-                      to={item.url}
-                      className="flex items-center gap-2 px-4 py-2 text-white hover:bg-sidebar-hover rounded-md"
-                    >
-                      <span>{item.title}</span>
-                    </Link>
-                  ))}
-                </CollapsibleContent>
-              </Collapsible>
-
-              <Collapsible
-                open={openSections.enterprises}
-                onOpenChange={() => toggleSection('enterprises')}
+                <Building2 className="h-5 w-5 mr-2" />
+                {!collapsed && "Dashboard"}
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-sidebar-text hover:text-white hover:bg-sidebar-hover"
+                onClick={() => navigate('/admin-profiles')}
               >
-                <CollapsibleTrigger className="flex items-center gap-2 w-full px-4 py-2 text-white hover:bg-sidebar-hover rounded-md">
-                  <Globe className="h-5 w-5" />
-                  <span className="flex-1 text-left">Enterprises</span>
-                  <ChevronDown className={cn(
-                    "h-4 w-4 transition-transform duration-200",
-                    openSections.enterprises ? "transform rotate-180" : ""
-                  )} />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pl-6">
-                  {subMenuItems.enterprises.map((item) => (
-                    <Link
-                      key={item.title}
-                      to={item.url}
-                      className="flex items-center gap-2 px-4 py-2 text-white hover:bg-sidebar-hover rounded-md"
-                    >
-                      <span>{item.title}</span>
-                    </Link>
-                  ))}
-                </CollapsibleContent>
-              </Collapsible>
+                <Users className="h-5 w-5 mr-2" />
+                {!collapsed && "Admin Profiles"}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-sidebar-text hover:text-white hover:bg-sidebar-hover"
+                onClick={() => navigate('/admin-dashboard')}
+              >
+                <Building2 className="h-5 w-5 mr-2" />
+                {!collapsed && "Enterprises"}
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-sidebar-text hover:text-white hover:bg-sidebar-hover"
+                onClick={() => navigate('/users')}
+              >
+                <Users className="h-5 w-5 mr-2" />
+                {!collapsed && "Users"}
+              </Button>
+            </>
+          )}
+          
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-sidebar-text hover:text-white hover:bg-sidebar-hover"
+            onClick={() => navigate('/settings')}
+          >
+            <Settings className="h-5 w-5 mr-2" />
+            {!collapsed && "Settings"}
+          </Button>
+        </div>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  className="text-white hover:bg-sidebar-hover"
-                >
-                  <Link 
-                    to="/dashboard?tab=settings"
-                    className="flex items-center gap-2 px-4 py-2 rounded-md"
-                  >
-                    <Settings className="h-5 w-5" />
-                    <span>Settings</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+        <div className="p-2 border-t border-sidebar-border">
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-sidebar-text hover:text-white hover:bg-sidebar-hover"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-5 w-5 mr-2" />
+            {!collapsed && "Logout"}
+          </Button>
+        </div>
+      </div>
+    </aside>
   );
 }
