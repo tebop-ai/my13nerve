@@ -13,12 +13,6 @@ import AdminSignup from "./pages/AdminSignup";
 
 const queryClient = new QueryClient();
 
-// Admin credentials
-const ADMIN_CREDENTIALS = {
-  username: "Goapele Main",
-  superCode: "DFGSTE^%$2738459K9I8uyhh00"
-};
-
 // Protected Route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = sessionStorage.getItem("isAdminAuthenticated") === "true";
@@ -38,19 +32,6 @@ const AppContent = () => {
     sessionStorage.getItem("isAdminAuthenticated") === "true"
   );
 
-  // Function to handle admin login
-  const handleAdminLogin = (username: string, superCode: string) => {
-    if (
-      username === ADMIN_CREDENTIALS.username &&
-      superCode === ADMIN_CREDENTIALS.superCode
-    ) {
-      sessionStorage.setItem("isAdminAuthenticated", "true");
-      setIsAuthenticated(true);
-      return true;
-    }
-    return false;
-  };
-
   return (
     <div className="min-h-screen flex w-full bg-[#F7F9FC]">
       {!isLandingPage && isAuthenticated && <AppSidebar />}
@@ -58,7 +39,7 @@ const AppContent = () => {
         <Routes>
           <Route 
             path="/" 
-            element={<Index onAdminLogin={handleAdminLogin} />} 
+            element={<Index />} 
           />
           <Route
             path="/dashboard"
@@ -87,7 +68,7 @@ const AppContent = () => {
 };
 
 const App = () => {
-  console.log("Rendering App component"); // Added for debugging
+  console.log("Rendering App component");
 
   return (
     <React.StrictMode>

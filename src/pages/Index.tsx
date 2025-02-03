@@ -3,7 +3,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminLoginForm } from "@/components/login/AdminLoginForm";
 import { EnterpriseLoginForm } from "@/components/login/EnterpriseLoginForm";
 
-const Index = () => {
+interface IndexProps {
+  onAdminLogin: (username: string, superCode: string) => boolean;
+}
+
+const Index: React.FC<IndexProps> = ({ onAdminLogin }) => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-4xl w-full">
