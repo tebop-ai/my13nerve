@@ -333,6 +333,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_profiles: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          email: string
+          enterprise_id: string | null
+          full_name: string
+          id: string
+          is_active: boolean | null
+          profile_type: Database["public"]["Enums"]["user_profile_type"] | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          email: string
+          enterprise_id?: string | null
+          full_name: string
+          id?: string
+          is_active?: boolean | null
+          profile_type?: Database["public"]["Enums"]["user_profile_type"] | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          email?: string
+          enterprise_id?: string | null
+          full_name?: string
+          id?: string
+          is_active?: boolean | null
+          profile_type?: Database["public"]["Enums"]["user_profile_type"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_enterprise_id_fkey"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_blueprints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -434,6 +475,7 @@ export type Database = {
         | "hr"
         | "finance"
         | "marketing"
+      user_profile_type: "enterprise_user"
     }
     CompositeTypes: {
       [_ in never]: never
