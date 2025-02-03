@@ -23,7 +23,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("Attempting admin login with:", { adminUsername });
+    console.log("Attempting admin login with:", { adminUsername, adminSuperCode });
     
     try {
       // First verify the admin profile exists and matches credentials
@@ -33,7 +33,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         .eq('email', adminUsername)
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
-        .maybeSingle(); // Using maybeSingle instead of single to handle no results case
+        .maybeSingle();
 
       if (adminError) {
         console.error("Error verifying admin profile:", adminError);
@@ -200,11 +200,11 @@ const Index = ({ onAdminLogin }: IndexProps) => {
 
                 <form onSubmit={handleAdminSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Username</label>
+                    <label className="text-sm font-medium">Email</label>
                     <div className="relative">
                       <Input
                         type="text"
-                        placeholder="Enter your username"
+                        placeholder="Enter your email"
                         className="pl-10"
                         value={adminUsername}
                         onChange={(e) => setAdminUsername(e.target.value)}
