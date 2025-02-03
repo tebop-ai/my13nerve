@@ -25,13 +25,26 @@ export const ApplicationCard = ({
     try {
       console.log("Approving application:", application.id);
       
+      // First check if user is authenticated
+      const { data: { session }, error: authError } = await supabase.auth.getSession();
+      
+      if (authError || !session) {
+        console.error('Authentication error:', authError);
+        toast({
+          title: "Authentication Error",
+          description: "Please make sure you are logged in.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Update application status
       const { error: updateError } = await supabase
         .from('admin_profile_applications')
         .update({ 
           status: 'approved',
           updated_at: new Date().toISOString(),
-          reviewed_by: (await supabase.auth.getUser()).data.user?.id
+          reviewed_by: session.user.id
         })
         .eq('id', application.id);
 
@@ -51,7 +64,7 @@ export const ApplicationCard = ({
       console.error('Error approving application:', error);
       toast({
         title: "Error",
-        description: "Failed to approve application.",
+        description: "Failed to approve application. Please make sure you have the required permissions.",
         variant: "destructive",
       });
     }
