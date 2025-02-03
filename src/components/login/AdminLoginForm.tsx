@@ -41,8 +41,8 @@ export const AdminLoginForm = () => {
         throw new Error('No active admin profile found');
       }
 
-      // Then verify the supercode - make sure to trim whitespace and match case
-      if (adminProfile.supercode.trim() !== adminSuperCode.trim()) {
+      // Compare the supercodes exactly as stored in the database
+      if (adminProfile.supercode !== adminSuperCode) {
         console.log("SuperCode mismatch");
         throw new Error('Invalid SuperCode');
       }
