@@ -5,11 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { EnterpriseManagement } from "./DashboardSections/EnterpriseManagement";
 import { UserManagement } from "./DashboardSections/UserManagement";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const { data: adminProfile, isLoading } = useQuery({
     queryKey: ['adminCheck'],
@@ -34,9 +36,14 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (!isLoading && !adminProfile) {
       console.log("Not a regular admin, redirecting...");
+      toast({
+        title: "Access Denied",
+        description: "Invalid admin credentials",
+        variant: "destructive"
+      });
       navigate('/');
     }
-  }, [adminProfile, isLoading, navigate]);
+  }, [adminProfile, isLoading, navigate, toast]);
 
   if (isLoading) {
     return <div>Loading...</div>;

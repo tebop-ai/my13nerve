@@ -225,6 +225,7 @@ export type Database = {
       enterprise_blueprints: {
         Row: {
           accounting_tasks: string[] | null
+          blueprint_type: string | null
           board_type: Database["public"]["Enums"]["board_type"]
           business_functions:
             | Database["public"]["Enums"]["business_function_type"][]
@@ -243,9 +244,11 @@ export type Database = {
           is_active: boolean | null
           management_types: Database["public"]["Enums"]["management_type"][]
           name: string
+          super_admin_created: boolean | null
         }
         Insert: {
           accounting_tasks?: string[] | null
+          blueprint_type?: string | null
           board_type: Database["public"]["Enums"]["board_type"]
           business_functions?:
             | Database["public"]["Enums"]["business_function_type"][]
@@ -264,9 +267,11 @@ export type Database = {
           is_active?: boolean | null
           management_types: Database["public"]["Enums"]["management_type"][]
           name: string
+          super_admin_created?: boolean | null
         }
         Update: {
           accounting_tasks?: string[] | null
+          blueprint_type?: string | null
           board_type?: Database["public"]["Enums"]["board_type"]
           business_functions?:
             | Database["public"]["Enums"]["business_function_type"][]
@@ -285,6 +290,7 @@ export type Database = {
           is_active?: boolean | null
           management_types?: Database["public"]["Enums"]["management_type"][]
           name?: string
+          super_admin_created?: boolean | null
         }
         Relationships: []
       }
@@ -367,9 +373,11 @@ export type Database = {
           created_by: string | null
           email: string
           enterprise_id: string | null
+          enterprise_role: string | null
           full_name: string
           id: string
           is_active: boolean | null
+          permissions: Json | null
           profile_type: Database["public"]["Enums"]["user_profile_type"] | null
         }
         Insert: {
@@ -378,9 +386,11 @@ export type Database = {
           created_by?: string | null
           email: string
           enterprise_id?: string | null
+          enterprise_role?: string | null
           full_name: string
           id?: string
           is_active?: boolean | null
+          permissions?: Json | null
           profile_type?: Database["public"]["Enums"]["user_profile_type"] | null
         }
         Update: {
@@ -389,9 +399,11 @@ export type Database = {
           created_by?: string | null
           email?: string
           enterprise_id?: string | null
+          enterprise_role?: string | null
           full_name?: string
           id?: string
           is_active?: boolean | null
+          permissions?: Json | null
           profile_type?: Database["public"]["Enums"]["user_profile_type"] | null
         }
         Relationships: [

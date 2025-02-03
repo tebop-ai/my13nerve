@@ -9,9 +9,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const { data: adminProfile, isLoading } = useQuery({
     queryKey: ['superAdminCheck'],
@@ -36,9 +38,14 @@ const Dashboard = () => {
   useEffect(() => {
     if (!isLoading && !adminProfile) {
       console.log("Not super admin, redirecting...");
+      toast({
+        title: "Access Denied",
+        description: "Only Super Admin can access this dashboard",
+        variant: "destructive"
+      });
       navigate('/admin-dashboard');
     }
-  }, [adminProfile, isLoading, navigate]);
+  }, [adminProfile, isLoading, navigate, toast]);
 
   if (isLoading) {
     return <div>Loading...</div>;
