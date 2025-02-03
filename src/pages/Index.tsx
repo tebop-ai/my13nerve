@@ -35,6 +35,8 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         .eq('status', 'active')
         .maybeSingle();
 
+      console.log("Admin profile query result:", { adminProfile, adminError });
+
       if (adminError) {
         console.error("Error verifying admin profile:", adminError);
         throw new Error("Failed to verify admin credentials");
@@ -54,6 +56,7 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         // Set authentication state
         const loginSuccess = await onAdminLogin(adminUsername, adminSuperCode);
         if (!loginSuccess) {
+          console.error("Login failed in onAdminLogin");
           throw new Error("Login failed");
         }
 
