@@ -24,19 +24,26 @@ export const ApplicationCard = ({
     try {
       console.log("Approving application:", application.id);
       
-      // Check if we have an active session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError || !session) {
-        console.error("Authentication error:", sessionError);
+      // First verify if the user is the super admin
+      const { data: adminProfiles, error: adminError } = await supabase
+        .from('admin_profiles')
+        .select('*')
+        .eq('email', 'Goapele Main')
+        .eq('is_super_admin', true)
+        .eq('status', 'active')
+        .single();
+
+      if (adminError || !adminProfiles) {
+        console.error("Super admin verification failed:", adminError);
         toast({
-          title: "Authentication Error",
-          description: "Please ensure you are logged in as an admin.",
+          title: "Authorization Error",
+          description: "Only the super admin can approve applications.",
           variant: "destructive",
         });
         return;
       }
 
+      // Proceed with the approval
       const { error } = await supabase
         .from('admin_profile_applications')
         .update({ status: 'approved' })
