@@ -29,12 +29,37 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       // Special handling for Super Admin
       if (adminUsername === "Goapele Main" && adminSuperCode === "DFGSTE^%$2738459K9I8uyhh00") {
         console.log("Super Admin credentials match");
+        // Set authentication state before navigation
         sessionStorage.setItem("isAdminAuthenticated", "true");
+        
+        // Verify super admin status in database
+        const { data: adminProfile, error } = await supabase
+          .from('admin_profiles')
+          .select('*')
+          .eq('email', 'Goapele Main')
+          .eq('is_super_admin', true)
+          .single();
+
+        if (error) {
+          console.error("Error verifying super admin:", error);
+          throw new Error("Failed to verify super admin status");
+        }
+
+        if (!adminProfile) {
+          console.error("Super admin profile not found");
+          throw new Error("Super admin profile not found");
+        }
+
         toast({
           title: "Login successful",
           description: "Welcome back, Super Admin!",
         });
-        navigate("/dashboard"); // This routes to the Super Admin dashboard
+
+        // Ensure navigation happens after authentication is set
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 100);
+        
         return;
       }
 
@@ -70,7 +95,10 @@ const Index = ({ onAdminLogin }: IndexProps) => {
       });
 
       // Regular admins go to admin-dashboard
-      navigate("/admin-dashboard");
+      setTimeout(() => {
+        navigate("/admin-dashboard");
+      }, 100);
+
     } catch (error) {
       console.error("Login error:", error);
       toast({
@@ -78,6 +106,8 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         description: error instanceof Error ? error.message : "Invalid credentials. Please try again.",
         variant: "destructive",
       });
+      // Clear authentication state on error
+      sessionStorage.removeItem("isAdminAuthenticated");
     } finally {
       setIsLoading(false);
     }
