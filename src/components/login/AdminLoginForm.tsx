@@ -17,29 +17,34 @@ export const AdminLoginForm = () => {
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("Attempting login with email:", adminEmail);
+    console.log("Starting login attempt with email:", adminEmail);
 
     try {
-      // Query admin profile with exact match on email and supercode
+      // First, check if the admin profile exists and is active
       const { data: adminProfile, error: profileError } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', adminEmail.trim().toLowerCase())
-        .eq('supercode', adminSuperCode.trim())
         .eq('status', 'active')
         .eq('validation_status', 'validated')
         .maybeSingle();
 
-      console.log("Admin profile query result:", adminProfile);
+      console.log("Initial admin profile query result:", adminProfile);
 
       if (profileError) {
         console.error("Profile query error:", profileError);
-        throw profileError;
+        throw new Error('Error checking admin profile');
       }
 
       if (!adminProfile) {
-        console.log("No matching admin profile found");
-        throw new Error('Invalid credentials or inactive account');
+        console.log("No active admin profile found for email");
+        throw new Error('No active admin profile found');
+      }
+
+      // Then verify the supercode
+      if (adminProfile.supercode !== adminSuperCode.trim()) {
+        console.log("SuperCode mismatch");
+        throw new Error('Invalid SuperCode');
       }
 
       // Update last login timestamp
@@ -69,9 +74,24 @@ export const AdminLoginForm = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
+      let errorMessage = "Login failed. ";
+      
+      if (error instanceof Error) {
+        switch (error.message) {
+          case 'No active admin profile found':
+            errorMessage += "No active admin profile found for this email.";
+            break;
+          case 'Invalid SuperCode':
+            errorMessage += "Invalid SuperCode provided.";
+            break;
+          default:
+            errorMessage += "Please check your credentials and try again.";
+        }
+      }
+
       toast({
         title: "Login failed",
-        description: "Please check your email and SuperCode and try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
