@@ -63,7 +63,8 @@ const AdminSignup = () => {
             personal_statement: data.personal_statement,
             languages_spoken: data.languages_spoken,
             preferred_timezone: data.preferred_timezone,
-            status: 'pending'
+            status: 'pending',
+            role: 'admin'
           }
         ])
         .select();
@@ -77,7 +78,7 @@ const AdminSignup = () => {
       
       toast({
         title: "Application Submitted",
-        description: "Your admin application has been submitted successfully. We'll review it shortly.",
+        description: "Your admin application has been submitted for review by the Super Admin. You'll receive further instructions via email.",
       });
       
       navigate("/");
@@ -104,7 +105,12 @@ const AdminSignup = () => {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Admin Application</h1>
-          <p className="mt-2 text-gray-600">Join our team of administrators</p>
+          <p className="mt-2 text-gray-600">
+            Join our platform as an Admin to manage enterprises and their users
+          </p>
+          <p className="mt-1 text-sm text-gray-500">
+            Your application will be reviewed by our Super Admin
+          </p>
         </div>
 
         <Card className="p-6">

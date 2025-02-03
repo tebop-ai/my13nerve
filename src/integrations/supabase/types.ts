@@ -144,6 +144,7 @@ export type Database = {
           application_id: string | null
           created_at: string | null
           email: string
+          enterprise_limit: number | null
           full_name: string
           id: string
           is_super_admin: boolean | null
@@ -156,6 +157,7 @@ export type Database = {
           application_id?: string | null
           created_at?: string | null
           email: string
+          enterprise_limit?: number | null
           full_name: string
           id: string
           is_super_admin?: boolean | null
@@ -168,6 +170,7 @@ export type Database = {
           application_id?: string | null
           created_at?: string | null
           email?: string
+          enterprise_limit?: number | null
           full_name?: string
           id?: string
           is_super_admin?: boolean | null
@@ -350,6 +353,7 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          admin_creator_id: string | null
           created_at: string | null
           created_by: string | null
           email: string
@@ -360,6 +364,7 @@ export type Database = {
           profile_type: Database["public"]["Enums"]["user_profile_type"] | null
         }
         Insert: {
+          admin_creator_id?: string | null
           created_at?: string | null
           created_by?: string | null
           email: string
@@ -370,6 +375,7 @@ export type Database = {
           profile_type?: Database["public"]["Enums"]["user_profile_type"] | null
         }
         Update: {
+          admin_creator_id?: string | null
           created_at?: string | null
           created_by?: string | null
           email?: string
@@ -380,6 +386,13 @@ export type Database = {
           profile_type?: Database["public"]["Enums"]["user_profile_type"] | null
         }
         Relationships: [
+          {
+            foreignKeyName: "user_profiles_admin_creator_id_fkey"
+            columns: ["admin_creator_id"]
+            isOneToOne: false
+            referencedRelation: "admin_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "user_profiles_enterprise_id_fkey"
             columns: ["enterprise_id"]
@@ -394,6 +407,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_admin_enterprise_limit: {
+        Args: {
+          admin_id: string
+        }
+        Returns: boolean
+      }
       generate_secure_supercode: {
         Args: Record<PropertyKey, never>
         Returns: string
