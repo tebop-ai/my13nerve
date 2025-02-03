@@ -13,37 +13,62 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const { data: adminProfile, isLoading } = useQuery({
+  const { data: adminProfile, isLoading, error } = useQuery({
     queryKey: ['adminCheck'],
     queryFn: async () => {
       console.log("Checking admin status...");
-      const { data: profile, error } = await supabase
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError) {
+        console.error("Error getting user:", userError);
+        return null;
+      }
+
+      if (!user?.email) {
+        console.log("No user email found");
+        return null;
+      }
+
+      console.log("Fetching admin profile for email:", user.email);
+      const { data: profile, error: profileError } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('email', (await supabase.auth.getUser()).data.user?.email)
+        .eq('email', user.email)
         .eq('is_super_admin', false)
-        .single();
+        .maybeSingle();
 
-      if (error) {
-        console.error("Error checking admin status:", error);
+      if (profileError) {
+        console.error("Error checking admin status:", profileError);
         return null;
       }
       
+      console.log("Admin profile found:", profile);
       return profile;
-    }
+    },
+    retry: false
   });
 
   useEffect(() => {
-    if (!isLoading && !adminProfile) {
-      console.log("Not a regular admin, redirecting...");
-      toast({
-        title: "Access Denied",
-        description: "Invalid admin credentials",
-        variant: "destructive"
-      });
-      navigate('/');
+    if (!isLoading) {
+      if (error) {
+        console.error("Query error:", error);
+        toast({
+          title: "Error",
+          description: "Failed to verify admin credentials",
+          variant: "destructive"
+        });
+        navigate('/');
+      } else if (!adminProfile) {
+        console.log("No regular admin profile found, redirecting...");
+        toast({
+          title: "Access Denied",
+          description: "Invalid admin credentials",
+          variant: "destructive"
+        });
+        navigate('/');
+      }
     }
-  }, [adminProfile, isLoading, navigate, toast]);
+  }, [adminProfile, isLoading, error, navigate, toast]);
 
   if (isLoading) {
     return <div>Loading...</div>;
