@@ -24,18 +24,31 @@ export const ApplicationCard = ({
     try {
       console.log("Approving application:", application.id);
       
-      // First verify if the user is the super admin by checking all required conditions
+      // Get current user's session
+      const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+      
+      if (sessionError) {
+        console.error("Error getting current user:", sessionError);
+        toast({
+          title: "Authentication Error",
+          description: "Please sign in again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Verify if the user is the super admin using their session email
       const { data: adminProfile, error: adminError } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('email', 'Goapele Main')
+        .eq('email', user?.email)
         .eq('is_super_admin', true)
         .eq('status', 'active')
-        .single();
+        .maybeSingle();
 
       console.log("Admin profile check result:", { adminProfile, adminError });
 
-      if (adminError) {
+      if (adminError || !adminProfile) {
         console.error("Error checking super admin status:", adminError);
         toast({
           title: "Authorization Error",
