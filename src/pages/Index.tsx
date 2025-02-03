@@ -23,16 +23,21 @@ const Index = ({ onAdminLogin }: IndexProps) => {
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("Attempting admin login with:", { adminUsername, adminSuperCode });
+    console.log("Attempting admin login with:", { adminUsername });
     
     try {
-      // First verify the admin profile exists and matches credentials
+      // First verify if this is the Super Admin
+      const isSuperAdmin = adminUsername === 'Goapele Main';
+      console.log("Is Super Admin check:", isSuperAdmin);
+
+      // Query admin profile
       const { data: adminProfile, error: adminError } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', adminUsername)
         .eq('status', 'active')
-        .maybeSingle();
+        .eq('is_super_admin', isSuperAdmin)
+        .single();
 
       console.log("Admin profile query result:", { adminProfile, adminError });
 
@@ -46,49 +51,28 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         throw new Error("Invalid credentials");
       }
 
-      // Verify supercode separately
+      // Verify supercode
       if (adminProfile.supercode !== adminSuperCode) {
         console.log("Supercode mismatch");
         throw new Error("Invalid credentials");
       }
 
-      console.log("Admin profile found:", adminProfile);
+      console.log("Admin profile verified:", adminProfile);
 
-      // Special handling for Super Admin
-      if (adminProfile.is_super_admin) {
-        console.log("Super Admin profile verified");
-        
-        // Set authentication state
-        const loginSuccess = await onAdminLogin(adminUsername, adminSuperCode);
-        if (!loginSuccess) {
-          console.error("Login failed in onAdminLogin");
-          throw new Error("Login failed");
-        }
-
-        toast({
-          title: "Login successful",
-          description: "Welcome back, Super Admin!",
-        });
-
-        // Navigate to dashboard
-        navigate("/dashboard");
-        return;
-      }
-
-      // Regular admin flow
-      console.log("Regular admin login successful");
+      // Set authentication state
       const loginSuccess = await onAdminLogin(adminUsername, adminSuperCode);
       if (!loginSuccess) {
+        console.error("Login failed in onAdminLogin");
         throw new Error("Login failed");
       }
-      
+
       toast({
         title: "Login successful",
-        description: "Welcome back, Admin!",
+        description: isSuperAdmin ? "Welcome back, Super Admin!" : "Welcome back, Admin!",
       });
 
-      // Regular admins go to admin-dashboard
-      navigate("/admin-dashboard");
+      // Navigate based on admin type
+      navigate(isSuperAdmin ? "/dashboard" : "/admin-dashboard");
 
     } catch (error) {
       console.error("Login error:", error);
