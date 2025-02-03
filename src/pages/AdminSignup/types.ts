@@ -1,3 +1,5 @@
+import { UseFormReturn } from "react-hook-form";
+
 export interface AdminSignupFormData {
   full_name: string;
   email: string;
