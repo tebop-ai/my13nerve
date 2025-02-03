@@ -1,8 +1,8 @@
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
 import { Lock, LogIn, User, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -34,61 +34,55 @@ const Index = ({ onAdminLogin }: IndexProps) => {
         .eq('email', adminUsername)
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
-        .eq('is_super_admin', true)  // Add this line to check for super admin
-        .maybeSingle();
+        .eq('is_super_admin', true)
+        .single();
 
       if (adminError) {
         console.error("Admin login database error:", adminError);
         throw new Error('Database error occurred');
       }
 
-      if (!adminProfile) {
-        console.log("No admin profile found or invalid credentials");
-        throw new Error('Invalid credentials');
-      }
-
       console.log("Admin profile found:", adminProfile);
 
-      // If valid, proceed with the app's login flow
+      // If we got here, we found a valid admin profile
+      // Now check against the hardcoded credentials in App.tsx
       const loginSuccess = onAdminLogin(adminUsername, adminSuperCode);
       console.log("Login success:", loginSuccess);
 
-      if (loginSuccess) {
-        // Update last login timestamp
-        const { error: updateError } = await supabase
-          .from('admin_profiles')
-          .update({ 
-            last_login: new Date().toISOString() 
-          })
-          .eq('id', adminProfile.id);
-
-        if (updateError) {
-          console.error("Error updating last login:", updateError);
-          // Don't throw here, as login was successful
-        }
-
-        toast({
-          title: "Login successful",
-          description: `Welcome back, ${adminProfile.full_name}!`,
-        });
-
-        navigate("/dashboard");
-      } else {
+      if (!loginSuccess) {
         throw new Error('Login verification failed');
       }
+
+      // Update last login timestamp
+      const { error: updateError } = await supabase
+        .from('admin_profiles')
+        .update({ 
+          last_login: new Date().toISOString() 
+        })
+        .eq('id', adminProfile.id);
+
+      if (updateError) {
+        console.error("Error updating last login:", updateError);
+        // Don't throw here, as login was successful
+      }
+
+      toast({
+        title: "Login successful",
+        description: `Welcome back, ${adminProfile.full_name}!`,
+      });
+
+      navigate("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
       toast({
         title: "Login failed",
-        description: error instanceof Error ? error.message : "Invalid credentials. Please try again.",
+        description: "Invalid credentials. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
-
-  // ... keep existing code (JSX for the component remains unchanged)
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
