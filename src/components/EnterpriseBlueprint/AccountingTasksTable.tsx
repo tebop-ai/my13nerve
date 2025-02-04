@@ -72,23 +72,23 @@ export const AccountingTasksTable = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-h-[60vh] overflow-y-auto">
       {Object.entries(groupedTasks).map(([group, groupTasks]) => (
         <Collapsible
           key={group}
           open={openGroups[group]}
           onOpenChange={() => toggleGroup(group)}
-          className="border rounded-md"
+          className="border rounded-md bg-background"
         >
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-gray-50">
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-accent">
             <h4 className="font-medium">{group} Tasks</h4>
             <ChevronDown className={cn(
               "h-4 w-4 transition-transform duration-200",
               openGroups[group] ? "transform rotate-180" : ""
             )} />
           </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className="rounded-md border">
+          <CollapsibleContent className="relative">
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
