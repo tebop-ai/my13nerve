@@ -10,13 +10,12 @@ const Index = () => {
       <div className="max-w-4xl w-full">
         <div className="text-center mb-8">
           <Logo className="mx-auto mb-4 h-12" />
-          <p className="text-gray-600">Business Co-pilot Platform</p>
         </div>
 
         <Tabs defaultValue="admins" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="users">Enterprise Users</TabsTrigger>
-            <TabsTrigger value="admins">For Admins</TabsTrigger>
+            <TabsTrigger value="admins" className="text-gray-600">Access Admin Panel</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">

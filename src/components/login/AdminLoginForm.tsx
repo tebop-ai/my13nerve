@@ -24,12 +24,10 @@ export const AdminLoginForm = () => {
       const { data: adminProfile, error: profileError } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('email', adminEmail.trim().toLowerCase())
-        .eq('status', 'active')
-        .eq('validation_status', 'validated')
-        .single();
+        .eq('email', adminEmail)
+        .maybeSingle();
 
-      console.log("Initial admin profile query result:", adminProfile);
+      console.log("Admin profile query result:", adminProfile);
 
       if (profileError) {
         console.error("Profile query error:", profileError);
@@ -37,14 +35,25 @@ export const AdminLoginForm = () => {
       }
 
       if (!adminProfile) {
-        console.log("No active admin profile found for email");
-        throw new Error('No active admin profile found');
+        console.log("No admin profile found");
+        throw new Error('Invalid credentials');
       }
 
-      // Compare the supercodes exactly as stored in the database
+      if (adminProfile.status !== 'active') {
+        console.log("Admin profile not active");
+        throw new Error('Admin account is not active');
+      }
+
+      // Compare supercodes exactly
+      console.log("Comparing supercodes:", {
+        stored: adminProfile.supercode,
+        provided: adminSuperCode,
+        match: adminProfile.supercode === adminSuperCode
+      });
+
       if (adminProfile.supercode !== adminSuperCode) {
-        console.log("SuperCode mismatch");
-        throw new Error('Invalid SuperCode');
+        console.log("Supercode mismatch");
+        throw new Error('Invalid credentials');
       }
 
       // Update last login timestamp
@@ -67,7 +76,6 @@ export const AdminLoginForm = () => {
       });
 
       // Redirect based on admin type
-      console.log("Admin type:", adminProfile.is_super_admin ? "super admin" : "regular admin");
       if (adminProfile.is_super_admin) {
         navigate("/dashboard");
       } else {
@@ -75,24 +83,9 @@ export const AdminLoginForm = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      let errorMessage = "Login failed. ";
-      
-      if (error instanceof Error) {
-        switch (error.message) {
-          case 'No active admin profile found':
-            errorMessage += "No active admin profile found for this email.";
-            break;
-          case 'Invalid SuperCode':
-            errorMessage += "Invalid SuperCode provided. Please check and try again.";
-            break;
-          default:
-            errorMessage += "Please check your credentials and try again.";
-        }
-      }
-
       toast({
         title: "Login failed",
-        description: errorMessage,
+        description: error instanceof Error ? error.message : "Please check your credentials and try again",
         variant: "destructive",
       });
     } finally {
