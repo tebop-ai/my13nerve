@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Cog, Database, Upload, Check } from "lucide-react";
+import { AccountingTasksTable } from "../EnterpriseBlueprint/AccountingTasksTable";
 
 const INDUSTRY_TYPES = [
   "Technology",
@@ -25,6 +26,7 @@ export const CreateAiAgentDialog = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [industryType, setIndustryType] = useState("");
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const { toast } = useToast();
 
   // Fetch available tasks
@@ -89,6 +91,7 @@ export const CreateAiAgentDialog = () => {
     setName("");
     setDescription("");
     setIndustryType("");
+    setSelectedTasks([]);
   };
 
   const handleCreate = () => {
@@ -116,6 +119,14 @@ export const CreateAiAgentDialog = () => {
       industryType,
       taskCapacities
     });
+  };
+
+  const handleTaskSelect = (taskId: string) => {
+    setSelectedTasks(prev => 
+      prev.includes(taskId) 
+        ? prev.filter(id => id !== taskId)
+        : [...prev, taskId]
+    );
   };
 
   return (
@@ -163,6 +174,13 @@ export const CreateAiAgentDialog = () => {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Available Tasks</Label>
+            <AccountingTasksTable
+              selectedTasks={selectedTasks}
+              onTaskSelect={handleTaskSelect}
+            />
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Database className="h-4 w-4" />
