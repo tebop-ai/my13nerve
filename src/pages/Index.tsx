@@ -10,27 +10,31 @@ interface CSVTask {
 }
 
 const Index = () => {
-  const { data: blueprint } = useQuery({
+  const { data: blueprint, isLoading, error } = useQuery({
     queryKey: ['blueprint', 'Demo 1'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('enterprise_blueprints')
         .select('*')
         .eq('name', 'Demo 1')
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
     },
   });
 
-  if (!blueprint) {
+  if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (error || !blueprint) {
+    return <div>No blueprint found with name "Demo 1"</div>;
   }
 
   // Ensure csv_tasks is an array and has the correct shape
   const csvTasks = Array.isArray(blueprint.csv_tasks) 
-    ? (blueprint.csv_tasks as CSVTask[])
+    ? (blueprint.csv_tasks as unknown as CSVTask[])
     : [] as CSVTask[];
 
   return (
