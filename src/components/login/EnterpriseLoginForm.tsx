@@ -28,7 +28,7 @@ export const EnterpriseLoginForm = () => {
 
       if (authError) {
         console.error("Auth error:", authError);
-        throw authError;
+        throw new Error("Invalid credentials");
       }
 
       console.log("Auth successful, checking user profile");
@@ -42,28 +42,33 @@ export const EnterpriseLoginForm = () => {
 
       if (profileError) {
         console.error("Profile error:", profileError);
-        throw profileError;
+        throw new Error("Error fetching user profile");
       }
 
-      if (!userProfile || !userProfile.enterprise_id) {
-        console.error("No enterprise access found for user");
+      if (!userProfile) {
+        console.error("No user profile found");
+        throw new Error("User profile not found");
+      }
+
+      if (!userProfile.enterprise_id) {
+        console.error("No enterprise access found");
         throw new Error("No enterprise access found");
       }
 
       console.log("Enterprise profile found:", userProfile);
 
-      // Step 3: Store all necessary data in session storage
+      // Step 3: Store authentication data in session storage
       sessionStorage.setItem("isEnterpriseAuthenticated", "true");
       sessionStorage.setItem("userEmail", email);
       sessionStorage.setItem("userProfile", JSON.stringify(userProfile));
       sessionStorage.setItem("enterpriseId", userProfile.enterprise_id);
 
+      // Step 4: Show success message and navigate
       toast({
         title: "Login successful",
         description: "Welcome back!",
       });
 
-      // Step 4: Navigate to enterprise view
       navigate("/enterprise");
     } catch (error) {
       console.error("Login error:", error);
@@ -72,6 +77,11 @@ export const EnterpriseLoginForm = () => {
         description: error instanceof Error ? error.message : "Please check your credentials and try again",
         variant: "destructive",
       });
+      // Clear session storage on error
+      sessionStorage.removeItem("isEnterpriseAuthenticated");
+      sessionStorage.removeItem("userEmail");
+      sessionStorage.removeItem("userProfile");
+      sessionStorage.removeItem("enterpriseId");
     } finally {
       setIsLoading(false);
     }
