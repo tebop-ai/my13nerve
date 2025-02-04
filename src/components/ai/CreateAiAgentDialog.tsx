@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Cog, Database, Upload, Check } from "lucide-react";
+import { Cog, Database, Upload } from "lucide-react";
 import { AccountingTasksTable } from "../EnterpriseBlueprint/AccountingTasksTable";
 
 const INDUSTRY_TYPES = [
@@ -137,7 +137,7 @@ export const CreateAiAgentDialog = () => {
           Create AI Agent
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="sm:max-w-[800px] h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>Create New AI Agent</DialogTitle>
         </DialogHeader>
