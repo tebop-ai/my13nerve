@@ -5,6 +5,8 @@ import { Building2, Users, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const RegularAdminOverview = () => {
+  console.log("Rendering Regular Admin Overview");
+
   const { data: adminProfile } = useQuery({
     queryKey: ['adminProfile'],
     queryFn: async () => {

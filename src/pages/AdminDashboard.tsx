@@ -7,6 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 const AdminDashboard = () => {
+  console.log("Rendering Regular Admin Dashboard");
+  
   const { data: adminProfile } = useQuery({
     queryKey: ['adminProfile'],
     queryFn: async () => {
