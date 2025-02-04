@@ -10,6 +10,7 @@ import { DashboardOverview } from "./DashboardSections/DashboardOverview";
 import { AdminApplications } from "./DashboardSections/AdminApplications";
 import { EnterpriseSettings } from "./DashboardSections/EnterpriseSettings";
 import { AdminProfiles } from "./DashboardSections/AdminProfiles";
+import { CreateAiAgentDialog } from "@/components/ai/CreateAiAgentDialog";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -65,9 +66,12 @@ const Dashboard = () => {
             <p className="text-gray-600">Complete system control and oversight</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
-          <Sparkles className="h-5 w-5 text-gray-700" />
-          <span className="text-gray-700 font-medium">Super Admin Access</span>
+        <div className="flex items-center gap-4">
+          <CreateAiAgentDialog />
+          <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
+            <Sparkles className="h-5 w-5 text-gray-700" />
+            <span className="text-gray-700 font-medium">Super Admin Access</span>
+          </div>
         </div>
       </div>
 

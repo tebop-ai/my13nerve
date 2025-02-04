@@ -198,6 +198,48 @@ export type Database = {
           },
         ]
       }
+      ai_agents: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          industry_type: string
+          is_active: boolean | null
+          last_updated: string | null
+          name: string
+          specifications: Json | null
+          task_capacities: Json | null
+          version: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          industry_type: string
+          is_active?: boolean | null
+          last_updated?: string | null
+          name: string
+          specifications?: Json | null
+          task_capacities?: Json | null
+          version?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          industry_type?: string
+          is_active?: boolean | null
+          last_updated?: string | null
+          name?: string
+          specifications?: Json | null
+          task_capacities?: Json | null
+          version?: string | null
+        }
+        Relationships: []
+      }
       "Customer Insights": {
         Row: {
           Code: string
@@ -469,6 +511,17 @@ export type Database = {
       generate_secure_supercode: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_available_tasks: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          table_name: string
+          task_code: string
+          task_description: string
+          occurrence: string
+          sub_task: string
+          tools: string
+        }[]
       }
       validate_admin_profile: {
         Args: {
