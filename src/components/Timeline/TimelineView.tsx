@@ -34,17 +34,22 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ enterpriseId, csvTas
     const setupTimelineView = async () => {
       try {
         // Get or create timeline view preference
-        const { data: existingView } = await supabase
+        const { data: existingView, error } = await supabase
           .from('timeline_views')
           .select('*')
           .eq('enterprise_id', enterpriseId)
           .single();
 
-        if (!existingView) {
-          await supabase
-            .from('timeline_views')
-            .insert([{ enterprise_id: enterpriseId, timeframe }]);
-        } else {
+        if (error) {
+          if (error.code === 'PGRST116') {
+            // No record found, create one
+            await supabase
+              .from('timeline_views')
+              .insert([{ enterprise_id: enterpriseId, timeframe }]);
+          } else {
+            throw error;
+          }
+        } else if (existingView?.timeframe) {
           setTimeframe(existingView.timeframe as TimeframeOption);
         }
 
@@ -60,7 +65,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ enterpriseId, csvTas
               filter: `enterprise_id=eq.${enterpriseId}`,
             },
             (payload) => {
-              if (payload.new) {
+              if (payload.new && payload.new.timeframe) {
                 setTimeframe(payload.new.timeframe as TimeframeOption);
               }
             }

@@ -3,6 +3,12 @@ import { TimelineView } from '@/components/Timeline/TimelineView';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+interface CSVTask {
+  'Sub-Task': string;
+  'Full Description': string;
+  Occurrence: string;
+}
+
 const Index = () => {
   const { data: blueprint } = useQuery({
     queryKey: ['blueprint', 'Demo 1'],
@@ -22,11 +28,14 @@ const Index = () => {
     return <div>Loading...</div>;
   }
 
+  // Ensure csv_tasks is an array and has the correct shape
+  const csvTasks = (blueprint.csv_tasks || []) as CSVTask[];
+
   return (
     <div className="container mx-auto p-6">
       <TimelineView
         enterpriseId={blueprint.id}
-        csvTasks={blueprint.csv_tasks || []}
+        csvTasks={csvTasks}
       />
     </div>
   );
