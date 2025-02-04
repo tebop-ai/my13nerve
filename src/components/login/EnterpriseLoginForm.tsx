@@ -44,8 +44,9 @@ export const EnterpriseLoginForm = () => {
 
       console.log("Enterprise profile found:", userProfile);
 
-      // Store authentication state
+      // Store authentication state AND email
       sessionStorage.setItem("isEnterpriseAuthenticated", "true");
+      sessionStorage.setItem("userEmail", email);
       sessionStorage.setItem("userProfile", JSON.stringify(userProfile));
 
       toast({
