@@ -25,17 +25,17 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#0263E0", // Twilio blue
+          DEFAULT: "#9b87f5", // Updated to primary purple
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#1C2533", // Dark sidebar color
+          DEFAULT: "#7E69AB", // Updated to secondary purple
           foreground: "#FFFFFF",
         },
         sidebar: {
-          DEFAULT: "#1C2533", // Dark sidebar background
-          hover: "#252F3F",
-          active: "#2C3B52",
+          DEFAULT: "#1A1F2C", // Updated to dark purple
+          hover: "#2C3B52",
+          active: "#6E59A5", // Updated to tertiary purple
           text: "#FFFFFF",
         },
         destructive: {
@@ -43,11 +43,11 @@ export default {
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "#6B7280",
-          foreground: "#9CA3AF",
+          DEFAULT: "#8E9196", // Updated to neutral gray
+          foreground: "#D6BCFA", // Updated to light purple
         },
         accent: {
-          DEFAULT: "#252F3F",
+          DEFAULT: "#6E59A5", // Updated to tertiary purple
           foreground: "#FFFFFF",
         },
         popover: {
