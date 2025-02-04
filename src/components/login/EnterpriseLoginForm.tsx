@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export const EnterpriseLoginForm = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("info@13thai.com"); // Pre-fill with stored credentials
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();

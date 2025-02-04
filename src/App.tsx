@@ -60,7 +60,7 @@ const LandingPage = () => {
           <img 
             src="/lovable-uploads/ed890ce8-93b5-46f2-a9f4-f00fe6437b34.png"
             alt="my13nerve"
-            className="h-24 mx-auto mb-6" // Increased size by 1.5x from default h-16
+            className="h-20 mx-auto mb-6" // Changed from h-24 to h-20 (1.25x from h-16)
           />
           <div className="mt-4 space-x-4">
             <button
