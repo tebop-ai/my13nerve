@@ -20,40 +20,50 @@ export const EnterpriseLoginForm = () => {
     console.log("Attempting enterprise login for:", email);
 
     try {
+      // Step 1: Sign in with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error("Auth error:", authError);
+        throw authError;
+      }
 
       console.log("Auth successful, checking user profile");
 
-      // Fetch user profile to verify enterprise access
+      // Step 2: Fetch user profile to verify enterprise access
       const { data: userProfile, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('email', email)
         .maybeSingle();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Profile error:", profileError);
+        throw profileError;
+      }
 
       if (!userProfile || !userProfile.enterprise_id) {
+        console.error("No enterprise access found for user");
         throw new Error("No enterprise access found");
       }
 
       console.log("Enterprise profile found:", userProfile);
 
-      // Store authentication state AND email
+      // Step 3: Store all necessary data in session storage
       sessionStorage.setItem("isEnterpriseAuthenticated", "true");
       sessionStorage.setItem("userEmail", email);
       sessionStorage.setItem("userProfile", JSON.stringify(userProfile));
+      sessionStorage.setItem("enterpriseId", userProfile.enterprise_id);
 
       toast({
         title: "Login successful",
         description: "Welcome back!",
       });
 
+      // Step 4: Navigate to enterprise view
       navigate("/enterprise");
     } catch (error) {
       console.error("Login error:", error);
