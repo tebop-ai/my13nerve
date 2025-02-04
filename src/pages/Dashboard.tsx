@@ -78,10 +78,10 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card className="p-4 bg-gray-50 border-gray-200 hover:bg-gray-100 transition-colors">
           <div className="flex items-center gap-3">
-            <Users className="h-8 w-8 text-gray-700" />
+            <Shield className="h-8 w-8 text-gray-700" />
             <div>
-              <h3 className="font-semibold text-gray-900">Admin Management</h3>
-              <p className="text-sm text-gray-600">Oversee admin accounts</p>
+              <h3 className="font-semibold text-gray-900">System Security</h3>
+              <p className="text-sm text-gray-600">Monitor system access</p>
             </div>
           </div>
         </Card>
@@ -107,21 +107,21 @@ const Dashboard = () => {
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList className="grid grid-cols-4 gap-4 bg-gray-100/50 p-1">
-          <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-gray-200">
+          <TabsTrigger value="overview" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
-            Overview
+            System Overview
           </TabsTrigger>
-          <TabsTrigger value="admin-profiles" className="flex items-center gap-2 data-[state=active]:bg-gray-200">
+          <TabsTrigger value="admin-profiles" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            Admin Profiles
+            Admin Management
           </TabsTrigger>
-          <TabsTrigger value="admin-applications" className="flex items-center gap-2 data-[state=active]:bg-gray-200">
+          <TabsTrigger value="admin-applications" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             Applications
           </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-gray-200">
+          <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
-            Settings
+            System Settings
           </TabsTrigger>
         </TabsList>
 
