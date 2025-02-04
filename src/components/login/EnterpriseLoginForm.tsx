@@ -37,12 +37,12 @@ export const EnterpriseLoginForm = () => {
 
       console.log("Auth successful, checking user profile");
 
-      // Step 2: Now that we're authenticated, fetch user profile
+      // Step 2: Fetch user profile with enterprise_id
       const { data: userProfile, error: profileError } = await supabase
         .from('user_profiles')
-        .select('*')
-        .eq('id', authData.user.id)
-        .maybeSingle(); // Using maybeSingle instead of single to handle no results case
+        .select('*, enterprise_blueprints(*)')
+        .eq('email', email)
+        .single();
 
       if (profileError) {
         console.error("Profile error:", profileError);
