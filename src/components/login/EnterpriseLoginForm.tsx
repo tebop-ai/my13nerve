@@ -31,14 +31,18 @@ export const EnterpriseLoginForm = () => {
         throw new Error("Invalid credentials");
       }
 
+      if (!authData.user) {
+        throw new Error("No user data returned");
+      }
+
       console.log("Auth successful, checking user profile");
 
-      // Step 2: Fetch user profile to verify enterprise access
+      // Step 2: Now that we're authenticated, fetch user profile
       const { data: userProfile, error: profileError } = await supabase
         .from('user_profiles')
         .select('*')
-        .eq('email', email)
-        .maybeSingle();
+        .eq('id', authData.user.id)
+        .single();
 
       if (profileError) {
         console.error("Profile error:", profileError);
