@@ -27,7 +27,8 @@ const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode,
     isAdminAuthenticated,
     isEnterpriseAuthenticated,
     isSuperAdmin,
-    requiredRole
+    requiredRole,
+    adminProfile
   });
 
   if (requiredRole === 'enterprise' && !isEnterpriseAuthenticated) {
@@ -39,10 +40,12 @@ const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode,
   }
 
   if (requiredRole === 'super_admin' && !isSuperAdmin) {
+    console.log("Redirecting non-super admin to admin dashboard");
     return <Navigate to="/admin-dashboard" replace />;
   }
 
   if (requiredRole === 'admin' && isSuperAdmin) {
+    console.log("Redirecting super admin to super admin dashboard");
     return <Navigate to="/dashboard" replace />;
   }
 

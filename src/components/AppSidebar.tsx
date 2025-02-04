@@ -33,6 +33,8 @@ export function AppSidebar() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    sessionStorage.removeItem("adminProfile");
+    sessionStorage.removeItem("isAdminAuthenticated");
     navigate('/');
   };
 
@@ -74,14 +76,6 @@ export function AppSidebar() {
               >
                 <Bot className="h-5 w-5 mr-2" />
                 {state !== "collapsed" && "AI Agents"}
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-sidebar-text hover:text-white hover:bg-sidebar-hover"
-                onClick={() => navigate('/admin-profiles')}
-              >
-                <Users className="h-5 w-5 mr-2" />
-                {state !== "collapsed" && "Admin Profiles"}
               </Button>
             </>
           ) : (
