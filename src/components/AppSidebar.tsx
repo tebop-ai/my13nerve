@@ -57,6 +57,7 @@ export function AppSidebar() {
 
         <div className="flex-1 py-4 space-y-2 px-2">
           {adminProfile?.is_super_admin ? (
+            // Super Admin Menu Items
             <>
               <Button
                 variant="ghost"
@@ -84,6 +85,7 @@ export function AppSidebar() {
               </Button>
             </>
           ) : (
+            // Regular Admin Menu Items
             <>
               <Button
                 variant="ghost"
