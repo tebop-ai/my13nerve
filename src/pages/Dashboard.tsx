@@ -1,15 +1,15 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { BarChart3, Users, Building2, Settings, Crown, Shield, Siren, Database, Sparkles } from "lucide-react";
-import { DashboardOverview } from "./DashboardSections/DashboardOverview";
-import { AdminApplications } from "./DashboardSections/AdminApplications";
-import { EnterpriseSettings } from "./DashboardSections/EnterpriseSettings";
-import { AdminProfiles } from "./DashboardSections/AdminProfiles";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { DashboardOverview } from "./DashboardSections/DashboardOverview";
+import { AdminApplications } from "./DashboardSections/AdminApplications";
+import { EnterpriseSettings } from "./DashboardSections/EnterpriseSettings";
+import { AdminProfiles } from "./DashboardSections/AdminProfiles";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -134,10 +134,7 @@ const Dashboard = () => {
         </TabsContent>
 
         <TabsContent value="settings">
-          <Card className="p-6 border-purple-200">
-            <h2 className="text-2xl font-semibold text-purple-900 mb-4">System Configuration</h2>
-            <p className="text-purple-700">Global system settings and security configurations.</p>
-          </Card>
+          <EnterpriseSettings />
         </TabsContent>
       </Tabs>
     </div>

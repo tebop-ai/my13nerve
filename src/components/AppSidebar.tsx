@@ -48,10 +48,10 @@ export function AppSidebar() {
       )}
     >
       <div className="flex flex-col h-full">
-        <div className="h-16 flex items-center justify-center border-b border-sidebar-border">
+        <div className="h-24 flex items-center justify-center border-b border-sidebar-border">
           <Logo className={cn(
             "transition-all duration-300",
-            state === "collapsed" ? "h-8" : "h-10"
+            state === "collapsed" ? "h-12" : "h-16"
           )} />
         </div>
 

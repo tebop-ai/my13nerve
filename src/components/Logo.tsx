@@ -41,7 +41,7 @@ export const Logo = ({ className = "" }: { className?: string }) => {
     <img
       src="/lovable-uploads/3a5a3430-f107-42bc-aabc-e51e89c74d22.png"
       alt="13nerve"
-      className={`h-8 cursor-pointer ${className}`}
+      className={`h-16 cursor-pointer ${className}`} // Increased height from h-8 to h-16
       onClick={handleLogoClick}
     />
   );
