@@ -25,17 +25,17 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#9b87f5", // Updated to primary purple
+          DEFAULT: "#333333", // Updated to dark gray
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#7E69AB", // Updated to secondary purple
+          DEFAULT: "#555555", // Updated to medium dark gray
           foreground: "#FFFFFF",
         },
         sidebar: {
-          DEFAULT: "#1A1F2C", // Updated to dark purple
-          hover: "#2C3B52",
-          active: "#6E59A5", // Updated to tertiary purple
+          DEFAULT: "#222222", // Updated to darker gray
+          hover: "#444444",
+          active: "#666666", // Updated to medium gray
           text: "#FFFFFF",
         },
         destructive: {
@@ -43,11 +43,11 @@ export default {
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "#8E9196", // Updated to neutral gray
-          foreground: "#D6BCFA", // Updated to light purple
+          DEFAULT: "#777777", // Updated to light gray
+          foreground: "#AAAAAA", // Updated to very light gray
         },
         accent: {
-          DEFAULT: "#6E59A5", // Updated to tertiary purple
+          DEFAULT: "#444444", // Updated to medium dark gray
           foreground: "#FFFFFF",
         },
         popover: {

@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export const EnterpriseLoginForm = () => {
-  const [email, setEmail] = useState("info@13thai.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -20,7 +20,6 @@ export const EnterpriseLoginForm = () => {
     console.log("Attempting enterprise login for:", email);
 
     try {
-      // Step 1: Sign in with Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -37,7 +36,6 @@ export const EnterpriseLoginForm = () => {
 
       console.log("Auth successful, checking user profile");
 
-      // Step 2: Fetch user profile with enterprise_id
       const { data: userProfile, error: profileError } = await supabase
         .from('user_profiles')
         .select('*, enterprise_blueprints(*)')
@@ -61,13 +59,11 @@ export const EnterpriseLoginForm = () => {
 
       console.log("Enterprise profile found:", userProfile);
 
-      // Step 3: Store authentication data in session storage
       sessionStorage.setItem("isEnterpriseAuthenticated", "true");
       sessionStorage.setItem("userEmail", email);
       sessionStorage.setItem("userProfile", JSON.stringify(userProfile));
       sessionStorage.setItem("enterpriseId", userProfile.enterprise_id);
 
-      // Step 4: Show success message and navigate
       toast({
         title: "Login successful",
         description: "Welcome back!",
@@ -81,7 +77,6 @@ export const EnterpriseLoginForm = () => {
         description: error instanceof Error ? error.message : "Please check your credentials and try again",
         variant: "destructive",
       });
-      // Clear session storage on error
       sessionStorage.removeItem("isEnterpriseAuthenticated");
       sessionStorage.removeItem("userEmail");
       sessionStorage.removeItem("userProfile");
