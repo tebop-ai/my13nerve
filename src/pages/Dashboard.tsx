@@ -59,63 +59,63 @@ const Dashboard = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-3">
-          <Crown className="h-10 w-10 text-purple-500" />
+          <Crown className="h-10 w-10 text-gray-700" />
           <div>
-            <h1 className="text-3xl font-bold text-purple-900">Super Admin Control Center</h1>
-            <p className="text-purple-600">Complete system control and oversight</p>
+            <h1 className="text-3xl font-bold text-gray-900">Super Admin Control Center</h1>
+            <p className="text-gray-600">Complete system control and oversight</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-lg border border-purple-200">
-          <Sparkles className="h-5 w-5 text-purple-500" />
-          <span className="text-purple-700 font-medium">Super Admin Access</span>
+        <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-lg border border-gray-200">
+          <Sparkles className="h-5 w-5 text-gray-700" />
+          <span className="text-gray-700 font-medium">Super Admin Access</span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card className="p-4 bg-purple-50 border-purple-200 hover:bg-purple-100 transition-colors">
+        <Card className="p-4 bg-gray-50 border-gray-200 hover:bg-gray-100 transition-colors">
           <div className="flex items-center gap-3">
-            <Users className="h-8 w-8 text-purple-500" />
+            <Users className="h-8 w-8 text-gray-700" />
             <div>
-              <h3 className="font-semibold text-purple-900">Admin Management</h3>
-              <p className="text-sm text-purple-700">Oversee admin accounts</p>
+              <h3 className="font-semibold text-gray-900">Admin Management</h3>
+              <p className="text-sm text-gray-600">Oversee admin accounts</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 bg-indigo-50 border-indigo-200 hover:bg-indigo-100 transition-colors">
+        <Card className="p-4 bg-gray-50 border-gray-200 hover:bg-gray-100 transition-colors">
           <div className="flex items-center gap-3">
-            <Database className="h-8 w-8 text-indigo-500" />
+            <Database className="h-8 w-8 text-gray-700" />
             <div>
-              <h3 className="font-semibold text-indigo-900">System Overview</h3>
-              <p className="text-sm text-indigo-700">Monitor performance</p>
+              <h3 className="font-semibold text-gray-900">System Overview</h3>
+              <p className="text-sm text-gray-600">Monitor performance</p>
             </div>
           </div>
         </Card>
-        <Card className="p-4 bg-violet-50 border-violet-200 hover:bg-violet-100 transition-colors">
+        <Card className="p-4 bg-gray-50 border-gray-200 hover:bg-gray-100 transition-colors">
           <div className="flex items-center gap-3">
-            <Siren className="h-8 w-8 text-violet-500" />
+            <Siren className="h-8 w-8 text-gray-700" />
             <div>
-              <h3 className="font-semibold text-violet-900">Security Center</h3>
-              <p className="text-sm text-violet-700">System security status</p>
+              <h3 className="font-semibold text-gray-900">Security Center</h3>
+              <p className="text-sm text-gray-600">System security status</p>
             </div>
           </div>
         </Card>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid grid-cols-4 gap-4 bg-purple-100/50 p-1">
-          <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-purple-100">
+        <TabsList className="grid grid-cols-4 gap-4 bg-gray-100/50 p-1">
+          <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-gray-200">
             <BarChart3 className="h-4 w-4" />
             Overview
           </TabsTrigger>
-          <TabsTrigger value="admin-profiles" className="flex items-center gap-2 data-[state=active]:bg-purple-100">
+          <TabsTrigger value="admin-profiles" className="flex items-center gap-2 data-[state=active]:bg-gray-200">
             <Users className="h-4 w-4" />
             Admin Profiles
           </TabsTrigger>
-          <TabsTrigger value="admin-applications" className="flex items-center gap-2 data-[state=active]:bg-purple-100">
+          <TabsTrigger value="admin-applications" className="flex items-center gap-2 data-[state=active]:bg-gray-200">
             <Users className="h-4 w-4" />
             Applications
           </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-purple-100">
+          <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-gray-200">
             <Settings className="h-4 w-4" />
             Settings
           </TabsTrigger>

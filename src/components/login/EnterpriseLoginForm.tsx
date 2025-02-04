@@ -57,6 +57,11 @@ export const EnterpriseLoginForm = () => {
         throw new Error("No enterprise access found");
       }
 
+      if (!userProfile.is_active) {
+        console.error("User account is inactive");
+        throw new Error("Your account is currently inactive. Please contact your administrator.");
+      }
+
       console.log("Enterprise profile found:", userProfile);
 
       sessionStorage.setItem("isEnterpriseAuthenticated", "true");
