@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export const EnterpriseLoginForm = () => {
-  const [email, setEmail] = useState("info@13thai.com"); // Pre-fill with stored credentials
+  const [email, setEmail] = useState("info@13thai.com");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export const EnterpriseLoginForm = () => {
         .from('user_profiles')
         .select('*, enterprise_blueprints(*)')
         .eq('email', email)
-        .single();
+        .maybeSingle();
 
       if (profileError) {
         console.error("Profile error:", profileError);
