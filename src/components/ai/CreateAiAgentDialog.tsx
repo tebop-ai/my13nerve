@@ -137,11 +137,11 @@ export const CreateAiAgentDialog = () => {
           Create AI Agent
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>Create New AI Agent</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="flex-1 overflow-y-auto py-4 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Agent Name</Label>
             <Input
@@ -191,20 +191,22 @@ export const CreateAiAgentDialog = () => {
             </span>
           </div>
         </div>
-        <Button
-          onClick={handleCreate}
-          disabled={createAgentMutation.isPending}
-          className="w-full"
-        >
-          {createAgentMutation.isPending ? (
-            <Cog className="h-4 w-4 animate-spin" />
-          ) : (
-            <>
-              <Upload className="h-4 w-4 mr-2" />
-              Create Agent
-            </>
-          )}
-        </Button>
+        <div className="pt-4 border-t">
+          <Button
+            onClick={handleCreate}
+            disabled={createAgentMutation.isPending}
+            className="w-full"
+          >
+            {createAgentMutation.isPending ? (
+              <Cog className="h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                <Upload className="h-4 w-4 mr-2" />
+                Create Agent
+              </>
+            )}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
