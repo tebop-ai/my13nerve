@@ -39,9 +39,9 @@ export const Logo = ({ className = "" }: { className?: string }) => {
 
   return (
     <img
-      src="/lovable-uploads/3a5a3430-f107-42bc-aabc-e51e89c74d22.png"
-      alt="13nerve"
-      className={`h-16 cursor-pointer ${className}`} // Increased height from h-8 to h-16
+      src="/lovable-uploads/ed890ce8-93b5-46f2-a9f4-f00fe6437b34.png"
+      alt="my13nerve"
+      className={`h-24 cursor-pointer ${className}`} // Increased size by 1.5x from h-16
       onClick={handleLogoClick}
     />
   );

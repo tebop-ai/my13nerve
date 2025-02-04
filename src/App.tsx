@@ -57,13 +57,17 @@ const LandingPage = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">Welcome</h1>
+          <img 
+            src="/lovable-uploads/ed890ce8-93b5-46f2-a9f4-f00fe6437b34.png"
+            alt="my13nerve"
+            className="h-24 mx-auto mb-6" // Increased size by 1.5x from default h-16
+          />
           <div className="mt-4 space-x-4">
             <button
               onClick={() => setLoginType('enterprise')}
               className={`px-4 py-2 rounded ${loginType === 'enterprise' ? 'bg-primary text-white' : 'bg-gray-200'}`}
             >
-              Enterprise Login
+              Enterprise User Login
             </button>
             <button
               onClick={() => setLoginType('admin')}
