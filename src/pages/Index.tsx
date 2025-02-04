@@ -1,32 +1,33 @@
-import React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AdminLoginForm } from "@/components/login/AdminLoginForm";
-import { EnterpriseLoginForm } from "@/components/login/EnterpriseLoginForm";
-import { Logo } from "@/components/Logo";
+import React from 'react';
+import { TimelineView } from '@/components/Timeline/TimelineView';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
+  const { data: blueprint } = useQuery({
+    queryKey: ['blueprint', 'Demo 1'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('enterprise_blueprints')
+        .select('*')
+        .eq('name', 'Demo 1')
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (!blueprint) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-4xl w-full">
-        <div className="text-center mb-8">
-          <Logo className="mx-auto mb-4 h-12" />
-        </div>
-
-        <Tabs defaultValue="admins" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="users">Enterprise Users</TabsTrigger>
-            <TabsTrigger value="admins" className="text-gray-500">Access Admin Panel</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="users">
-            <EnterpriseLoginForm />
-          </TabsContent>
-
-          <TabsContent value="admins">
-            <AdminLoginForm />
-          </TabsContent>
-        </Tabs>
-      </div>
+    <div className="container mx-auto p-6">
+      <TimelineView
+        enterpriseId={blueprint.id}
+        csvTasks={blueprint.csv_tasks || []}
+      />
     </div>
   );
 };

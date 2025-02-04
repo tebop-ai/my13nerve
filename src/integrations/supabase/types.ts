@@ -366,6 +366,38 @@ export type Database = {
         }
         Relationships: []
       }
+      timeline_views: {
+        Row: {
+          created_at: string | null
+          enterprise_id: string
+          id: string
+          timeframe: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          enterprise_id: string
+          id?: string
+          timeframe?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          enterprise_id?: string
+          id?: string
+          timeframe?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timeline_views_enterprise_id_fkey"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "enterprise_blueprints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           admin_creator_id: string | null
