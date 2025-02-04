@@ -34,8 +34,8 @@ const AdminDashboard = () => {
       <div className="flex items-center gap-3 mb-6">
         <Building2 className="h-10 w-10 text-gray-700" />
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage your enterprises and users</p>
+          <h1 className="text-3xl font-bold text-gray-900">Enterprise Management</h1>
+          <p className="text-gray-600">Manage your assigned enterprises and users</p>
         </div>
       </div>
 
@@ -47,11 +47,11 @@ const AdminDashboard = () => {
           </TabsTrigger>
           <TabsTrigger value="enterprises" className="flex items-center gap-2">
             <Building2 className="h-4 w-4" />
-            Enterprises
+            My Enterprises
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            Users
+            Enterprise Users
           </TabsTrigger>
         </TabsList>
 
