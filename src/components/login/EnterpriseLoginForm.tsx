@@ -42,7 +42,7 @@ export const EnterpriseLoginForm = () => {
         .from('user_profiles')
         .select('*')
         .eq('id', authData.user.id)
-        .single();
+        .maybeSingle(); // Using maybeSingle instead of single to handle no results case
 
       if (profileError) {
         console.error("Profile error:", profileError);
@@ -51,7 +51,7 @@ export const EnterpriseLoginForm = () => {
 
       if (!userProfile) {
         console.error("No user profile found");
-        throw new Error("User profile not found");
+        throw new Error("No enterprise access found. Please contact your administrator.");
       }
 
       if (!userProfile.enterprise_id) {
