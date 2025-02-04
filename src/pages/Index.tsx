@@ -15,7 +15,7 @@ const Index = () => {
         <Tabs defaultValue="admins" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="users">Enterprise Users</TabsTrigger>
-            <TabsTrigger value="admins" className="text-gray-600">Access Admin Panel</TabsTrigger>
+            <TabsTrigger value="admins" className="text-gray-500">Access Admin Panel</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">
