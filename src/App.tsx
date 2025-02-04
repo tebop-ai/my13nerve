@@ -12,10 +12,10 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSignup from "./pages/AdminSignup";
 import EnterpriseView from "./pages/EnterpriseView";
+import AiAgents from "./pages/AiAgents";
 
 const queryClient = new QueryClient();
 
-// Protected Route component with role check
 const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode, requiredRole: 'super_admin' | 'admin' | 'enterprise' }) => {
   const isAdminAuthenticated = sessionStorage.getItem("isAdminAuthenticated") === "true";
   const isEnterpriseAuthenticated = sessionStorage.getItem("isEnterpriseAuthenticated") === "true";
@@ -49,7 +49,6 @@ const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode,
   return <>{children}</>;
 };
 
-// Landing page component to handle role-based login
 const LandingPage = () => {
   const [loginType, setLoginType] = React.useState<'enterprise' | 'admin'>('enterprise');
   
@@ -88,7 +87,6 @@ const LandingPage = () => {
   );
 };
 
-// Wrapper component to conditionally render sidebar
 const AppContent = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
@@ -127,6 +125,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute requiredRole="super_admin">
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ai-agents"
+            element={
+              <ProtectedRoute requiredRole="super_admin">
+                <AiAgents />
               </ProtectedRoute>
             }
           />

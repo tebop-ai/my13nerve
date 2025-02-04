@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
-import { Building2, Users, Settings, LogOut } from "lucide-react";
+import { Building2, Users, Settings, LogOut, Bot } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "./Logo";
@@ -65,6 +65,14 @@ export function AppSidebar() {
               >
                 <Building2 className="h-5 w-5 mr-2" />
                 {state !== "collapsed" && "Dashboard"}
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-sidebar-text hover:text-white hover:bg-sidebar-hover"
+                onClick={() => navigate('/ai-agents')}
+              >
+                <Bot className="h-5 w-5 mr-2" />
+                {state !== "collapsed" && "AI Agents"}
               </Button>
               <Button
                 variant="ghost"
