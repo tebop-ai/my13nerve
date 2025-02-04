@@ -25,6 +25,14 @@ interface TimelineViewProps {
   }>;
 }
 
+interface TimelineView {
+  id: string;
+  enterprise_id: string;
+  timeframe: TimeframeOption;
+  created_at: string;
+  updated_at: string;
+}
+
 export const TimelineView: React.FC<TimelineViewProps> = ({ enterpriseId, csvTasks }) => {
   const { toast } = useToast();
   const [timeframe, setTimeframe] = useState<TimeframeOption>('daily');
@@ -33,7 +41,6 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ enterpriseId, csvTas
   useEffect(() => {
     const setupTimelineView = async () => {
       try {
-        // Get or create timeline view preference
         const { data: existingView, error } = await supabase
           .from('timeline_views')
           .select('*')
@@ -43,14 +50,19 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ enterpriseId, csvTas
         if (error) {
           if (error.code === 'PGRST116') {
             // No record found, create one
-            await supabase
+            const { error: insertError } = await supabase
               .from('timeline_views')
               .insert([{ enterprise_id: enterpriseId, timeframe }]);
+            
+            if (insertError) throw insertError;
           } else {
             throw error;
           }
-        } else if (existingView?.timeframe) {
-          setTimeframe(existingView.timeframe as TimeframeOption);
+        } else {
+          const view = existingView as TimelineView;
+          if (view.timeframe) {
+            setTimeframe(view.timeframe);
+          }
         }
 
         // Subscribe to real-time updates
@@ -65,8 +77,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ enterpriseId, csvTas
               filter: `enterprise_id=eq.${enterpriseId}`,
             },
             (payload) => {
-              if (payload.new && payload.new.timeframe) {
-                setTimeframe(payload.new.timeframe as TimeframeOption);
+              const newData = payload.new as TimelineView;
+              if (newData?.timeframe) {
+                setTimeframe(newData.timeframe);
               }
             }
           )
@@ -86,7 +99,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ enterpriseId, csvTas
     };
 
     setupTimelineView();
-  }, [enterpriseId, toast]);
+  }, [enterpriseId, toast, timeframe]);
 
   useEffect(() => {
     // Process CSV tasks based on timeframe

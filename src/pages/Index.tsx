@@ -29,7 +29,9 @@ const Index = () => {
   }
 
   // Ensure csv_tasks is an array and has the correct shape
-  const csvTasks = (blueprint.csv_tasks || []) as CSVTask[];
+  const csvTasks = Array.isArray(blueprint.csv_tasks) 
+    ? (blueprint.csv_tasks as CSVTask[])
+    : [] as CSVTask[];
 
   return (
     <div className="container mx-auto p-6">
