@@ -50,25 +50,9 @@ export const AdminLoginForm = () => {
         throw new Error('Invalid credentials');
       }
 
-      // Sign in with Supabase Auth
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: adminEmail,
-        password: adminSuperCode // Using supercode as password
-      });
-
-      if (signInError) {
-        console.error("Sign in error:", signInError);
-        // If the user doesn't exist in auth, create them
-        if (signInError.message.includes("Invalid login credentials")) {
-          const { error: signUpError } = await supabase.auth.signUp({
-            email: adminEmail,
-            password: adminSuperCode,
-          });
-          if (signUpError) throw signUpError;
-        } else {
-          throw signInError;
-        }
-      }
+      // Store authentication state and profile
+      sessionStorage.setItem("isAdminAuthenticated", "true");
+      sessionStorage.setItem("adminProfile", JSON.stringify(adminProfile));
 
       // Update last login timestamp
       const { error: updateError } = await supabase
@@ -79,10 +63,6 @@ export const AdminLoginForm = () => {
       if (updateError) {
         console.error("Error updating last login:", updateError);
       }
-
-      // Store authentication state and profile
-      sessionStorage.setItem("isAdminAuthenticated", "true");
-      sessionStorage.setItem("adminProfile", JSON.stringify(adminProfile));
 
       toast({
         title: "Login successful",
