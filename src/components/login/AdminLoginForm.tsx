@@ -28,7 +28,7 @@ export const AdminLoginForm = () => {
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
         .eq('validation_status', 'validated')
-        .single();
+        .maybeSingle();
 
       console.log("Admin profile query result:", adminProfile);
 
@@ -38,7 +38,7 @@ export const AdminLoginForm = () => {
       }
 
       if (!adminProfile) {
-        console.log("No admin profile found");
+        console.log("No admin profile found or invalid credentials");
         throw new Error('Invalid credentials');
       }
 
