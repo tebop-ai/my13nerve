@@ -20,12 +20,15 @@ export const AdminLoginForm = () => {
     console.log("Starting login attempt with email:", adminEmail);
 
     try {
-      // First, check if the admin profile exists and is active
+      // Query admin profile directly with email and supercode
       const { data: adminProfile, error: profileError } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', adminEmail)
-        .maybeSingle();
+        .eq('supercode', adminSuperCode)
+        .eq('status', 'active')
+        .eq('validation_status', 'validated')
+        .single();
 
       console.log("Admin profile query result:", adminProfile);
 
@@ -36,17 +39,6 @@ export const AdminLoginForm = () => {
 
       if (!adminProfile) {
         console.log("No admin profile found");
-        throw new Error('Invalid credentials');
-      }
-
-      if (adminProfile.status !== 'active') {
-        console.log("Admin profile not active");
-        throw new Error('Admin account is not active');
-      }
-
-      // Compare supercodes exactly
-      if (adminProfile.supercode !== adminSuperCode) {
-        console.log("Supercode mismatch");
         throw new Error('Invalid credentials');
       }
 
