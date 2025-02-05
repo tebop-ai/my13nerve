@@ -45,15 +45,29 @@ export const AdminLoginForm = () => {
       }
 
       // Compare supercodes exactly
-      console.log("Comparing supercodes:", {
-        stored: adminProfile.supercode,
-        provided: adminSuperCode,
-        match: adminProfile.supercode === adminSuperCode
-      });
-
       if (adminProfile.supercode !== adminSuperCode) {
         console.log("Supercode mismatch");
         throw new Error('Invalid credentials');
+      }
+
+      // Sign in with Supabase Auth
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: adminEmail,
+        password: adminSuperCode // Using supercode as password
+      });
+
+      if (signInError) {
+        console.error("Sign in error:", signInError);
+        // If the user doesn't exist in auth, create them
+        if (signInError.message.includes("Invalid login credentials")) {
+          const { error: signUpError } = await supabase.auth.signUp({
+            email: adminEmail,
+            password: adminSuperCode,
+          });
+          if (signUpError) throw signUpError;
+        } else {
+          throw signInError;
+        }
       }
 
       // Update last login timestamp
