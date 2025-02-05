@@ -20,25 +20,30 @@ export const AdminLoginForm = () => {
     console.log("Starting login attempt with email:", adminEmail);
 
     try {
-      // Query admin profile directly with email and supercode
-      const { data: adminProfile, error: profileError } = await supabase
+      // Query admin profile with detailed logging
+      const { data: profiles, error: queryError } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('email', adminEmail)
-        .eq('supercode', adminSuperCode)
-        .eq('status', 'active')
-        .eq('validation_status', 'validated')
-        .maybeSingle();
+        .eq('email', adminEmail.trim().toLowerCase());
 
-      console.log("Admin profile query result:", adminProfile);
+      console.log("Initial query results:", profiles);
 
-      if (profileError) {
-        console.error("Profile query error:", profileError);
+      if (queryError) {
+        console.error("Database query error:", queryError);
         throw new Error('Error checking admin profile');
       }
 
+      // Find the matching profile
+      const adminProfile = profiles?.find(profile => 
+        profile.supercode === adminSuperCode &&
+        profile.status === 'active' &&
+        profile.validation_status === 'validated'
+      );
+
+      console.log("Matched profile:", adminProfile);
+
       if (!adminProfile) {
-        console.log("No admin profile found or invalid credentials");
+        console.log("No matching admin profile found with provided credentials");
         throw new Error('Invalid credentials');
       }
 
