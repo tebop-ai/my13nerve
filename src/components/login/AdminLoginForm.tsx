@@ -20,11 +20,11 @@ export const AdminLoginForm = () => {
     console.log("Starting login attempt with email:", adminEmail);
 
     try {
-      // Query admin profile with detailed logging
+      // Query admin profile with exact email match
       const { data: profiles, error: queryError } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('email', adminEmail.trim().toLowerCase());
+        .eq('email', adminEmail); // Remove trim and toLowerCase to match exact email
 
       console.log("Initial query results:", profiles);
 
@@ -33,7 +33,7 @@ export const AdminLoginForm = () => {
         throw new Error('Error checking admin profile');
       }
 
-      // Find the matching profile
+      // Find the matching profile with exact supercode match
       const adminProfile = profiles?.find(profile => 
         profile.supercode === adminSuperCode &&
         profile.status === 'active' &&
@@ -50,16 +50,6 @@ export const AdminLoginForm = () => {
       // Store authentication state and profile
       sessionStorage.setItem("isAdminAuthenticated", "true");
       sessionStorage.setItem("adminProfile", JSON.stringify(adminProfile));
-
-      // Update last login timestamp
-      const { error: updateError } = await supabase
-        .from('admin_profiles')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', adminProfile.id);
-
-      if (updateError) {
-        console.error("Error updating last login:", updateError);
-      }
 
       toast({
         title: "Login successful",
