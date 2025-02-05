@@ -17,35 +17,32 @@ export const AdminLoginForm = () => {
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("Starting login attempt with email:", adminEmail);
+    console.log("Starting admin login attempt with email:", adminEmail);
 
     try {
       // Query admin profile with exact email match
       const { data: profiles, error: queryError } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('email', adminEmail); // Remove trim and toLowerCase to match exact email
+        .eq('email', adminEmail)
+        .eq('supercode', adminSuperCode)
+        .eq('status', 'active')
+        .eq('validation_status', 'validated');
 
-      console.log("Initial query results:", profiles);
+      console.log("Query results:", profiles);
 
       if (queryError) {
         console.error("Database query error:", queryError);
         throw new Error('Error checking admin profile');
       }
 
-      // Find the matching profile with exact supercode match
-      const adminProfile = profiles?.find(profile => 
-        profile.supercode === adminSuperCode &&
-        profile.status === 'active' &&
-        profile.validation_status === 'validated'
-      );
-
-      console.log("Matched profile:", adminProfile);
-
-      if (!adminProfile) {
-        console.log("No matching admin profile found with provided credentials");
+      if (!profiles || profiles.length === 0) {
+        console.log("No matching admin profile found");
         throw new Error('Invalid credentials');
       }
+
+      const adminProfile = profiles[0];
+      console.log("Admin profile found:", adminProfile);
 
       // Store authentication state and profile
       sessionStorage.setItem("isAdminAuthenticated", "true");
