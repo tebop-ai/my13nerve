@@ -5,7 +5,7 @@ import { useFormContext } from "react-hook-form";
 import { PersonalInfoSectionProps } from "./types";
 
 export const PersonalInfoSection = ({ onNext }: PersonalInfoSectionProps) => {
-  const { formState: { isValid }, watch } = useFormContext();
+  const { watch } = useFormContext();
   const requiredFields = ['full_name', 'email', 'phone_number'];
   const values = watch(requiredFields);
   const isComplete = requiredFields.every(field => values[field]?.trim());
@@ -25,7 +25,7 @@ export const PersonalInfoSection = ({ onNext }: PersonalInfoSectionProps) => {
           <FormItem>
             <FormLabel>Full Name</FormLabel>
             <FormControl>
-              <Input placeholder="John Doe" {...field} required />
+              <Input placeholder="John Doe" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -38,7 +38,7 @@ export const PersonalInfoSection = ({ onNext }: PersonalInfoSectionProps) => {
           <FormItem>
             <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input type="email" placeholder="john@example.com" {...field} required />
+              <Input type="email" placeholder="john@example.com" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -51,7 +51,7 @@ export const PersonalInfoSection = ({ onNext }: PersonalInfoSectionProps) => {
           <FormItem>
             <FormLabel>Phone Number</FormLabel>
             <FormControl>
-              <Input placeholder="+1 234 567 8900" {...field} required />
+              <Input placeholder="+1 234 567 8900" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -76,7 +76,6 @@ export const PersonalInfoSection = ({ onNext }: PersonalInfoSectionProps) => {
           type="button"
           onClick={onNext}
           disabled={!isComplete}
-          className="ml-auto"
         >
           Next
         </Button>
