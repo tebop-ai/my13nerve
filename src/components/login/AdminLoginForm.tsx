@@ -8,8 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export const AdminLoginForm = () => {
-  const [adminEmail, setAdminEmail] = useState("");
-  const [adminSuperCode, setAdminSuperCode] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -17,44 +17,57 @@ export const AdminLoginForm = () => {
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    console.log("Starting admin login attempt with email:", adminEmail);
+    console.log("Starting admin login attempt with email:", email);
 
     try {
-      // Query admin profile with exact email and supercode match
-      const { data: profile, error: queryError } = await supabase
+      // First, authenticate with Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (authError) {
+        console.error("Auth error:", authError);
+        throw new Error("Invalid credentials");
+      }
+
+      if (!authData.user) {
+        throw new Error("No user data returned");
+      }
+
+      console.log("Auth successful, checking admin profile");
+
+      // Then verify admin profile
+      const { data: adminProfile, error: profileError } = await supabase
         .from('admin_profiles')
         .select('*')
-        .eq('email', adminEmail)
-        .eq('supercode', adminSuperCode)
+        .eq('email', email)
         .eq('status', 'active')
         .eq('validation_status', 'validated')
         .maybeSingle();
 
-      console.log("Query results:", profile);
-
-      if (queryError) {
-        console.error("Database query error:", queryError);
-        throw new Error('Error checking admin profile');
+      if (profileError) {
+        console.error("Profile error:", profileError);
+        throw new Error("Error fetching admin profile");
       }
 
-      if (!profile) {
-        console.log("No matching admin profile found");
-        throw new Error('Invalid credentials');
+      if (!adminProfile) {
+        console.error("No admin profile found");
+        throw new Error("No admin access found. Please contact the super admin.");
       }
 
-      console.log("Admin profile found:", profile);
+      console.log("Admin profile found:", adminProfile);
 
-      // Store authentication state and profile
       sessionStorage.setItem("isAdminAuthenticated", "true");
-      sessionStorage.setItem("adminProfile", JSON.stringify(profile));
+      sessionStorage.setItem("adminProfile", JSON.stringify(adminProfile));
 
       toast({
         title: "Login successful",
-        description: `Welcome back, ${profile.full_name}!`,
+        description: `Welcome back, ${adminProfile.full_name}!`,
       });
 
       // Redirect based on admin type
-      if (profile.is_super_admin) {
+      if (adminProfile.is_super_admin) {
         navigate("/dashboard");
       } else {
         navigate("/admin-dashboard");
@@ -63,7 +76,7 @@ export const AdminLoginForm = () => {
       console.error("Login error:", error);
       toast({
         title: "Login failed",
-        description: "Invalid email or supercode. Please try again.",
+        description: error instanceof Error ? error.message : "Please check your credentials and try again",
         variant: "destructive",
       });
       sessionStorage.removeItem("isAdminAuthenticated");
@@ -89,8 +102,8 @@ export const AdminLoginForm = () => {
                 type="email"
                 placeholder="Enter your email"
                 className="pl-10"
-                value={adminEmail}
-                onChange={(e) => setAdminEmail(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
                 required
               />
@@ -99,14 +112,14 @@ export const AdminLoginForm = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">SuperCode</label>
+            <label className="text-sm font-medium">Password</label>
             <div className="relative">
               <Input
                 type="password"
-                placeholder="Enter your SuperCode"
+                placeholder="Enter your password"
                 className="pl-10"
-                value={adminSuperCode}
-                onChange={(e) => setAdminSuperCode(e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
                 required
               />
