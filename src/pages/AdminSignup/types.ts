@@ -34,4 +34,5 @@ export interface ProfessionalInfoSectionProps {
 export interface AgreementsSectionProps {
   form: UseFormReturn<AdminSignupFormData>;
   onBack: () => void;
+  isSubmitting: boolean;
 }

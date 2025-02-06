@@ -1,9 +1,10 @@
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { AgreementsSectionProps } from "./types";
 
-export const AgreementsSection = ({ form, onBack }: AgreementsSectionProps) => {
+export const AgreementsSection = ({ form, onBack, isSubmitting }: AgreementsSectionProps) => {
   return (
     <div className="space-y-4">
       <FormField
@@ -71,11 +72,22 @@ export const AgreementsSection = ({ form, onBack }: AgreementsSectionProps) => {
           type="button"
           variant="outline"
           onClick={onBack}
+          disabled={isSubmitting}
         >
           Back
         </Button>
-        <Button type="submit">
-          Submit Application
+        <Button 
+          type="submit"
+          disabled={isSubmitting || !form.getValues('terms_accepted') || !form.getValues('code_of_conduct_accepted')}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Submitting...
+            </>
+          ) : (
+            'Submit Application'
+          )}
         </Button>
       </div>
     </div>

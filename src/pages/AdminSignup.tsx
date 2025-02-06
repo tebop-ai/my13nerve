@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 const AdminSignup = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -39,6 +40,7 @@ const AdminSignup = () => {
 
   const handleSubmit = async (data: AdminSignupFormData) => {
     try {
+      setIsSubmitting(true);
       console.log("Submitting admin application:", data);
       
       const { data: response, error } = await supabase
@@ -63,8 +65,7 @@ const AdminSignup = () => {
             personal_statement: data.personal_statement,
             languages_spoken: data.languages_spoken,
             preferred_timezone: data.preferred_timezone,
-            status: 'pending',
-            role: 'admin'
+            status: 'pending'
           }
         ])
         .select();
@@ -77,18 +78,26 @@ const AdminSignup = () => {
       console.log("Admin application submitted successfully:", response);
       
       toast({
-        title: "Application Submitted",
-        description: "Your admin application has been submitted for review by the Super Admin. You'll receive further instructions via email.",
+        title: "Application Submitted Successfully",
+        description: "Your application has been received. You will receive further instructions via email.",
+        duration: 5000,
       });
       
-      navigate("/");
-    } catch (error) {
+      // Short delay before redirecting to allow user to see the success message
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+
+    } catch (error: any) {
       console.error("Error submitting admin application:", error);
       toast({
         title: "Submission Error",
-        description: "There was an error submitting your application. Please try again.",
+        description: error.message || "There was an error submitting your application. Please try again.",
         variant: "destructive",
+        duration: 5000,
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -134,6 +143,7 @@ const AdminSignup = () => {
                 <AgreementsSection
                   form={methods}
                   onBack={handleBack}
+                  isSubmitting={isSubmitting}
                 />
               )}
             </form>
