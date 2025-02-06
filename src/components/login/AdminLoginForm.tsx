@@ -20,14 +20,15 @@ export const AdminLoginForm = () => {
     console.log("Starting admin login attempt with email:", adminEmail);
 
     try {
-      // Query admin profile with exact email match
+      // Query admin profile with exact email and supercode match
       const { data: profiles, error: queryError } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', adminEmail)
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
-        .eq('validation_status', 'validated');
+        .eq('validation_status', 'validated')
+        .single();
 
       console.log("Query results:", profiles);
 
@@ -36,25 +37,24 @@ export const AdminLoginForm = () => {
         throw new Error('Error checking admin profile');
       }
 
-      if (!profiles || profiles.length === 0) {
+      if (!profiles) {
         console.log("No matching admin profile found");
         throw new Error('Invalid credentials');
       }
 
-      const adminProfile = profiles[0];
-      console.log("Admin profile found:", adminProfile);
+      console.log("Admin profile found:", profiles);
 
       // Store authentication state and profile
       sessionStorage.setItem("isAdminAuthenticated", "true");
-      sessionStorage.setItem("adminProfile", JSON.stringify(adminProfile));
+      sessionStorage.setItem("adminProfile", JSON.stringify(profiles));
 
       toast({
         title: "Login successful",
-        description: `Welcome back, ${adminProfile.full_name}!`,
+        description: `Welcome back, ${profiles.full_name}!`,
       });
 
       // Redirect based on admin type
-      if (adminProfile.is_super_admin) {
+      if (profiles.is_super_admin) {
         navigate("/dashboard");
       } else {
         navigate("/admin-dashboard");
@@ -63,9 +63,11 @@ export const AdminLoginForm = () => {
       console.error("Login error:", error);
       toast({
         title: "Login failed",
-        description: error instanceof Error ? error.message : "Please check your credentials and try again",
+        description: "Invalid email or supercode. Please try again.",
         variant: "destructive",
       });
+      sessionStorage.removeItem("isAdminAuthenticated");
+      sessionStorage.removeItem("adminProfile");
     } finally {
       setIsLoading(false);
     }
