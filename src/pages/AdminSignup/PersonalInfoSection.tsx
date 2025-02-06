@@ -5,10 +5,22 @@ import { useFormContext } from "react-hook-form";
 import { PersonalInfoSectionProps } from "./types";
 
 export const PersonalInfoSection = ({ onNext }: PersonalInfoSectionProps) => {
-  const { watch } = useFormContext();
-  const requiredFields = ['full_name', 'email', 'phone_number'];
-  const values = watch(requiredFields);
-  const isComplete = requiredFields.every(field => values[field]?.trim());
+  const form = useFormContext();
+  const { watch } = form;
+  
+  // Watch the required fields
+  const fullName = watch('full_name');
+  const email = watch('email');
+  const phoneNumber = watch('phone_number');
+  
+  // Check if required fields are filled
+  const isComplete = Boolean(
+    fullName?.trim() && 
+    email?.trim() && 
+    phoneNumber?.trim()
+  );
+
+  console.log("Form values:", { fullName, email, phoneNumber, isComplete });
 
   return (
     <div className="space-y-4">
@@ -23,9 +35,17 @@ export const PersonalInfoSection = ({ onNext }: PersonalInfoSectionProps) => {
         name="full_name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Full Name</FormLabel>
+            <FormLabel>Full Name *</FormLabel>
             <FormControl>
-              <Input placeholder="John Doe" {...field} />
+              <Input 
+                placeholder="John Doe" 
+                {...field} 
+                required
+                onChange={(e) => {
+                  field.onChange(e);
+                  console.log("Full name changed:", e.target.value);
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -36,9 +56,18 @@ export const PersonalInfoSection = ({ onNext }: PersonalInfoSectionProps) => {
         name="email"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Email</FormLabel>
+            <FormLabel>Email *</FormLabel>
             <FormControl>
-              <Input type="email" placeholder="john@example.com" {...field} />
+              <Input 
+                type="email" 
+                placeholder="john@example.com" 
+                {...field} 
+                required
+                onChange={(e) => {
+                  field.onChange(e);
+                  console.log("Email changed:", e.target.value);
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -49,9 +78,17 @@ export const PersonalInfoSection = ({ onNext }: PersonalInfoSectionProps) => {
         name="phone_number"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Phone Number</FormLabel>
+            <FormLabel>Phone Number *</FormLabel>
             <FormControl>
-              <Input placeholder="+1 234 567 8900" {...field} />
+              <Input 
+                placeholder="+1 234 567 8900" 
+                {...field} 
+                required
+                onChange={(e) => {
+                  field.onChange(e);
+                  console.log("Phone changed:", e.target.value);
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -74,7 +111,10 @@ export const PersonalInfoSection = ({ onNext }: PersonalInfoSectionProps) => {
       <div className="flex justify-end pt-6">
         <Button
           type="button"
-          onClick={onNext}
+          onClick={() => {
+            console.log("Next button clicked, form state:", { isComplete });
+            onNext();
+          }}
           disabled={!isComplete}
         >
           Next
