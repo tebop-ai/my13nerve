@@ -21,40 +21,40 @@ export const AdminLoginForm = () => {
 
     try {
       // Query admin profile with exact email and supercode match
-      const { data: profiles, error: queryError } = await supabase
+      const { data: profile, error: queryError } = await supabase
         .from('admin_profiles')
         .select('*')
         .eq('email', adminEmail)
         .eq('supercode', adminSuperCode)
         .eq('status', 'active')
         .eq('validation_status', 'validated')
-        .single();
+        .maybeSingle();
 
-      console.log("Query results:", profiles);
+      console.log("Query results:", profile);
 
       if (queryError) {
         console.error("Database query error:", queryError);
         throw new Error('Error checking admin profile');
       }
 
-      if (!profiles) {
+      if (!profile) {
         console.log("No matching admin profile found");
         throw new Error('Invalid credentials');
       }
 
-      console.log("Admin profile found:", profiles);
+      console.log("Admin profile found:", profile);
 
       // Store authentication state and profile
       sessionStorage.setItem("isAdminAuthenticated", "true");
-      sessionStorage.setItem("adminProfile", JSON.stringify(profiles));
+      sessionStorage.setItem("adminProfile", JSON.stringify(profile));
 
       toast({
         title: "Login successful",
-        description: `Welcome back, ${profiles.full_name}!`,
+        description: `Welcome back, ${profile.full_name}!`,
       });
 
       // Redirect based on admin type
-      if (profiles.is_super_admin) {
+      if (profile.is_super_admin) {
         navigate("/dashboard");
       } else {
         navigate("/admin-dashboard");
